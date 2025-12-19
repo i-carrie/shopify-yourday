@@ -1,0 +1,180 @@
+<header
+  x-data="{ mobileMenuOpen: false }"
+  class="sticky top-0 z-50 w-full bg-[#FDFBF7]/90 backdrop-blur-md border-b border-[#C2A992]/20 font-serif"
+>
+  <div class="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
+    {%- comment -%}
+      モバイルは flex、PC(lg) だけ grid 3カラムにして左右余白を「構造で」揃える
+    {%- endcomment -%}
+    <div class="flex items-center justify-between h-20 lg:grid lg:grid-cols-3 lg:items-center">
+      <!-- LEFT: LOGO -->
+      <div class="flex items-center lg:justify-start" style="height: 80px;">
+        <a href="/" class="flex items-center">
+          {% if section.settings.logo != blank %}
+            {% assign logo_alt = section.settings.logo.alt | default: shop.name %}
+            <img
+              src="{{ section.settings.logo | image_url: width: 500 }}"
+              alt="{{ logo_alt }}"
+              class="block"
+              style="width: {{ section.settings.logo_width }}px; height: auto; padding-top: 22px;"
+            >
+          {% else %}
+            <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider ml-1">
+              {{ section.settings.logo_text }}
+            </span>
+          {% endif %}
+        </a>
+      </div>
+
+      <!-- CENTER: NAV (PC only) -->
+      <nav class="hidden lg:flex lg:justify-center space-x-8">
+        {% for link in linklists['main-menu'].links %}
+          {% if link.links != blank %}
+            <div class="relative group" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+              <button class="flex items-center text-sm font-medium text-gray-600 group-hover:text-[#C2A992] transition-colors duration-300">
+                {{ link.title }}
+                <svg
+                  class="ml-1 w-4 h-4 transition-transform duration-300"
+                  :class="{ 'rotate-180': open }"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+              <div
+                x-show="open"
+                x-cloak
+                class="absolute left-0 mt-0 w-48 bg-[#FDFBF7] border border-[#C2A992]/10 shadow-xl py-2 z-50"
+              >
+                {% for childlink in link.links %}
+                  <a
+                    href="{{ childlink.url }}"
+                    class="block px-4 py-2 text-sm text-gray-600 hover:bg-[#C2A992]/5 hover:text-[#C2A992]"
+                  >
+                    {{ childlink.title }}
+                  </a>
+                {% endfor %}
+              </div>
+            </div>
+          {% else %}
+            <a
+              href="{{ link.url }}"
+              class="text-sm font-medium text-gray-600 hover:text-[#C2A992] transition-colors duration-300"
+            >
+              {{ link.title }}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </nav>
+
+      <!-- RIGHT: ICONS + ACCOUNT (PC), HAMBURGER (mobile) -->
+      <div class="flex items-center space-x-3 md:space-x-6 lg:justify-end">
+        <div class="hidden md:flex items-center space-x-5 text-sm font-medium text-gray-600">
+          <a href="{{ routes.search_url }}" class="hover:text-[#C2A992]">{% render 'icon-search' %}</a>
+          <a href="{{ routes.cart_url }}" class="hover:text-[#C2A992]">{% render 'icon-cart' %}</a>
+          {% if shop.customer_accounts_enabled %}
+            <a href="{{ routes.account_login_url }}" class="hover:text-[#C2A992]">Login</a>
+            <a href="{{ routes.account_register_url }}" class="hover:text-[#C2A992]">Register</a>
+          {% endif %}
+        </div>
+
+        <button
+          @click="mobileMenuOpen = !mobileMenuOpen"
+          type="button"
+          class="md:hidden text-gray-600 hover:text-[#C2A992] p-2"
+        >
+          {% render 'icon-hambarger' %}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE MENU -->
+  <div x-show="mobileMenuOpen" x-cloak class="md:hidden bg-[#FDFBF7] border-t border-[#C2A992]/10">
+    <nav class="px-4 py-6 space-y-1">
+      {% for link in linklists['main-menu'].links %}
+        {% if link.links != blank %}
+          <div x-data="{ expanded: false }">
+            <button
+              @click="expanded = !expanded"
+              class="flex items-center justify-between w-full py-3 text-lg text-gray-700"
+            >
+              {{ link.title }}
+              <svg
+                class="w-5 h-5 transition-transform"
+                :class="{ 'rotate-180': expanded }"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div x-show="expanded" class="pl-4 space-y-1 bg-gray-50/50 rounded-lg">
+              {% for childlink in link.links %}
+                <a
+                  href="{{ childlink.url }}"
+                  class="block py-3 text-base text-gray-600 border-b border-gray-100 last:border-0"
+                >
+                  {{ childlink.title }}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          <a href="{{ link.url }}" class="block py-3 text-lg text-gray-700 border-b border-[#C2A992]/5 last:border-0">
+            {{ link.title }}
+          </a>
+        {% endif %}
+      {% endfor %}
+
+      <div class="pt-6 mt-4 border-t border-[#C2A992]/20 flex flex-col space-y-4">
+        <a href="{{ routes.cart_url }}" class="flex items-center text-gray-600">
+          {%- render 'icon-cart' -%}
+          <span class="ml-3">Cart</span>
+        </a>
+        <a href="{{ routes.search_url }}" class="flex items-center text-gray-600">
+          {%- render 'icon-search' -%}
+          <span class="ml-3">Search</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style>
+  [x-cloak] {
+    display: none !important;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "ロゴ画像"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 50,
+      "max": 300,
+      "step": 5,
+      "unit": "px",
+      "label": "ロゴの横幅",
+      "default": 100
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "ロゴテキスト（画像がない時）",
+      "default": "Your day"
+    }
+  ]
+}
+{% endschema %}

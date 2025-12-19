@@ -7,14 +7,46 @@
     <meta name="description" content="{{ page_description | escape }}">
     <link rel="canonical" href="{{ canonical_url }}">
     <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+
     {{ content_for_header }}
-    <!-- Header hook for plugins -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+      rel="stylesheet"
+    >
+
     {{ 'application.css' | asset_url | stylesheet_tag }}
+
+    <style>
+      :root {
+        --color-bg-primary: #fdfbf7; /* 生成り色のベースカラー */
+        --color-accent: #c2a992; /* 大人っぽいベージュ */
+      }
+
+      body {
+        font-family: 'Noto Serif JP', serif;
+        background-color: var(--color-bg-primary);
+        color: #333;
+        margin: 0;
+      }
+
+      /* セリフ体（大人っぽさ）を適用したい場所 */
+      h1,
+      h2,
+      h3,
+      .font-serif {
+        font-family: 'Playfair Display', 'Noto Serif JP', serif;
+      }
+    </style>
+
     {{ 'application.js' | asset_url | script_tag }}
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   </head>
   <body>
-    {% comment %} {% section 'header' %} {% endcomment %}
+    {% section 'header' %}
+
     <main role="main">
       {{ content_for_layout }}
     </main>
