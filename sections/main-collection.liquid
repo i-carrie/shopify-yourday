@@ -1,0 +1,90 @@
+<div class="px-4 py-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- パンくずナビ -->
+    <nav class="mb-8 text-center">
+      <a
+        href="{{ routes.collections_url }}"
+        class="text-sm text-gray-600 hover:text-[#C2A992] transition-colors inline-flex items-center gap-2"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        コレクション一覧に戻る
+      </a>
+    </nav>
+
+    {% paginate collection.products by section.settings.number_of_products_per_page %}
+      <!-- コレクションタイトル -->
+      <h1 class="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">
+        {% if section.settings.custom_title != blank %}
+          {{ section.settings.custom_title }}
+        {% else %}
+          {{ collection.title }}
+        {% endif %}
+      </h1>
+
+      <!-- コレクション説明 -->
+      {% if collection.description != blank %}
+        <div class="max-w-3xl mx-auto mb-12 text-center text-gray-600">
+          {{ collection.description }}
+        </div>
+      {% endif %}
+
+      <!-- 商品グリッド -->
+      {% if collection.products.size > 0 %}
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-{{ section.settings.products_per_row }} gap-4 md:gap-8">
+          {% for product in collection.products %}
+            {% render 'product-card', product: product %}
+          {% endfor %}
+        </div>
+
+        <!-- ページネーション -->
+        {% if paginate.pages > 1 %}
+          {% render 'pagination', paginate: paginate %}
+        {% endif %}
+      {% else %}
+        <div class="text-center py-16">
+          <p class="text-xl text-gray-500">このコレクションには商品がまだ登録されていません</p>
+          <a
+            href="{{ routes.collections_url }}"
+            class="mt-6 inline-block px-6 py-3 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
+          >
+            他のコレクションを見る
+          </a>
+        </div>
+      {% endif %}
+    {% endpaginate %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Main Collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "custom_title",
+      "label": "タイトル",
+      "info": "例: 商品、おすすめ商品など"
+    },
+    {
+      "type": "range",
+      "id": "products_per_row",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "1行あたりの商品数（デスクトップ）",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "number_of_products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "label": "1ページあたりの商品数",
+      "default": 8
+    }
+  ]
+}
+{% endschema %}
