@@ -225,6 +225,9 @@
   .mx-auto {
     margin-inline: auto;
   }
+  .my-12 {
+    margin-block: calc(var(--spacing) * 12);
+  }
   .mt-0 {
     margin-top: calc(var(--spacing) * 0);
   }
@@ -316,11 +319,17 @@
   .rotate-180 {
     rotate: 180deg;
   }
+  .cursor-not-allowed {
+    cursor: not-allowed;
+  }
   .grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .flex-col {
     flex-direction: column;
+  }
+  .flex-wrap {
+    flex-wrap: wrap;
   }
   .items-center {
     align-items: center;
@@ -544,6 +553,9 @@
   }
   .text-\[\#C2A992\] {
     color: #C2A992;
+  }
+  .text-gray-300 {
+    color: var(--color-gray-300);
   }
   .text-gray-400 {
     color: var(--color-gray-400);

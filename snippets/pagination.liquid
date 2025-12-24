@@ -1,0 +1,48 @@
+{% comment %}
+  Parameters:
+  - paginate: Paginate object
+{% endcomment %}
+
+{% if paginate.pages > 1 %}
+  <nav
+    role="navigation"
+    aria-label="ページネーション"
+    class="flex justify-center items-center gap-2 my-12 flex-wrap"
+  >
+    <!-- 前へボタン -->
+    {% if paginate.previous %}
+      href="{{ paginate.previous.url }}" class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded
+      transition-colors font-medium" aria-label="前のページ" > 前へ
+      </a>
+    {% else %}
+      <span class="px-4 py-2 border border-gray-200 text-gray-300 rounded font-medium cursor-not-allowed"> 前へ </span>
+    {% endif %}
+
+    <!-- ページ番号 -->
+    {% for part in paginate.parts %}
+      {% if part.is_link %}
+        href="{{ part.url }}" class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded
+        transition-colors font-medium" aria-label="ページ {{ part.title }}" >
+        {{ part.title }}
+        </a>
+      {% else %}
+        <span
+          class="px-4 py-2 bg-gray-800 text-white rounded font-medium"
+          aria-current="page"
+          aria-label="現在のページ {{ part.title }}"
+        >
+          {{ part.title }}
+        </span>
+      {% endif %}
+    {% endfor %}
+
+    <!-- 次へボタン -->
+    {% if paginate.next %}
+      href="{{ paginate.next.url }}" class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded
+      transition-colors font-medium" aria-label="次のページ" > 次へ
+      </a>
+    {% else %}
+      <span class="px-4 py-2 border border-gray-200 text-gray-300 rounded font-medium cursor-not-allowed"> 次へ </span>
+    {% endif %}
+  </nav>
+{% endif %}
