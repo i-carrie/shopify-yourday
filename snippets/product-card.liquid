@@ -1,0 +1,61 @@
+{% comment %}
+  Parameters:
+  - product: Product object
+{% endcomment %}
+
+<div class="w-full py-6 px-3">
+  <div class="border border-gray-200 bg-white shadow-lg rounded-lg overflow-hidden group hover:shadow-xl transition-shadow duration-300">
+    <a href="{{ product.url }}" class="block">
+      <!-- 商品画像 -->
+      <div class="h-80 overflow-hidden relative">
+        {% if product.featured_image %}
+          <img
+            class="w-full h-full object-cover transition duration-1000 ease-in-out group-hover:scale-105 transform"
+            src="{{ product.featured_image | img_url: 'medium' }}"
+            alt="{{ product.featured_image.alt | escape }}"
+            loading="lazy"
+          >
+        {% else %}
+          {{ 'product-1' | placeholder_svg_tag: 'w-full h-full object-cover bg-gray-100' }}
+        {% endif %}
+
+        <!-- バッジ表示 -->
+        {% if product.compare_at_price > product.price %}
+          <span class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+            SALE
+          </span>
+        {% endif %}
+
+        {% unless product.available %}
+          <span class="absolute top-3 right-3 bg-gray-800 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+            SOLD OUT
+          </span>
+        {% endunless %}
+      </div>
+    </a>
+
+    <!-- 商品情報 -->
+    <div class="flex flex-col p-4">
+      {% if product.vendor != blank %}
+        <span class="text-sm text-gray-400 mb-1">{{ product.vendor }}</span>
+      {% endif %}
+
+      <a
+        href="{{ product.url }}"
+        class="text-gray-700 uppercase font-medium hover:text-[#C2A992] transition-colors mb-2"
+      >
+        {{ product.title }}
+      </a>
+
+      <!-- 価格表示 -->
+      <div class="flex items-center gap-2">
+        {% if product.compare_at_price > product.price %}
+          <span class="text-sm text-gray-400 line-through">
+            {{ product.compare_at_price | money }}
+          </span>
+        {% endif %}
+        <p class="text-gray-900 font-bold">{{ product.price | money }}</p>
+      </div>
+    </div>
+  </div>
+</div>
