@@ -46,7 +46,7 @@
           {% for part in paginate.parts %}
             {% if part.is_link %}
               <a href="{{ part.url }}" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">
-                {{- part.title -}}
+                {{ part.title }}
               </a>
             {% else %}
               <span class="px-4 py-2 bg-gray-800 text-white rounded">{{ part.title }}</span>
