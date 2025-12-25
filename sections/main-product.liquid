@@ -1,11 +1,20 @@
 <section class="max-w-screen-xl mx-auto px-4 py-8 md:px-8 lg:py-12">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
     <div class="flex flex-col gap-6">
-      <div class="aspect-[4/5] w-full bg-gray-100 flex items-center justify-center text-gray-400">
-        Main Image (Vertical Stack)
-      </div>
-      <div class="aspect-[4/5] w-full bg-gray-100 flex items-center justify-center text-gray-400">Scene Image 1</div>
-      <div class="aspect-[4/5] w-full bg-gray-100 flex items-center justify-center text-gray-400">Scene Image 2</div>
+      {% for image in product.images %}
+        <div class="aspect-[4/5] w-full bg-gray-100 overflow-hidden">
+          <img
+            src="{{ image.src | image_url: width: 1200 }}"
+            alt="{{ image.alt | escape }}"
+            loading="lazy"
+            class="w-full h-full object-cover"
+          >
+        </div>
+      {% else %}
+        <div class="aspect-[4/5] w-full bg-gray-100 flex items-center justify-center text-gray-400">
+          No image available
+        </div>
+      {% endfor %}
     </div>
 
     <div class="lg:sticky lg:top-8 flex flex-col gap-6 py-4">
