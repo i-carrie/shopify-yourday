@@ -11,10 +11,11 @@
   "sections": {
     "main": {
       "type": "main-collection",
-      "settings": {}
+      "settings": {
+        "products_per_row": 4,
+        "number_of_products_per_page": 8
+      }
     }
   },
-  "order": [
-    "main"
-  ]
+  "order": ["main"]
 }
