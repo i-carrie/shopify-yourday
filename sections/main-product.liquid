@@ -1,0 +1,48 @@
+<section class="max-w-screen-xl mx-auto px-4 py-8 md:px-8 lg:py-12">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+    <div class="flex flex-col gap-6">
+      <div class="aspect-[4/5] w-full bg-gray-100 flex items-center justify-center text-gray-400">
+        Main Image (Vertical Stack)
+      </div>
+      <div class="aspect-[4/5] w-full bg-gray-100 flex items-center justify-center text-gray-400">Scene Image 1</div>
+      <div class="aspect-[4/5] w-full bg-gray-100 flex items-center justify-center text-gray-400">Scene Image 2</div>
+    </div>
+
+    <div class="lg:sticky lg:top-8 flex flex-col gap-6 py-4">
+      <div class="space-y-4">
+        <p class="text-sm uppercase tracking-widest text-gray-500">Your day / Collection</p>
+        <h1 class="text-3xl md:text-4xl font-serif text-gray-900">Fabric Spray</h1>
+        <p class="text-xl text-gray-700">$15.00</p>
+      </div>
+
+      <div class="h-px bg-gray-200 w-full"></div>
+      <div class="space-y-4">
+        <div class="w-full h-12 bg-gray-100 flex items-center justify-center text-sm text-gray-500 border border-gray-200">
+          Variant Picker Placeholder
+        </div>
+        <button class="w-full bg-black text-white py-4 font-medium hover:bg-gray-800 transition">ADD TO CART</button>
+      </div>
+
+      <div class="mt-4 border-t border-gray-200 pt-4">
+        <details class="group cursor-pointer">
+          <summary class="flex justify-between items-center font-medium list-none">
+            <span>Product Description</span>
+            <span class="transition group-open:rotate-180">↓</span>
+          </summary>
+          <p class="mt-4 text-gray-600 leading-relaxed text-sm">
+            {{ product.description }}
+          </p>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "メイン商品",
+  "tag": "section",
+  "class": "section",
+  "settings": []
+}
+{% endschema %}
