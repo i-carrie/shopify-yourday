@@ -32,7 +32,7 @@
 
       <!-- 商品グリッド -->
       {% if collection.products.size > 0 %}
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-[repeat({{ section.settings.products_per_row | default: 4 }},minmax(0,1fr))] gap-4 md:gap-8">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-{{ section.settings.products_per_row }} gap-4 md:gap-8">
           {% for product in collection.products %}
             {% render 'product-card', product: product %}
           {% endfor %}
