@@ -1,18 +1,38 @@
 <section class="max-w-screen-xl mx-auto px-4 py-8 md:px-8 lg:py-12">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
     <div class="flex flex-col gap-6">
-      {% for image in product.images %}
-        <div class="aspect-[4/5] w-full bg-gray-100 overflow-hidden">
-          <img
-            src="{{ image.src | image_url: width: 1200 }}"
-            alt="{{ image.alt | escape }}"
-            loading="lazy"
-            class="w-full h-full object-cover"
-          >
+      {% for media in product.media %}
+        <div class="aspect-[4/5] w-full bg-gray-100 overflow-hidden relative">
+          {% case media.media_type %}
+            {% when 'image' %}
+              {{
+                media
+                | image_url: width: 1200
+                | image_tag: loading: 'lazy', class: 'w-full h-full object-cover', alt: media.alt
+                | escape
+              }}
+
+            {% when 'video', 'external_video' %}
+              {{
+                media
+                | video_tag:
+                  controls: true,
+                  autoplay: true,
+                  loop: true,
+                  muted: true,
+                  class: 'w-full h-full object-cover'
+              }}
+
+            {% when 'model' %}
+              {{ media | model_viewer_tag: class: 'w-full h-full' }}
+
+            {% else %}
+              {{ media | media_tag }}
+          {% endcase %}
         </div>
       {% else %}
         <div class="aspect-[4/5] w-full bg-gray-100 flex items-center justify-center text-gray-400">
-          No image available
+          No media available
         </div>
       {% endfor %}
     </div>
