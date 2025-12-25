@@ -34,7 +34,16 @@
 
       <!-- 商品グリッド -->
       {% if collection.products.size > 0 %}
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-{{ section.settings.products_per_row }} gap-4 md:gap-8">
+        <div
+          class="
+            grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8
+            {% if section.settings.products_per_row == 2 %}lg:grid-cols-2
+            {% elsif section.settings.products_per_row == 3 %}lg:grid-cols-3
+            {% elsif section.settings.products_per_row == 4 %}lg:grid-cols-4
+            {% elsif section.settings.products_per_row == 5 %}lg:grid-cols-5
+            {% endif %}
+          "
+        >
           {% for product in collection.products %}
             {% render 'product-card', product: product %}
           {% endfor %}
