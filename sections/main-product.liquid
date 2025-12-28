@@ -7,17 +7,21 @@
     scrollbar-width: none;
   }
 
-  /* 1. アクティブなサムネイルの枠線 */
+  /* 1. サムネイルのホバーとアクティブの動きを復活 */
+  .js-thumb {
+    opacity: 0.6;
+    transition: opacity 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+  }
+  .js-thumb:hover {
+    opacity: 1; /* ホバーで明るくなる */
+  }
   .js-thumb.is-active {
     border-color: #000;
     opacity: 1;
   }
-  .js-thumb {
-    opacity: 0.6;
-    transition: all 0.2s ease;
-  }
 
-  /* 2. 矢印ボタンの共通デザイン */
+  /* 2. 矢印ボタンのデザイン */
   .nav-btn-base {
     background-color: rgba(255, 255, 255, 0.9);
     border: 1px solid #e5e7eb;
@@ -29,18 +33,20 @@
     justify-content: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     z-index: 30;
-    transition: all 0.2s;
     color: #000;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+  .nav-btn-base:hover {
+    background-color: #fff;
+    transform: scale(1.1);
   }
 
-  /* 3. 【重要】CSSでの強制出し分け（!importantなし） */
-  /* PC (1024px以上) ではメイン画像上の矢印を消す */
+  /* 3. デバイスごとの出し分け */
   @media (min-width: 1024px) {
     .mobile-nav-only {
       display: none;
     }
   }
-  /* スマホ (1023px以下) ではサムネイル横の矢印を消す */
   @media (max-width: 1023px) {
     .desktop-nav-only {
       display: none;
@@ -143,8 +149,7 @@
           <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
             {% for media in product.media %}
               <div
-                class="js-thumb w-20 h-20 flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} transition-all cursor-pointer"
-                data-media-index="{{ forloop.index0 }}"
+                class="js-thumb w-20 h-20 flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %}"
                 data-media-type="{{ media.media_type }}"
                 {% if media.media_type == 'image' %}
                   data-src="{{ media | image_url: width: 1200 }}"
@@ -180,7 +185,7 @@
               stroke="currentColor"
               class="size-5"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
           </button>
         </div>
@@ -215,6 +220,7 @@
   (function () {
     const init = () => {
       const container = document.getElementById('MainMediaContainer');
+      const thumbList = document.getElementById('ThumbList');
       const thumbs = document.querySelectorAll('.js-thumb');
       const mainPrev = document.getElementById('MainPrev');
       const mainNext = document.getElementById('MainNext');
@@ -225,24 +231,19 @@
       const updateMedia = (index) => {
         const target = thumbs[index];
         if (!target) return;
-
         const type = target.getAttribute('data-media-type');
         if (type === 'image') {
-          const src = target.getAttribute('data-src');
-          container.innerHTML = `<img src="${src}" class="w-full h-full object-cover">`;
+          container.innerHTML = `<img src="${target.getAttribute('data-src')}" class="w-full h-full object-cover">`;
         } else {
-          const videoHtmlEscaped = target.getAttribute('data-video-html');
           const txt = document.createElement('textarea');
-          txt.innerHTML = videoHtmlEscaped;
+          txt.innerHTML = target.getAttribute('data-video-html');
           container.innerHTML = txt.value;
           const video = container.querySelector('video');
           if (video) video.play();
         }
-
         thumbs.forEach((t) => t.classList.remove('is-active'));
         target.classList.add('is-active');
         currentIndex = index;
-
         target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       };
 
@@ -250,10 +251,13 @@
         thumb.onclick = () => updateMedia(index);
       });
 
+      // 【スマホ】メイン画像上の矢印：画像切り替え
       if (mainPrev) mainPrev.onclick = () => updateMedia((currentIndex - 1 + thumbs.length) % thumbs.length);
       if (mainNext) mainNext.onclick = () => updateMedia((currentIndex + 1) % thumbs.length);
-      if (thumbPrev) thumbPrev.onclick = () => updateMedia((currentIndex - 1 + thumbs.length) % thumbs.length);
-      if (thumbNext) thumbNext.onclick = () => updateMedia((currentIndex + 1) % thumbs.length);
+
+      // 【PC】サムネイル横の矢印：スクロールさせるだけ！
+      if (thumbPrev) thumbPrev.onclick = () => thumbList.scrollBy({ left: -200, behavior: 'smooth' });
+      if (thumbNext) thumbNext.onclick = () => thumbList.scrollBy({ left: 200, behavior: 'smooth' });
     };
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
