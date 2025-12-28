@@ -1,5 +1,4 @@
 <style>
-  /* 1. ブラウザ標準機能のため残す（これはTailwindでできないため） */
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -8,18 +7,20 @@
     scrollbar-width: none;
   }
 
-  /* 2. セレクタを繋げることで「詳細度」を上げ、Tailwindに勝たせる */
+  /* 1. アクティブなサムネイルの枠線（!importantなし） */
   .js-thumb.is-active {
     border-color: #000;
     opacity: 1;
   }
-
   .js-thumb {
-    cursor: pointer;
-    position: relative;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+  }
+  .js-thumb:hover {
+    opacity: 1;
   }
 
-  /* 3. 動画サムネイル用のプレイアイコン */
+  /* 2. 動画サムネイル用のプレイアイコン */
   .thumb-video-badge {
     position: absolute;
     top: 50%;
@@ -34,24 +35,14 @@
     justify-content: center;
   }
 
-  /* 4. 矢印ボタンのデザイン */
-  .thumb-arrow {
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #e5e7eb;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 30;
-    transition: all 0.2s;
-    color: #000;
+  /* 3. メイン画像上の矢印ボタン（ショップチャンネル風） */
+  .main-nav-btn {
+    background-color: rgba(255, 255, 255, 0.7);
+    transition: background-color 0.2s, transform 0.2s;
   }
-  .thumb-arrow:hover {
-    background: #fff;
-    transform: scale(1.1);
+  .main-nav-btn:hover {
+    background-color: rgba(255, 255, 255, 1);
+    transform: translateY(-50%) scale(1.1);
   }
 </style>
 
@@ -81,52 +72,67 @@
             <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
           {% endif %}
         </div>
+
+        <button
+          id="MainPrev"
+          type="button"
+          class="main-nav-btn absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full shadow-sm text-gray-800"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+        <button
+          id="MainNext"
+          type="button"
+          class="main-nav-btn absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full shadow-sm text-gray-800"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
       </div>
 
       {% if product.media.size > 1 %}
-        <div class="relative group w-full px-1">
-          <button
-            id="GoPrev"
-            type="button"
-            class="thumb-arrow absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
-          >
-            {% render 'icon-chevron-left' %}
-          </button>
-
-          <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
-            {% for media in product.media %}
-              <div
-                class="js-thumb w-20 h-20 flex-shrink-0 bg-gray-50 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} opacity-60 hover:opacity-100 transition-all"
-                data-media-type="{{ media.media_type }}"
-                {% if media.media_type == 'image' %}
-                  data-src="{{ media | image_url: width: 1200 }}"
-                {% else %}
-                  {%- comment -%} 動画HTMLをエスケープして保存 {%- endcomment -%}
-                  data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
-                {% endif %}
+        <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {% for media in product.media %}
+            <div
+              class="js-thumb w-20 h-20 flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} transition-all cursor-pointer"
+              data-media-index="{{ forloop.index0 }}"
+              data-media-type="{{ media.media_type }}"
+              {% if media.media_type == 'image' %}
+                data-src="{{ media | image_url: width: 1200 }}"
+              {% else %}
+                data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
+              {% endif %}
+            >
+              <img
+                src="{{ media | image_url: width: 240 }}"
+                class="w-full h-full object-cover aspect-square pointer-events-none"
               >
-                <img
-                  src="{{ media | image_url: width: 240 }}"
-                  class="w-full h-full object-cover aspect-square pointer-events-none"
-                >
-                {% if media.media_type contains 'video' %}
-                  <div class="thumb-video-badge">
-                    <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
-                    </svg>
-                  </div>
-                {% endif %}
-              </div>
-            {% endfor %}
-          </div>
-
-          <button
-            id="GoNext"
-            type="button"
-            class="thumb-arrow absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
-          >
-            {% render 'icon-chevron-right' %}
-          </button>
+              {% if media.media_type contains 'video' %}
+                <div class="thumb-video-badge">
+                  <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                  </svg>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
         </div>
       {% endif %}
     </div>
@@ -158,48 +164,52 @@
 <script>
   (function () {
     const init = () => {
-      console.log('💎 修正版メディア対応JS: 起動！');
       const container = document.getElementById('MainMediaContainer');
-      const thumbList = document.getElementById('ThumbList');
       const thumbs = document.querySelectorAll('.js-thumb');
-      const btnPrev = document.getElementById('GoPrev');
-      const btnNext = document.getElementById('GoNext');
+      const btnPrev = document.getElementById('MainPrev');
+      const btnNext = document.getElementById('MainNext');
+      let currentIndex = 0;
 
-      thumbs.forEach((thumb) => {
-        thumb.onclick = function () {
-          const type = this.getAttribute('data-media-type');
-          console.log('選択されたメディアタイプ:', type);
+      const updateMedia = (index) => {
+        const target = thumbs[index];
+        if (!target) return;
 
-          if (type === 'image') {
-            const src = this.getAttribute('data-src');
-            container.innerHTML = `<img src="${src}" class="w-full h-full object-cover">`;
-          } else {
-            // エスケープされたHTMLを確実にHTMLとして流し込む
-            const videoHtmlEscaped = this.getAttribute('data-video-html');
-            const txt = document.createElement('textarea');
-            txt.innerHTML = videoHtmlEscaped;
-            container.innerHTML = txt.value; // ここでデコードされたHTMLが入る
+        const type = target.getAttribute('data-media-type');
+        if (type === 'image') {
+          const src = target.getAttribute('data-src');
+          container.innerHTML = `<img src="${src}" class="w-full h-full object-cover">`;
+        } else {
+          const videoHtmlEscaped = target.getAttribute('data-video-html');
+          const txt = document.createElement('textarea');
+          txt.innerHTML = videoHtmlEscaped;
+          container.innerHTML = txt.value;
+          const video = container.querySelector('video');
+          if (video) video.play();
+        }
 
-            // 動画を確実に再生させる
-            const video = container.querySelector('video');
-            if (video) video.play();
-          }
+        thumbs.forEach((t) => t.classList.remove('is-active'));
+        target.classList.add('is-active');
+        currentIndex = index;
 
-          thumbs.forEach((t) => t.classList.remove('is-active'));
-          this.classList.add('is-active');
-        };
+        // サムネイルをスクロール追従させる
+        target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      };
+
+      thumbs.forEach((thumb, index) => {
+        thumb.onclick = () => updateMedia(index);
       });
 
-      if (btnNext && thumbList) {
-        btnNext.onclick = (e) => {
-          e.preventDefault();
-          thumbList.scrollLeft += 180;
+      if (btnPrev) {
+        btnPrev.onclick = () => {
+          const newIndex = (currentIndex - 1 + thumbs.length) % thumbs.length;
+          updateMedia(newIndex);
         };
       }
-      if (btnPrev && thumbList) {
-        btnPrev.onclick = (e) => {
-          e.preventDefault();
-          thumbList.scrollLeft -= 180;
+
+      if (btnNext) {
+        btnNext.onclick = () => {
+          const newIndex = (currentIndex + 1) % thumbs.length;
+          updateMedia(newIndex);
         };
       }
     };
