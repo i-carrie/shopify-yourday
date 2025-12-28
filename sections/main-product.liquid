@@ -24,6 +24,9 @@
     border-radius: 50%;
     padding: 4px;
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .thumb-arrow {
     background: rgba(255, 255, 255, 0.9);
@@ -91,6 +94,7 @@
                 {% if media.media_type == 'image' %}
                   data-src="{{ media | image_url: width: 1200 }}"
                 {% else %}
+                  {%- comment -%} 動画HTMLをエスケープして保存 {%- endcomment -%}
                   data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
                 {% endif %}
               >
@@ -98,9 +102,9 @@
                   src="{{ media | image_url: width: 240 }}"
                   class="w-full h-full object-cover aspect-square pointer-events-none"
                 >
-                {% if media.media_type == 'video' or media.media_type == 'external_video' %}
+                {% if media.media_type contains 'video' %}
                   <div class="thumb-video-badge">
-                    <svg class="size-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
                     </svg>
                   </div>
@@ -128,9 +132,7 @@
         <h1 class="text-3xl md:text-4xl font-serif text-gray-900">{{ product.title }}</h1>
         <p class="text-xl text-gray-700">{{ product.price | money }}</p>
       </div>
-
       <div class="h-px bg-gray-200 w-full"></div>
-
       <div class="space-y-4">
         <div class="w-full h-12 bg-gray-50 border border-gray-200 flex items-center px-4 text-sm text-gray-500">
           Variant Picker Placeholder
@@ -139,7 +141,6 @@
           ADD TO CART
         </button>
       </div>
-
       <div class="mt-4 border-t border-gray-200 pt-4 text-sm leading-relaxed text-gray-600">
         {{ product.description }}
       </div>
@@ -150,7 +151,7 @@
 <script>
   (function () {
     const init = () => {
-      console.log('💎 動画対応JS起動！');
+      console.log('💎 修正版メディア対応JS: 起動！');
       const container = document.getElementById('MainMediaContainer');
       const thumbList = document.getElementById('ThumbList');
       const thumbs = document.querySelectorAll('.js-thumb');
@@ -160,14 +161,23 @@
       thumbs.forEach((thumb) => {
         thumb.onclick = function () {
           const type = this.getAttribute('data-media-type');
+          console.log('選択されたメディアタイプ:', type);
+
           if (type === 'image') {
             const src = this.getAttribute('data-src');
             container.innerHTML = `<img src="${src}" class="w-full h-full object-cover">`;
           } else {
-            const videoHtml = this.getAttribute('data-video-html');
-            const doc = new DOMParser().parseFromString(videoHtml, 'text/html');
-            container.innerHTML = doc.body.textContent;
+            // エスケープされたHTMLを確実にHTMLとして流し込む
+            const videoHtmlEscaped = this.getAttribute('data-video-html');
+            const txt = document.createElement('textarea');
+            txt.innerHTML = videoHtmlEscaped;
+            container.innerHTML = txt.value; // ここでデコードされたHTMLが入る
+
+            // 動画を確実に再生させる
+            const video = container.querySelector('video');
+            if (video) video.play();
           }
+
           thumbs.forEach((t) => t.classList.remove('is-active'));
           this.classList.add('is-active');
         };
@@ -199,16 +209,7 @@
   "name": "メイン商品",
   "tag": "section",
   "class": "section",
-  "settings": [
-    {
-      "type": "header",
-      "content": "商品情報の設定"
-    }
-  ],
-  "presets": [
-    {
-      "name": "メイン商品"
-    }
-  ]
+  "settings": [],
+  "presets": [{ "name": "メイン商品" }]
 }
 {% endschema %}
