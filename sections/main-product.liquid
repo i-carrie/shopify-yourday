@@ -1,20 +1,22 @@
 <section class="max-w-screen-xl mx-auto px-4 py-8 md:px-8 lg:py-12">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-    <div class="flex flex-col gap-6">
-      {% for media in product.media %}
-        <div class="aspect-[4/5] w-full bg-gray-100 overflow-hidden relative">
-          {% case media.media_type %}
+    <div class="flex flex-col gap-4">
+      <div class="relative group aspect-[4/5] w-full bg-gray-50 overflow-hidden">
+        {%- assign featured_media = product.selected_or_first_available_variant.featured_media
+          | default: product.featured_media
+        -%}
+
+        {%- if featured_media -%}
+          {% case featured_media.media_type %}
             {% when 'image' %}
               {{
-                media
+                featured_media
                 | image_url: width: 1200
-                | image_tag: loading: 'lazy', class: 'w-full h-full object-cover', alt: media.alt
-                | escape
+                | image_tag: class: 'w-full h-full object-cover', loading: 'eager'
               }}
-
             {% when 'video', 'external_video' %}
               {{
-                media
+                featured_media
                 | video_tag:
                   controls: true,
                   autoplay: true,
@@ -22,45 +24,63 @@
                   muted: true,
                   class: 'w-full h-full object-cover'
               }}
-
-            {% when 'model' %}
-              {{ media | model_viewer_tag: class: 'w-full h-full' }}
-
             {% else %}
-              {{ media | media_tag }}
+              {{ featured_media | media_tag: class: 'w-full h-full object-cover' }}
           {% endcase %}
-        </div>
-      {% else %}
-        <div class="aspect-[4/5] w-full bg-gray-100 flex items-center justify-center text-gray-400">
-          No media available
-        </div>
-      {% endfor %}
+        {%- else -%}
+          <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+        {%- endif -%}
+
+        <button class="hidden lg:block absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+          {% render 'icon-chevron-left' %}
+        </button>
+        <button class="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+          {% render 'icon-chevron-right' %}
+        </button>
+      </div>
+
+      <div class="hidden lg:flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        {% for media in product.media %}
+          <div class="w-20 h-20 flex-shrink-0 bg-gray-50 border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} hover:border-gray-300 cursor-pointer transition-all">
+            {{
+              media
+              | image_url: width: 200
+              | image_tag: class: 'w-full h-full object-cover aspect-square', loading: 'lazy'
+            }}
+          </div>
+        {% endfor %}
+      </div>
     </div>
 
     <div class="lg:sticky lg:top-8 flex flex-col gap-6 py-4">
       <div class="space-y-4">
-        <p class="text-sm uppercase tracking-widest text-gray-500">Your day / Collection</p>
+        <p class="text-sm uppercase tracking-widest text-gray-500">
+          Your day / {{ product.collections.first.title | default: 'Collection' }}
+        </p>
         <h1 class="text-3xl md:text-4xl font-serif text-gray-900">{{ product.title }}</h1>
         <p class="text-xl text-gray-700">{{ product.price | money }}</p>
       </div>
 
       <div class="h-px bg-gray-200 w-full"></div>
+
       <div class="space-y-4">
-        <div class="w-full h-12 bg-gray-100 flex items-center justify-center text-sm text-gray-500 border border-gray-200">
+        <div class="w-full h-12 bg-gray-50 border border-gray-200 flex items-center px-4 text-sm text-gray-500">
           Variant Picker Placeholder
         </div>
-        <button class="w-full bg-black text-white py-4 font-medium hover:bg-gray-800 transition">ADD TO CART</button>
+        <button class="w-full bg-black text-white py-4 font-medium hover:bg-gray-800 transition uppercase tracking-widest">
+          ADD TO CART
+        </button>
       </div>
 
       <div class="mt-4 border-t border-gray-200 pt-4">
-        <details class="group cursor-pointer">
+        <details class="group cursor-pointer" open>
           <summary class="flex justify-between items-center font-medium list-none">
             <span>Product Description</span>
             <span class="transition group-open:rotate-180">{% render 'icon-chevron-down' %}</span>
           </summary>
-          <p class="mt-4 text-gray-600 leading-relaxed text-sm">
+          <div class="mt-4 text-gray-600 leading-relaxed text-sm prose prose-sm">
             {{ product.description }}
-          </p>
+          </div>
         </details>
       </div>
     </div>
