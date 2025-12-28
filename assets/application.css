@@ -665,6 +665,9 @@
   .text-\[\#C2A992\] {
     color: #C2A992;
   }
+  .text-black {
+    color: var(--color-black);
+  }
   .text-gray-300 {
     color: var(--color-gray-300);
   }
@@ -797,6 +800,16 @@
     &:last-child {
       border-style: var(--tw-border-style);
       border-width: 0px;
+    }
+  }
+  .hover\:scale-110 {
+    &:hover {
+      @media (hover: hover) {
+        --tw-scale-x: 110%;
+        --tw-scale-y: 110%;
+        --tw-scale-z: 110%;
+        scale: var(--tw-scale-x) var(--tw-scale-y);
+      }
     }
   }
   .hover\:border-gray-300 {
