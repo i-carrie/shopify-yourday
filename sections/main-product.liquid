@@ -1,65 +1,50 @@
-<style>
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  /* 選ばれているサムネイルを少し明るくする */
-  .is-active {
-    border-color: #000 !important;
-    opacity: 1 !important;
-  }
-</style>
-
 <section class="max-w-screen-xl mx-auto px-4 py-8 md:px-8 lg:py-12">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
     <div class="flex flex-col gap-4">
-      <div id="MainVisualArea" class="relative group aspect-[4/5] w-full bg-gray-50 overflow-hidden">
-        {%- assign featured_media = product.selected_or_first_available_variant.featured_media
+      <div class="relative group aspect-[4/5] w-full bg-gray-50 overflow-hidden">
+        {% assign featured_media = product.selected_or_first_available_variant.featured_media
           | default: product.featured_media
-        -%}
+        %}
 
-        <div id="MainMediaWrapper" class="w-full h-full">
-          {%- if featured_media -%}
-            {% case featured_media.media_type %}
-              {% when 'image' %}
-                <img src="{{ featured_media | image_url: width: 1200 }}" class="w-full h-full object-cover">
-              {% when 'video', 'external_video' %}
-                {{ featured_media | video_tag: controls: true, class: 'w-full h-full object-cover' }}
-              {% else %}
-                {{ featured_media | media_tag: class: 'w-full h-full object-cover' }}
-            {% endcase %}
-          {%- else -%}
-            <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
-          {%- endif -%}
-        </div>
+        {% if featured_media %}
+          {% case featured_media.media_type %}
+            {% when 'image' %}
+              {{
+                featured_media
+                | image_url: width: 1200
+                | image_tag: class: 'w-full h-full object-cover', loading: 'eager'
+              }}
+            {% when 'video', 'external_video' %}
+              {{
+                featured_media
+                | video_tag:
+                  controls: true,
+                  autoplay: true,
+                  loop: true,
+                  muted: true,
+                  class: 'w-full h-full object-cover'
+              }}
+            {% else %}
+              {{ featured_media | media_tag: class: 'w-full h-full object-cover' }}
+          {% endcase %}
+        {% else %}
+          <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+        {% endif %}
 
         {% if product.media.size > 1 %}
-          <button
-            id="BtnPrev"
-            class="hidden lg:block absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10"
-          >
+          <button class="hidden lg:block absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
             {% render 'icon-chevron-left' %}
           </button>
-          <button
-            id="BtnNext"
-            class="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10"
-          >
+          <button class="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
             {% render 'icon-chevron-right' %}
           </button>
         {% endif %}
       </div>
 
       {% if product.media.size > 1 %}
-        <div id="ThumbSlider" class="hidden lg:flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div class="hidden lg:flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {% for media in product.media %}
-            <div
-              class="js-thumb w-20 h-20 flex-shrink-0 bg-gray-50 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} opacity-60 hover:opacity-100 cursor-pointer transition-all"
-              data-media-type="{{ media.media_type }}"
-              data-src="{{ media | image_url: width: 1200 }}"
-            >
+            <div class="w-20 h-20 flex-shrink-0 bg-gray-50 border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} hover:border-gray-300 cursor-pointer transition-all">
               {{
                 media
                 | image_url: width: 200
@@ -79,7 +64,9 @@
         <h1 class="text-3xl md:text-4xl font-serif text-gray-900">{{ product.title }}</h1>
         <p class="text-xl text-gray-700">{{ product.price | money }}</p>
       </div>
+
       <div class="h-px bg-gray-200 w-full"></div>
+
       <div class="space-y-4">
         <div class="w-full h-12 bg-gray-50 border border-gray-200 flex items-center px-4 text-sm text-gray-500">
           Variant Picker Placeholder
@@ -88,65 +75,21 @@
           ADD TO CART
         </button>
       </div>
+
       <div class="mt-4 border-t border-gray-200 pt-4">
         <details class="group cursor-pointer" open>
           <summary class="flex justify-between items-center font-medium list-none">
             <span>Product Description</span>
             <span class="transition group-open:rotate-180">{% render 'icon-chevron-down' %}</span>
           </summary>
-          <div class="mt-4 text-gray-600 leading-relaxed text-sm prose prose-sm">{{ product.description }}</div>
+          <div class="mt-4 text-gray-600 leading-relaxed text-sm prose prose-sm">
+            {{ product.description }}
+          </div>
         </details>
       </div>
     </div>
   </div>
 </section>
-
-<script>
-  // すべての要素を読み込んでから実行
-  window.onload = function () {
-    console.log('ゆめかちゃんJS起動！');
-
-    const mainWrapper = document.getElementById('MainMediaWrapper');
-    const thumbSlider = document.getElementById('ThumbSlider');
-    const thumbs = document.querySelectorAll('.js-thumb');
-    const btnPrev = document.getElementById('BtnPrev');
-    const btnNext = document.getElementById('BtnNext');
-
-    // サムネイルクリック機能
-    thumbs.forEach((thumb) => {
-      thumb.addEventListener('click', function () {
-        const newSrc = this.getAttribute('data-src');
-        const type = this.getAttribute('data-media-type');
-        console.log('クリックされたよ！タイプ:', type);
-
-        if (type === 'image') {
-          mainWrapper.innerHTML = `<img src="${newSrc}" class="w-full h-full object-cover animate-fade-in">`;
-        } else {
-          // 動画などの場合は一旦リロードさせるのが確実（今回は画像メインで対応）
-          location.href = location.pathname + '?variant=' + this.dataset.variantId;
-        }
-
-        // アクティブ表示の切り替え
-        thumbs.forEach((t) => t.classList.remove('is-active'));
-        this.classList.add('is-active');
-      });
-    });
-
-    // 矢印スクロール機能
-    if (btnNext && thumbSlider) {
-      btnNext.onclick = () => {
-        console.log('右ボタン！');
-        thumbSlider.scrollBy({ left: 160, behavior: 'smooth' });
-      };
-    }
-    if (btnPrev && thumbSlider) {
-      btnPrev.onclick = () => {
-        console.log('左ボタン！');
-        thumbSlider.scrollBy({ left: -160, behavior: 'smooth' });
-      };
-    }
-  };
-</script>
 
 {% schema %}
 {
