@@ -7,7 +7,7 @@
     scrollbar-width: none;
   }
 
-  /* 1. アクティブなサムネイルの枠線（詳細度で!importantを回避） */
+  /* 1. アクティブなサムネイルの枠線 */
   .js-thumb.is-active {
     border-color: #000;
     opacity: 1;
@@ -32,12 +32,21 @@
     transition: all 0.2s;
     color: #000;
   }
-  .nav-btn-base:hover {
-    background-color: #fff;
-    transform: scale(1.1);
+
+  /* 3. 【重要】CSSでの強制出し分け（!importantなし） */
+  /* PC (1024px以上) ではメイン画像上の矢印を消す */
+  @media (min-width: 1024px) {
+    .mobile-nav-only {
+      display: none;
+    }
+  }
+  /* スマホ (1023px以下) ではサムネイル横の矢印を消す */
+  @media (max-width: 1023px) {
+    .desktop-nav-only {
+      display: none;
+    }
   }
 
-  /* 動画プレイアイコン */
   .thumb-video-badge {
     position: absolute;
     top: 50%;
@@ -78,7 +87,11 @@
           {% endif %}
         </div>
 
-        <button id="MainPrev" type="button" class="nav-btn-base absolute left-3 top-1/2 -translate-y-1/2 md:hidden">
+        <button
+          id="MainPrev"
+          type="button"
+          class="nav-btn-base mobile-nav-only absolute left-3 top-1/2 -translate-y-1/2"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -90,7 +103,11 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </button>
-        <button id="MainNext" type="button" class="nav-btn-base absolute right-3 top-1/2 -translate-y-1/2 md:hidden">
+        <button
+          id="MainNext"
+          type="button"
+          class="nav-btn-base mobile-nav-only absolute right-3 top-1/2 -translate-y-1/2"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -109,7 +126,7 @@
           <button
             id="ThumbPrev"
             type="button"
-            class="nav-btn-base absolute -left-4 top-1/2 -translate-y-1/2 hidden md:flex opacity-0 group-hover:opacity-100"
+            class="nav-btn-base desktop-nav-only absolute -left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -153,7 +170,7 @@
           <button
             id="ThumbNext"
             type="button"
-            class="nav-btn-base absolute -right-4 top-1/2 -translate-y-1/2 hidden md:flex opacity-0 group-hover:opacity-100"
+            class="nav-btn-base desktop-nav-only absolute -right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
