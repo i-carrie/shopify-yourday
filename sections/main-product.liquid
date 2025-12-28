@@ -229,8 +229,13 @@
               </svg>
             </span>
           </summary>
+
           <div class="pb-8 text-sm leading-relaxed text-gray-600">
-            {{ product.description }}
+            {% if product.description != blank %}
+              {{ product.description }}
+            {% else %}
+              商品詳細情報はありません。
+            {% endif %}
           </div>
         </details>
       </div>
