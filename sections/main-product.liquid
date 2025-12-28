@@ -59,27 +59,27 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
     <div class="flex flex-col gap-4">
       <div id="MainVisualArea" class="relative aspect-[4/5] w-full bg-gray-50 overflow-hidden">
-        <div
-          id="MainMediaContainer"
-          class="flex md:block w-full h-full overflow-x-auto md:overflow-hidden snap-x snap-mandatory scrollbar-hide"
-        >
-          {% for media in product.media %}
-            <div class="w-full h-full flex-shrink-0 snap-center">
-              {% if media.media_type == 'image' %}
-                <img src="{{ media | image_url: width: 1200 }}" class="w-full h-full object-cover">
-              {% else %}
-                {{
-                  media
-                  | video_tag:
-                    controls: true,
-                    autoplay: true,
-                    muted: true,
-                    loop: true,
-                    class: 'w-full h-full object-cover'
-                }}
-              {% endif %}
-            </div>
-          {% endfor %}
+        <div id="MainMediaContainer" class="w-full h-full">
+          {% assign featured_media = product.selected_or_first_available_variant.featured_media
+            | default: product.featured_media
+          %}
+          {% if featured_media %}
+            {% if featured_media.media_type == 'image' %}
+              <img src="{{ featured_media | image_url: width: 1200 }}" class="w-full h-full object-cover">
+            {% else %}
+              {{
+                featured_media
+                | video_tag:
+                  controls: true,
+                  autoplay: true,
+                  muted: true,
+                  loop: true,
+                  class: 'w-full h-full object-cover'
+              }}
+            {% endif %}
+          {% else %}
+            <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+          {% endif %}
         </div>
       </div>
 
