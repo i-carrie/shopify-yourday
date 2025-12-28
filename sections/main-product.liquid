@@ -10,6 +10,43 @@
     scrollbar-width: none; /* Firefox */
   }
 </style>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const mainImageContainer = document.querySelector('.group.aspect-\\[4\\/5\\]');
+    const thumbnailContainer = document.querySelector('.overflow-x-auto');
+    const thumbnails = document.querySelectorAll('.w-20.h-20');
+    const btnPrev =
+      document.querySelector('button:has([render="icon-chevron-left"])') ||
+      document.querySelectorAll('.absolute.left-4')[0];
+    const btnNext =
+      document.querySelector('button:has([render="icon-chevron-right"])') ||
+      document.querySelectorAll('.absolute.right-4')[0];
+
+    // 1. サムネイルクリックでメイン画像を切り替える
+    thumbnails.forEach((thumb) => {
+      thumb.addEventListener('click', function () {
+        // メインの画像または動画のソースを差し替えるロジック
+        const newImage = this.querySelector('img').src.replace('width=200', 'width=1200');
+        const mainImg = mainImageContainer.querySelector('img');
+        if (mainImg) mainImg.src = newImage;
+
+        // 枠線の色を更新
+        thumbnails.forEach((t) => t.classList.remove('border-black'));
+        this.classList.add('border-black');
+      });
+    });
+
+    // 2. 矢印でサムネイルをスクロールさせる
+    if (btnPrev && btnNext) {
+      btnNext.addEventListener('click', () => {
+        thumbnailContainer.scrollBy({ left: 200, behavior: 'smooth' });
+      });
+      btnPrev.addEventListener('click', () => {
+        thumbnailContainer.scrollBy({ left: -200, behavior: 'smooth' });
+      });
+    }
+  });
+</script>
 
 <section class="max-w-screen-xl mx-auto px-4 py-8 md:px-8 lg:py-12">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
