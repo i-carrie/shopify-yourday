@@ -7,21 +7,21 @@
     scrollbar-width: none;
   }
 
-  /* 1. サムネイルのホバーとアクティブの動きを復活 */
+  /* 1. サムネイルのホバーとアクティブの動き */
   .js-thumb {
     opacity: 0.6;
     transition: opacity 0.3s ease, border-color 0.3s ease;
     cursor: pointer;
   }
   .js-thumb:hover {
-    opacity: 1; /* ホバーで明るくなる */
+    opacity: 1;
   }
   .js-thumb.is-active {
     border-color: #000;
     opacity: 1;
   }
 
-  /* 2. 矢印ボタンのデザイン */
+  /* 2. 矢印ボタンの共通デザイン */
   .nav-btn-base {
     background-color: rgba(255, 255, 255, 0.9);
     border: 1px solid #e5e7eb;
@@ -90,6 +90,8 @@
                   class: 'w-full h-full object-cover'
               }}
             {% endif %}
+          {% else %}
+            <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
           {% endif %}
         </div>
 
@@ -209,6 +211,7 @@
           ADD TO CART
         </button>
       </div>
+
       <div class="mt-4 border-t border-gray-200 pt-4 text-sm leading-relaxed text-gray-600">
         {{ product.description }}
       </div>
