@@ -2,11 +2,11 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
     <div class="flex flex-col gap-4">
       <div class="relative group aspect-[4/5] w-full bg-gray-50 overflow-hidden">
-        {% assign featured_media = product.selected_or_first_available_variant.featured_media
+        {%- assign featured_media = product.selected_or_first_available_variant.featured_media
           | default: product.featured_media
-        %}
+        -%}
 
-        {% if featured_media %}
+        {%- if featured_media -%}
           {% case featured_media.media_type %}
             {% when 'image' %}
               {{
@@ -27,29 +27,33 @@
             {% else %}
               {{ featured_media | media_tag: class: 'w-full h-full object-cover' }}
           {% endcase %}
-        {% else %}
+        {%- else -%}
           <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+        {%- endif -%}
+
+        {% if product.media.size > 1 %}
+          <button class="hidden lg:block absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+            {% render 'icon-chevron-left' %}
+          </button>
+          <button class="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+            {% render 'icon-chevron-right' %}
+          </button>
         {% endif %}
-
-        <button class="hidden lg:block absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
-          {% render 'icon-chevron-left' %}
-        </button>
-        <button class="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
-          {% render 'icon-chevron-right' %}
-        </button>
       </div>
 
-      <div class="hidden lg:flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-        {% for media in product.media %}
-          <div class="w-20 h-20 flex-shrink-0 bg-gray-50 border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} hover:border-gray-300 cursor-pointer transition-all">
-            {{
-              media
-              | image_url: width: 200
-              | image_tag: class: 'w-full h-full object-cover aspect-square', loading: 'lazy'
-            }}
-          </div>
-        {% endfor %}
-      </div>
+      {% if product.media.size > 1 %}
+        <div class="hidden lg:flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {% for media in product.media %}
+            <div class="w-20 h-20 flex-shrink-0 bg-gray-50 border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} hover:border-gray-300 cursor-pointer transition-all">
+              {{
+                media
+                | image_url: width: 200
+                | image_tag: class: 'w-full h-full object-cover aspect-square', loading: 'lazy'
+              }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
     </div>
 
     <div class="lg:sticky lg:top-8 flex flex-col gap-6 py-4">
