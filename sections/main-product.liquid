@@ -32,9 +32,9 @@
               src="{{ featured_media | image_url: width: 1200 }}"
               class="w-full h-full object-cover"
             >
-          {%- else -%}
+          {% else %}
             <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
-          {%- endif -%}
+          {% endif %}
         </div>
 
         {% if product.media.size > 1 %}
