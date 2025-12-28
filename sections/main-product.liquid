@@ -6,14 +6,18 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  .is-active {
-    border-color: #000 !important;
-    opacity: 1 !important;
+
+  /* 1. !importantなし：クラスを繋げて詳細度を上げ、確実に上書きする */
+  .js-thumb.is-active {
+    border-color: #000;
+    opacity: 1;
   }
+
   .js-thumb {
-    cursor: pointer !important;
+    cursor: pointer;
     position: relative;
   }
+
   /* 動画サムネイル用のプレイアイコン */
   .thumb-video-badge {
     position: absolute;
@@ -28,12 +32,14 @@
     align-items: center;
     justify-content: center;
   }
+
+  /* 2. 矢印ボタン：!importantなしで微調整 */
   .thumb-arrow {
-    background: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.9);
     border: 1px solid #e5e7eb;
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -41,9 +47,10 @@
     z-index: 30;
     transition: all 0.2s;
     color: #000;
+    cursor: pointer;
   }
   .thumb-arrow:hover {
-    background: #fff;
+    background-color: #fff;
     transform: scale(1.1);
   }
 </style>
@@ -77,13 +84,22 @@
       </div>
 
       {% if product.media.size > 1 %}
-        <div class="relative group w-full px-1">
+        <div class="relative group w-full px-10">
           <button
             id="GoPrev"
             type="button"
             class="thumb-arrow absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
           >
-            {% render 'icon-chevron-left' %}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
           </button>
 
           <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
@@ -94,7 +110,6 @@
                 {% if media.media_type == 'image' %}
                   data-src="{{ media | image_url: width: 1200 }}"
                 {% else %}
-                  {%- comment -%} 動画HTMLをエスケープして保存 {%- endcomment -%}
                   data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
                 {% endif %}
               >
@@ -118,7 +133,16 @@
             type="button"
             class="thumb-arrow absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
           >
-            {% render 'icon-chevron-right' %}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
           </button>
         </div>
       {% endif %}
