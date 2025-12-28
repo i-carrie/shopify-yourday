@@ -10,8 +10,21 @@
     border-color: #000 !important;
     opacity: 1 !important;
   }
-
-  /* サムネイル矢印専用のデザイン */
+  .js-thumb {
+    cursor: pointer !important;
+    position: relative;
+  }
+  /* 動画サムネイル用のプレイアイコン */
+  .thumb-video-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    padding: 4px;
+    pointer-events: none;
+  }
   .thumb-arrow {
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid #e5e7eb;
@@ -30,26 +43,30 @@
     background: #fff;
     transform: scale(1.1);
   }
-  .thumb-arrow svg {
-    width: 18px;
-    height: 18px;
-  } /* size-6ではなく確実に数値指定 */
 </style>
 
 <section class="max-w-screen-xl mx-auto px-4 py-8 md:px-8 lg:py-12">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
     <div class="flex flex-col gap-4">
       <div id="MainVisualArea" class="relative aspect-[4/5] w-full bg-gray-50 overflow-hidden">
-        {%- assign featured_media = product.selected_or_first_available_variant.featured_media
-          | default: product.featured_media
-        -%}
         <div id="MainMediaContainer" class="w-full h-full">
+          {%- assign featured_media = product.selected_or_first_available_variant.featured_media
+            | default: product.featured_media
+          -%}
           {%- if featured_media -%}
-            <img
-              id="TargetMainImage"
-              src="{{ featured_media | image_url: width: 1200 }}"
-              class="w-full h-full object-cover"
-            >
+            {%- if featured_media.media_type == 'image' -%}
+              <img src="{{ featured_media | image_url: width: 1200 }}" class="w-full h-full object-cover">
+            {%- else -%}
+              {{
+                featured_media
+                | video_tag:
+                  controls: true,
+                  autoplay: true,
+                  muted: true,
+                  loop: true,
+                  class: 'w-full h-full object-cover'
+              }}
+            {%- endif -%}
           {%- else -%}
             <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
           {%- endif -%}
@@ -63,27 +80,31 @@
             type="button"
             class="thumb-arrow absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
+            {% render 'icon-chevron-left' %}
           </button>
 
           <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
             {% for media in product.media %}
               <div
-                class="js-thumb w-20 h-20 flex-shrink-0 bg-gray-50 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} opacity-60 hover:opacity-100 transition-all cursor-pointer"
-                data-src="{{ media | image_url: width: 1200 }}"
+                class="js-thumb w-20 h-20 flex-shrink-0 bg-gray-50 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} opacity-60 hover:opacity-100 transition-all"
+                data-media-type="{{ media.media_type }}"
+                {% if media.media_type == 'image' %}
+                  data-src="{{ media | image_url: width: 1200 }}"
+                {% else %}
+                  data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
+                {% endif %}
               >
                 <img
                   src="{{ media | image_url: width: 240 }}"
                   class="w-full h-full object-cover aspect-square pointer-events-none"
                 >
+                {% if media.media_type == 'video' or media.media_type == 'external_video' %}
+                  <div class="thumb-video-badge">
+                    <svg class="size-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                    </svg>
+                  </div>
+                {% endif %}
               </div>
             {% endfor %}
           </div>
@@ -93,15 +114,7 @@
             type="button"
             class="thumb-arrow absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg>
+            {% render 'icon-chevron-right' %}
           </button>
         </div>
       {% endif %}
@@ -115,7 +128,9 @@
         <h1 class="text-3xl md:text-4xl font-serif text-gray-900">{{ product.title }}</h1>
         <p class="text-xl text-gray-700">{{ product.price | money }}</p>
       </div>
+
       <div class="h-px bg-gray-200 w-full"></div>
+
       <div class="space-y-4">
         <div class="w-full h-12 bg-gray-50 border border-gray-200 flex items-center px-4 text-sm text-gray-500">
           Variant Picker Placeholder
@@ -124,23 +139,9 @@
           ADD TO CART
         </button>
       </div>
-      <div class="mt-4 border-t border-gray-200 pt-4">
-        <details class="group cursor-pointer" open>
-          <summary class="flex justify-between items-center font-medium list-none">
-            <span>Product Description</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-5 h-5 transition group-open:rotate-180"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-            </svg>
-          </summary>
-          <div class="mt-4 text-gray-600 leading-relaxed text-sm prose prose-sm">{{ product.description }}</div>
-        </details>
+
+      <div class="mt-4 border-t border-gray-200 pt-4 text-sm leading-relaxed text-gray-600">
+        {{ product.description }}
       </div>
     </div>
   </div>
@@ -149,8 +150,8 @@
 <script>
   (function () {
     const init = () => {
-      console.log('💎 ゆめかちゃん最新JS: 起動！');
-      const mainImg = document.getElementById('TargetMainImage');
+      console.log('💎 動画対応JS起動！');
+      const container = document.getElementById('MainMediaContainer');
       const thumbList = document.getElementById('ThumbList');
       const thumbs = document.querySelectorAll('.js-thumb');
       const btnPrev = document.getElementById('GoPrev');
@@ -158,12 +159,17 @@
 
       thumbs.forEach((thumb) => {
         thumb.onclick = function () {
-          const newSrc = this.getAttribute('data-src');
-          if (mainImg && newSrc) {
-            mainImg.src = newSrc;
-            thumbs.forEach((t) => t.classList.remove('is-active'));
-            this.classList.add('is-active');
+          const type = this.getAttribute('data-media-type');
+          if (type === 'image') {
+            const src = this.getAttribute('data-src');
+            container.innerHTML = `<img src="${src}" class="w-full h-full object-cover">`;
+          } else {
+            const videoHtml = this.getAttribute('data-video-html');
+            const doc = new DOMParser().parseFromString(videoHtml, 'text/html');
+            container.innerHTML = doc.body.textContent;
           }
+          thumbs.forEach((t) => t.classList.remove('is-active'));
+          this.classList.add('is-active');
         };
       });
 
@@ -193,6 +199,16 @@
   "name": "メイン商品",
   "tag": "section",
   "class": "section",
-  "settings": []
+  "settings": [
+    {
+      "type": "header",
+      "content": "商品情報の設定"
+    }
+  ],
+  "presets": [
+    {
+      "name": "メイン商品"
+    }
+  ]
 }
 {% endschema %}
