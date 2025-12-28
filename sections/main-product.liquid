@@ -7,7 +7,7 @@
     scrollbar-width: none;
   }
 
-  /* 1. アクティブなサムネイルの枠線（!importantなし） */
+  /* 1. アクティブなサムネイルの枠線（詳細度で!importantを回避） */
   .js-thumb.is-active {
     border-color: #000;
     opacity: 1;
@@ -35,20 +35,30 @@
     justify-content: center;
   }
 
-  /* 3. メイン画像上の矢印ボタン（ショップチャンネル風） */
-  .main-nav-btn {
-    background-color: rgba(255, 255, 255, 0.7);
-    transition: background-color 0.2s, transform 0.2s;
+  /* 3. 共通のボタンベース（白丸デザイン） */
+  .nav-btn-base {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e5e7eb;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 30;
+    transition: all 0.2s;
+    color: #000;
   }
-  .main-nav-btn:hover {
-    background-color: rgba(255, 255, 255, 1);
-    transform: translateY(-50%) scale(1.1);
+  .nav-btn-base:hover {
+    background-color: #fff;
+    transform: scale(1.1);
   }
 </style>
 
 <section class="max-w-screen-xl mx-auto px-4 py-8 md:px-8 lg:py-12">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-6">
       <div id="MainVisualArea" class="relative aspect-[4/5] w-full bg-gray-50 overflow-hidden">
         <div id="MainMediaContainer" class="w-full h-full">
           {% assign featured_media = product.selected_or_first_available_variant.featured_media
@@ -68,16 +78,10 @@
                   class: 'w-full h-full object-cover'
               }}
             {% endif %}
-          {% else %}
-            <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
           {% endif %}
         </div>
 
-        <button
-          id="MainPrev"
-          type="button"
-          class="main-nav-btn absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full shadow-sm text-gray-800"
-        >
+        <button id="MainPrev" type="button" class="nav-btn-base absolute left-2 top-1/2 -translate-y-1/2 md:hidden">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -89,11 +93,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </button>
-        <button
-          id="MainNext"
-          type="button"
-          class="main-nav-btn absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full shadow-sm text-gray-800"
-        >
+        <button id="MainNext" type="button" class="nav-btn-base absolute right-2 top-1/2 -translate-y-1/2 md:hidden">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -108,31 +108,67 @@
       </div>
 
       {% if product.media.size > 1 %}
-        <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {% for media in product.media %}
-            <div
-              class="js-thumb w-20 h-20 flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} transition-all cursor-pointer"
-              data-media-index="{{ forloop.index0 }}"
-              data-media-type="{{ media.media_type }}"
-              {% if media.media_type == 'image' %}
-                data-src="{{ media | image_url: width: 1200 }}"
-              {% else %}
-                data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
-              {% endif %}
+        <div class="relative group w-full md:px-10">
+          <button
+            id="ThumbPrev"
+            type="button"
+            class="nav-btn-base absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex opacity-0 group-hover:opacity-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
             >
-              <img
-                src="{{ media | image_url: width: 240 }}"
-                class="w-full h-full object-cover aspect-square pointer-events-none"
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+
+          <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
+            {% for media in product.media %}
+              <div
+                class="js-thumb w-20 h-20 flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} transition-all cursor-pointer"
+                data-media-index="{{ forloop.index0 }}"
+                data-media-type="{{ media.media_type }}"
+                {% if media.media_type == 'image' %}
+                  data-src="{{ media | image_url: width: 1200 }}"
+                {% else %}
+                  data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
+                {% endif %}
               >
-              {% if media.media_type contains 'video' %}
-                <div class="thumb-video-badge">
-                  <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
-                  </svg>
-                </div>
-              {% endif %}
-            </div>
-          {% endfor %}
+                <img
+                  src="{{ media | image_url: width: 240 }}"
+                  class="w-full h-full object-cover aspect-square pointer-events-none"
+                >
+                {% if media.media_type contains 'video' %}
+                  <div class="thumb-video-badge">
+                    <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                    </svg>
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <button
+            id="ThumbNext"
+            type="button"
+            class="nav-btn-base absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex opacity-0 group-hover:opacity-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
         </div>
       {% endif %}
     </div>
@@ -166,8 +202,10 @@
     const init = () => {
       const container = document.getElementById('MainMediaContainer');
       const thumbs = document.querySelectorAll('.js-thumb');
-      const btnPrev = document.getElementById('MainPrev');
-      const btnNext = document.getElementById('MainNext');
+      const mainPrev = document.getElementById('MainPrev');
+      const mainNext = document.getElementById('MainNext');
+      const thumbPrev = document.getElementById('ThumbPrev');
+      const thumbNext = document.getElementById('ThumbNext');
       let currentIndex = 0;
 
       const updateMedia = (index) => {
@@ -191,7 +229,7 @@
         target.classList.add('is-active');
         currentIndex = index;
 
-        // サムネイルをスクロール追従させる
+        // アクティブなサムネイルを中央にスクロール
         target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       };
 
@@ -199,19 +237,13 @@
         thumb.onclick = () => updateMedia(index);
       });
 
-      if (btnPrev) {
-        btnPrev.onclick = () => {
-          const newIndex = (currentIndex - 1 + thumbs.length) % thumbs.length;
-          updateMedia(newIndex);
-        };
-      }
+      // スマホ用矢印（画像の上）の動作
+      if (mainPrev) mainPrev.onclick = () => updateMedia((currentIndex - 1 + thumbs.length) % thumbs.length);
+      if (mainNext) mainNext.onclick = () => updateMedia((currentIndex + 1) % thumbs.length);
 
-      if (btnNext) {
-        btnNext.onclick = () => {
-          const newIndex = (currentIndex + 1) % thumbs.length;
-          updateMedia(newIndex);
-        };
-      }
+      // PC用矢印（サムネイルの横）の動作
+      if (thumbPrev) thumbPrev.onclick = () => updateMedia((currentIndex - 1 + thumbs.length) % thumbs.length);
+      if (thumbNext) thumbNext.onclick = () => updateMedia((currentIndex + 1) % thumbs.length);
     };
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
