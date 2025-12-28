@@ -21,12 +21,12 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
     <div class="flex flex-col gap-4">
       <div id="MainVisualArea" class="relative group aspect-[4/5] w-full bg-gray-50 overflow-hidden">
-        {%- assign featured_media = product.selected_or_first_available_variant.featured_media
+        {% assign featured_media = product.selected_or_first_available_variant.featured_media
           | default: product.featured_media
-        -%}
+        %}
 
         <div id="MainMediaContainer" class="w-full h-full">
-          {%- if featured_media -%}
+          {% if featured_media %}
             <img
               id="TargetMainImage"
               src="{{ featured_media | image_url: width: 1200 }}"
