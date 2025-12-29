@@ -1,0 +1,294 @@
+<style>
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* 1. サムネイルの動き */
+  .js-thumb {
+    opacity: 0.6;
+    transition: opacity 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+  }
+  .js-thumb:hover {
+    opacity: 1;
+  }
+  .js-thumb.is-active {
+    border-color: #000;
+    opacity: 1;
+  }
+
+  /* 2. 矢印ボタンのデザイン */
+  .nav-btn-base {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e5e7eb;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 30;
+    color: #000;
+  }
+
+  /* 3. デバイスごとの出し分け（1024pxを基準に） */
+  @media (min-width: 1024px) {
+    .mobile-nav-only {
+      display: none;
+    }
+  }
+  @media (max-width: 1023px) {
+    .desktop-nav-only {
+      display: none;
+    }
+  }
+
+  /* 動画バッジ */
+  .thumb-video-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    padding: 4px;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
+<section class="max-w-screen-xl mx-auto px-4 py-8 md:px-8 lg:py-12">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+    <div class="flex flex-col gap-4">
+      <div id="MainVisualArea" class="relative aspect-square w-full bg-gray-50 overflow-hidden">
+        <div id="MainMediaContainer" class="w-full h-full">
+          {% assign featured_media = product.selected_or_first_available_variant.featured_media
+            | default: product.featured_media
+          %}
+          {% if featured_media %}
+            {% if featured_media.media_type == 'image' %}
+              <img src="{{ featured_media | image_url: width: 1200 }}" class="w-full h-full object-cover">
+            {% else %}
+              {{
+                featured_media
+                | video_tag:
+                  controls: true,
+                  autoplay: true,
+                  muted: true,
+                  loop: true,
+                  class: 'w-full h-full object-cover'
+              }}
+            {% endif %}
+          {% endif %}
+        </div>
+
+        <button
+          id="MainPrev"
+          type="button"
+          class="nav-btn-base mobile-nav-only absolute left-3 top-1/2 -translate-y-1/2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+        <button
+          id="MainNext"
+          type="button"
+          class="nav-btn-base mobile-nav-only absolute right-3 top-1/2 -translate-y-1/2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
+          >
+            <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+      </div>
+
+      {% if product.media.size > 1 %}
+        <div class="relative group w-full">
+          <button
+            id="ThumbPrev"
+            type="button"
+            class="nav-btn-base desktop-nav-only absolute -left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-5"
+            >
+              <path d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+
+          <div
+            id="ThumbList"
+            class="grid grid-cols-5 gap-2 md:flex md:overflow-x-auto pb-2 scrollbar-hide"
+            style="scroll-behavior: smooth;"
+          >
+            {% for media in product.media %}
+              <div
+                class="js-thumb aspect-square w-full md:w-20 md:h-20 flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %}"
+                data-media-type="{{ media.media_type }}"
+                {% if media.media_type == 'image' %}
+                  data-src="{{ media | image_url: width: 1200 }}"
+                {% else %}
+                  data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
+                {% endif %}
+              >
+                <img src="{{ media | image_url: width: 240 }}" class="w-full h-full object-cover pointer-events-none">
+              </div>
+            {% endfor %}
+          </div>
+
+          <button
+            id="ThumbNext"
+            type="button"
+            class="nav-btn-base desktop-nav-only absolute -right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-5"
+            >
+              <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="lg:sticky lg:top-8 flex flex-col gap-6">
+      <div class="space-y-4">
+        <p class="text-sm uppercase tracking-widest text-gray-500">
+          Your day / {{ product.collections.first.title | default: 'Collection' }}
+        </p>
+        <h1 class="text-3xl md:text-4xl font-serif text-gray-900 leading-tight">{{ product.title }}</h1>
+        <p class="text-2xl text-gray-800 font-medium">{{ product.price | money }}</p>
+      </div>
+
+      <div class="h-px bg-gray-200 w-full"></div>
+
+      <div class="space-y-4">
+        <div class="w-full h-12 bg-gray-50 border border-gray-200 flex items-center px-4 text-sm text-gray-500">
+          Variant Picker Placeholder
+        </div>
+        <button class="w-full bg-black text-white py-4 font-medium hover:bg-gray-800 transition uppercase tracking-widest">
+          ADD TO CART
+        </button>
+      </div>
+
+      <div class="border-t border-gray-200">
+        <details class="group" open>
+          <summary class="flex justify-between items-center py-5 cursor-pointer list-none">
+            <span class="text-sm font-medium uppercase tracking-widest text-gray-900">商品詳細</span>
+            <span class="transition-transform duration-300 group-open:rotate-180">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-5"
+              >
+                <path d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+              </svg>
+            </span>
+          </summary>
+          <div class="pb-8 text-sm leading-relaxed text-gray-600">
+            {% if product.description != blank %}
+              {{ product.description }}
+            {% else %}
+              商品詳細情報はありません。
+            {% endif %}
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const init = () => {
+      const container = document.getElementById('MainMediaContainer');
+      const thumbList = document.getElementById('ThumbList');
+      const thumbs = document.querySelectorAll('.js-thumb');
+      const mainPrev = document.getElementById('MainPrev');
+      const mainNext = document.getElementById('MainNext');
+      const thumbPrev = document.getElementById('ThumbPrev');
+      const thumbNext = document.getElementById('ThumbNext');
+      let currentIndex = 0;
+
+      const updateMedia = (index) => {
+        const target = thumbs[index];
+        if (!target) return;
+        const type = target.getAttribute('data-media-type');
+        if (type === 'image') {
+          container.innerHTML = `<img src="${target.getAttribute('data-src')}" class="w-full h-full object-cover">`;
+        } else {
+          const txt = document.createElement('textarea');
+          txt.innerHTML = target.getAttribute('data-video-html');
+          container.innerHTML = txt.value;
+          const v = container.querySelector('video');
+          if (v) v.play();
+        }
+        thumbs.forEach((t) => t.classList.remove('is-active'));
+        target.classList.add('is-active');
+        currentIndex = index;
+        target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      };
+
+      thumbs.forEach((thumb, index) => {
+        thumb.onclick = () => updateMedia(index);
+      });
+      if (mainPrev) mainPrev.onclick = () => updateMedia((currentIndex - 1 + thumbs.length) % thumbs.length);
+      if (mainNext) mainNext.onclick = () => updateMedia((currentIndex + 1) % thumbs.length);
+      if (thumbPrev) thumbPrev.onclick = () => thumbList.scrollBy({ left: -200, behavior: 'smooth' });
+      if (thumbNext) thumbNext.onclick = () => thumbList.scrollBy({ left: 200, behavior: 'smooth' });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "メイン商品",
+  "tag": "section",
+  "class": "section",
+  "settings": [],
+  "presets": [
+    {
+      "name": "メイン商品"
+    }
+  ]
+}
+{% endschema %}
