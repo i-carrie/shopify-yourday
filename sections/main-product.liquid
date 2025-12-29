@@ -214,6 +214,11 @@
           </p>
         {% endif %}
 
+        {% assign current_variant = product.selected_or_first_available_variant %}
+        {% if current_variant.sku != blank %}
+          <p class="text-sm text-gray-600 mt-2 mb-2">商品番号：{{ current_variant.sku }}</p>
+        {% endif %}
+
         <p class="text-xl text-gray-800">{{ product.price | money }}</p>
 
         {% if product.vendor != blank %}
