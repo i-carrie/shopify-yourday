@@ -201,7 +201,7 @@
 
           {% if product.metafields.custom.is_limited.value == true %}
             <span class="border border-blue-400 text-blue-500 text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm"
-              >期間限定</span
+              >期間限定価格</span
             >
           {% endif %}
         </div>
@@ -236,8 +236,8 @@
           {% assign end_w_idx = end | date: '%w' | plus: 0 %}
           {% assign end_w = weekdays[end_w_idx] %}
 
-          <div style="background-color: #f3f4f6; padding: 10px; border-left: 4px solid #ef4444; margin-bottom: 16px;">
-            <p style="color: #ef4444; font-weight: bold; font-size: 13px; margin: 0; letter-spacing: -0.02em;">
+          <div style="background-color: #f3f4f6; padding: 10px; border-left: 4px solid #0066ff; margin-bottom: 16px;">
+            <p style="color: #0066ff; font-weight: bold; font-size: 13px; margin: 0; letter-spacing: -0.02em;">
               期間限定：{{ start_md }}({{ start_w }}) 〜 {{ end_md }}({{ end_w }})
             </p>
           </div>
