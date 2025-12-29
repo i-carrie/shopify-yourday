@@ -9,6 +9,8 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
     --color-red-500: oklch(63.7% 0.237 25.331);
+    --color-pink-100: oklch(94.8% 0.028 342.258);
+    --color-pink-600: oklch(59.2% 0.249 0.584);
     --color-gray-50: oklch(98.5% 0.002 247.839);
     --color-gray-100: oklch(96.7% 0.003 264.542);
     --color-gray-200: oklch(92.8% 0.006 264.531);
@@ -364,6 +366,9 @@
     width: calc(var(--spacing) * 6);
     height: calc(var(--spacing) * 6);
   }
+  .h-3 {
+    height: calc(var(--spacing) * 3);
+  }
   .h-4 {
     height: calc(var(--spacing) * 4);
   }
@@ -387,6 +392,9 @@
   }
   .h-px {
     height: 1px;
+  }
+  .w-3 {
+    width: calc(var(--spacing) * 3);
   }
   .w-4 {
     width: calc(var(--spacing) * 4);
@@ -637,6 +645,9 @@
   .bg-gray-800 {
     background-color: var(--color-gray-800);
   }
+  .bg-pink-100 {
+    background-color: var(--color-pink-100);
+  }
   .bg-red-500 {
     background-color: var(--color-red-500);
   }
@@ -788,6 +799,9 @@
   .text-gray-900 {
     color: var(--color-gray-900);
   }
+  .text-pink-600 {
+    color: var(--color-pink-600);
+  }
   .text-white {
     color: var(--color-white);
   }
@@ -925,6 +939,20 @@
     &:hover {
       @media (hover: hover) {
         color: #C2A992;
+      }
+    }
+  }
+  .hover\:text-pink-600 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-pink-600);
+      }
+    }
+  }
+  .hover\:underline {
+    &:hover {
+      @media (hover: hover) {
+        text-decoration-line: underline;
       }
     }
   }
