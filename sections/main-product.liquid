@@ -35,14 +35,9 @@
     z-index: 30;
     color: #000;
     cursor: pointer;
-    pointer-events: auto; /* クリックを確実に拾う */
-  }
-  .nav-btn-base:hover {
-    transform: scale(1.1);
-    background-color: #fff;
   }
 
-  /* 3. 出し分け設定 */
+  /* 3. デバイスごとの出し分け */
   @media (min-width: 1024px) {
     .mobile-nav-only {
       display: none;
@@ -54,6 +49,7 @@
     }
   }
 
+  /* 動画プレイバッジ */
   .thumb-video-badge {
     position: absolute;
     top: 50%;
@@ -206,28 +202,19 @@
         </button>
       </div>
 
-      <div class="border-t border-gray-100">
-        <details class="group" open>
+      <div class="border-t border-gray-100 mt-2">
+        <details class="group">
           <summary class="flex justify-between items-center py-4 cursor-pointer list-none">
             <span class="text-xs font-bold uppercase tracking-widest text-gray-900">商品詳細</span>
             <span class="transition-transform duration-300 group-open:rotate-180">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-4"
-              >
-                <path d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-              </svg>
+              {% render 'icon-chevron-down' %}
             </span>
           </summary>
           <div class="pb-6 text-sm leading-relaxed text-gray-600">
             {% if product.description != blank %}
               {{ product.description }}
             {% else %}
-              商品詳細情報はありません。
+              <strong>商品詳細情報はありません。</strong>
             {% endif %}
           </div>
         </details>
@@ -253,7 +240,6 @@
       const updateMedia = (index) => {
         const target = thumbs[index];
         if (!target) return;
-
         const type = target.getAttribute('data-media-type');
         if (type === 'image') {
           container.innerHTML = `<img src="${target.getAttribute('data-src')}" class="w-full h-full object-cover">`;
@@ -264,7 +250,6 @@
           const v = container.querySelector('video');
           if (v) v.play();
         }
-
         thumbs.forEach((t) => t.classList.remove('is-active'));
         target.classList.add('is-active');
         currentIndex = index;
@@ -274,27 +259,12 @@
       thumbs.forEach((thumb, index) => {
         thumb.addEventListener('click', () => updateMedia(index));
       });
-
-      // メイン画像矢印
       if (mainPrev)
         mainPrev.addEventListener('click', () => updateMedia((currentIndex - 1 + thumbs.length) % thumbs.length));
       if (mainNext) mainNext.addEventListener('click', () => updateMedia((currentIndex + 1) % thumbs.length));
-
-      // 【修正】サムネイル矢印：scrollBy をより確実に実行
-      if (thumbPrev) {
-        thumbPrev.addEventListener('click', (e) => {
-          e.stopPropagation();
-          thumbList.scrollBy({ left: -thumbList.clientWidth / 2, behavior: 'smooth' });
-        });
-      }
-      if (thumbNext) {
-        thumbNext.addEventListener('click', (e) => {
-          e.stopPropagation();
-          thumbList.scrollBy({ left: thumbList.clientWidth / 2, behavior: 'smooth' });
-        });
-      }
+      if (thumbPrev) thumbPrev.addEventListener('click', () => thumbList.scrollBy({ left: -200, behavior: 'smooth' }));
+      if (thumbNext) thumbNext.addEventListener('click', () => thumbList.scrollBy({ left: 200, behavior: 'smooth' }));
     };
-
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
