@@ -7,7 +7,7 @@
     scrollbar-width: none;
   }
 
-  /* 1. サムネイルの動き */
+  /* 1. サムネイルのホバーとアクティブの動き */
   .js-thumb {
     opacity: 0.6;
     transition: opacity 0.3s ease, border-color 0.3s ease;
@@ -21,7 +21,7 @@
     opacity: 1;
   }
 
-  /* 2. 矢印ボタンのデザイン */
+  /* 2. 矢印ボタンの共通デザイン */
   .nav-btn-base {
     background-color: rgba(255, 255, 255, 0.9);
     border: 1px solid #e5e7eb;
@@ -34,9 +34,14 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     z-index: 30;
     color: #000;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+  .nav-btn-base:hover {
+    background-color: #fff;
+    transform: scale(1.1);
   }
 
-  /* 3. デバイスごとの出し分け（1024pxを基準に） */
+  /* 3. デバイスごとの出し分け */
   @media (min-width: 1024px) {
     .mobile-nav-only {
       display: none;
@@ -48,7 +53,6 @@
     }
   }
 
-  /* 動画バッジ */
   .thumb-video-badge {
     position: absolute;
     top: 50%;
@@ -65,9 +69,9 @@
 </style>
 
 <section class="max-w-screen-xl mx-auto px-4 py-8 md:px-8 lg:py-12">
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
-    <div class="flex flex-col gap-4">
-      <div id="MainVisualArea" class="relative aspect-square w-full bg-gray-50 overflow-hidden">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+    <div class="flex flex-col gap-6">
+      <div id="MainVisualArea" class="relative aspect-[4/5] w-full bg-gray-50 overflow-hidden">
         <div id="MainMediaContainer" class="w-full h-full">
           {% assign featured_media = product.selected_or_first_available_variant.featured_media
             | default: product.featured_media
@@ -86,6 +90,8 @@
                   class: 'w-full h-full object-cover'
               }}
             {% endif %}
+          {% else %}
+            <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
           {% endif %}
         </div>
 
@@ -118,7 +124,7 @@
             stroke="currentColor"
             class="size-6"
           >
-            <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
           </svg>
         </button>
       </div>
@@ -138,18 +144,14 @@
               stroke="currentColor"
               class="size-5"
             >
-              <path d="M15.75 19.5L8.25 12l7.5-7.5" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button>
 
-          <div
-            id="ThumbList"
-            class="grid grid-cols-5 gap-2 md:flex md:overflow-x-auto pb-2 scrollbar-hide"
-            style="scroll-behavior: smooth;"
-          >
+          <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
             {% for media in product.media %}
               <div
-                class="js-thumb aspect-square w-full md:w-20 md:h-20 flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %}"
+                class="js-thumb w-20 h-20 flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %}"
                 data-media-type="{{ media.media_type }}"
                 {% if media.media_type == 'image' %}
                   data-src="{{ media | image_url: width: 1200 }}"
@@ -157,7 +159,17 @@
                   data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
                 {% endif %}
               >
-                <img src="{{ media | image_url: width: 240 }}" class="w-full h-full object-cover pointer-events-none">
+                <img
+                  src="{{ media | image_url: width: 240 }}"
+                  class="w-full h-full object-cover aspect-square pointer-events-none"
+                >
+                {% if media.media_type contains 'video' %}
+                  <div class="thumb-video-badge">
+                    <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                    </svg>
+                  </div>
+                {% endif %}
               </div>
             {% endfor %}
           </div>
@@ -182,17 +194,15 @@
       {% endif %}
     </div>
 
-    <div class="lg:sticky lg:top-8 flex flex-col gap-6">
+    <div class="lg:sticky lg:top-8 flex flex-col gap-6 py-4">
       <div class="space-y-4">
         <p class="text-sm uppercase tracking-widest text-gray-500">
           Your day / {{ product.collections.first.title | default: 'Collection' }}
         </p>
-        <h1 class="text-3xl md:text-4xl font-serif text-gray-900 leading-tight">{{ product.title }}</h1>
-        <p class="text-2xl text-gray-800 font-medium">{{ product.price | money }}</p>
+        <h1 class="text-3xl md:text-4xl font-serif text-gray-900">{{ product.title }}</h1>
+        <p class="text-xl text-gray-700">{{ product.price | money }}</p>
       </div>
-
       <div class="h-px bg-gray-200 w-full"></div>
-
       <div class="space-y-4">
         <div class="w-full h-12 bg-gray-50 border border-gray-200 flex items-center px-4 text-sm text-gray-500">
           Variant Picker Placeholder
@@ -203,7 +213,7 @@
       </div>
 
       <div class="border-t border-gray-200">
-        <details class="group" open>
+        <details class="group">
           <summary class="flex justify-between items-center py-5 cursor-pointer list-none">
             <span class="text-sm font-medium uppercase tracking-widest text-gray-900">商品詳細</span>
             <span class="transition-transform duration-300 group-open:rotate-180">
@@ -215,10 +225,11 @@
                 stroke="currentColor"
                 class="size-5"
               >
-                <path d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
               </svg>
             </span>
           </summary>
+
           <div class="pb-8 text-sm leading-relaxed text-gray-600">
             {% if product.description != blank %}
               {{ product.description }}
@@ -254,8 +265,8 @@
           const txt = document.createElement('textarea');
           txt.innerHTML = target.getAttribute('data-video-html');
           container.innerHTML = txt.value;
-          const v = container.querySelector('video');
-          if (v) v.play();
+          const video = container.querySelector('video');
+          if (video) video.play();
         }
         thumbs.forEach((t) => t.classList.remove('is-active'));
         target.classList.add('is-active');
@@ -266,8 +277,12 @@
       thumbs.forEach((thumb, index) => {
         thumb.onclick = () => updateMedia(index);
       });
+
+      // 【スマホ】メイン画像上の矢印：画像切り替え
       if (mainPrev) mainPrev.onclick = () => updateMedia((currentIndex - 1 + thumbs.length) % thumbs.length);
       if (mainNext) mainNext.onclick = () => updateMedia((currentIndex + 1) % thumbs.length);
+
+      // 【PC】サムネイル横の矢印：スクロールさせるだけ！
       if (thumbPrev) thumbPrev.onclick = () => thumbList.scrollBy({ left: -200, behavior: 'smooth' });
       if (thumbNext) thumbNext.onclick = () => thumbList.scrollBy({ left: 200, behavior: 'smooth' });
     };
@@ -285,10 +300,6 @@
   "tag": "section",
   "class": "section",
   "settings": [],
-  "presets": [
-    {
-      "name": "メイン商品"
-    }
-  ]
+  "presets": [{ "name": "メイン商品" }]
 }
 {% endschema %}
