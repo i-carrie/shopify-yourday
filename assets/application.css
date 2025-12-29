@@ -400,6 +400,9 @@
   .w-48 {
     width: calc(var(--spacing) * 48);
   }
+  .w-\[calc\(20\%-8px\)\] {
+    width: calc(20% - 8px);
+  }
   .w-full {
     width: 100%;
   }
@@ -819,6 +822,11 @@
   }
   .transition-colors {
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-opacity {
+    transition-property: opacity;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
   }
