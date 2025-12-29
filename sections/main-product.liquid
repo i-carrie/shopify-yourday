@@ -214,6 +214,8 @@
           </p>
         {% endif %}
 
+        <p class="text-xl text-gray-800">{{ product.price | money }}</p>
+
         {% if product.vendor != blank %}
           <div class="flex items-center gap-2 mt-4">
             <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
@@ -229,8 +231,6 @@
             </a>
           </div>
         {% endif %}
-
-        <p class="text-xl text-gray-800">{{ product.price | money }}</p>
       </div>
       <div class="h-px bg-gray-100 w-full"></div>
       <div class="space-y-4">
