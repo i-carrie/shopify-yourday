@@ -7,7 +7,7 @@
     scrollbar-width: none;
   }
 
-  /* 1. サムネイルの視覚効果 */
+  /* サムネイルの視覚効果 */
   .js-thumb {
     opacity: 0.6;
     transition: all 0.3s ease;
@@ -21,7 +21,7 @@
     opacity: 1;
   }
 
-  /* 2. 矢印ボタンのデザイン（復活） */
+  /* 矢印ボタン（ショップチャンネル風に少し小さく上品に） */
   .nav-btn-base {
     background-color: rgba(255, 255, 255, 0.9);
     border: 1px solid #e5e7eb;
@@ -33,14 +33,9 @@
     justify-content: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 30;
-    color: #000;
-  }
-  .nav-btn-base:hover {
-    transform: scale(1.1);
-    background-color: #fff;
   }
 
-  /* 3. 出し分け設定 */
+  /* 出し分け */
   @media (min-width: 1024px) {
     .mobile-nav-only {
       display: none;
@@ -51,45 +46,18 @@
       display: none;
     }
   }
-
-  /* 動画プレイバッジ */
-  .thumb-video-badge {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 50%;
-    padding: 4px;
-    pointer-events: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 </style>
 
 <section class="max-w-6xl mx-auto px-4 py-8 md:px-8 lg:py-12">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-    <div class="flex flex-col gap-4 w-full">
+    <div class="flex flex-col gap-4 w-full max-w-[500px] mx-auto lg:ml-0">
       <div id="MainVisualArea" class="relative aspect-square w-full bg-gray-50 overflow-hidden border border-gray-100">
         <div id="MainMediaContainer" class="w-full h-full">
           {% assign featured_media = product.selected_or_first_available_variant.featured_media
             | default: product.featured_media
           %}
           {% if featured_media %}
-            {% if featured_media.media_type == 'image' %}
-              <img src="{{ featured_media | image_url: width: 1200 }}" class="w-full h-full object-cover">
-            {% else %}
-              {{
-                featured_media
-                | video_tag:
-                  controls: true,
-                  autoplay: true,
-                  muted: true,
-                  loop: true,
-                  class: 'w-full h-full object-cover'
-              }}
-            {% endif %}
+            <img src="{{ featured_media | image_url: width: 1000 }}" class="w-full h-full object-cover">
           {% endif %}
         </div>
 
@@ -129,62 +97,17 @@
 
       {% if product.media.size > 1 %}
         <div class="relative w-full group">
-          <button
-            id="ThumbPrev"
-            type="button"
-            class="nav-btn-base desktop-nav-only absolute -left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-4"
-            >
-              <path d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-          </button>
-
-          <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
-            {% for media in product.media %}
+          <div id="ThumbList" class="grid grid-cols-5 gap-2">
+            {% for media in product.media limit: 5 %}
               <div
-                class="js-thumb aspect-square w-[calc(20%-8px)] flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} relative overflow-hidden"
+                class="js-thumb aspect-square border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} overflow-hidden"
                 data-media-type="{{ media.media_type }}"
-                {% if media.media_type == 'image' %}
-                  data-src="{{ media | image_url: width: 1200 }}"
-                {% else %}
-                  data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
-                {% endif %}
+                data-src="{{ media | image_url: width: 1000 }}"
               >
-                <img src="{{ media | image_url: width: 240 }}" class="w-full h-full object-cover pointer-events-none">
-                {% if media.media_type contains 'video' %}
-                  <div class="thumb-video-badge">
-                    <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
-                    </svg>
-                  </div>
-                {% endif %}
+                <img src="{{ media | image_url: width: 200 }}" class="w-full h-full object-cover pointer-events-none">
               </div>
             {% endfor %}
           </div>
-
-          <button
-            id="ThumbNext"
-            type="button"
-            class="nav-btn-base desktop-nav-only absolute -right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-4"
-            >
-              <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg>
-          </button>
         </div>
       {% endif %}
     </div>
@@ -192,10 +115,12 @@
     <div class="flex flex-col gap-6 w-full">
       <div class="space-y-3">
         <p class="text-xs uppercase tracking-widest text-gray-400">Your day / Home Page</p>
-        <h1 class="text-2xl md:text-3xl font-serif text-gray-900 leading-tight">{{ product.title }}</h1>
+        <h1 class="text-2xl md:text-3xl font-serif text-gray-900">{{ product.title }}</h1>
         <p class="text-xl text-gray-800">{{ product.price | money }}</p>
       </div>
+
       <div class="h-px bg-gray-100 w-full"></div>
+
       <div class="space-y-4">
         <div class="w-full h-12 bg-gray-50 border border-gray-200 flex items-center px-4 text-sm text-gray-400">
           Variant Picker Placeholder
@@ -205,7 +130,7 @@
         </button>
       </div>
 
-      <div class="border-t border-gray-100">
+      <div class="border-t border-gray-100 mt-2">
         <details class="group" open>
           <summary class="flex justify-between items-center py-4 cursor-pointer list-none">
             <span class="text-xs font-bold uppercase tracking-widest text-gray-900">商品詳細</span>
@@ -222,7 +147,7 @@
               </svg>
             </span>
           </summary>
-          <div class="pb-6 text-sm leading-relaxed text-gray-600">
+          <div class="pb-6 text-sm leading-relaxed text-gray-500">
             {% if product.description != blank %}
               {{ product.description }}
             {% else %}
@@ -239,49 +164,25 @@
   (function () {
     const init = () => {
       const container = document.getElementById('MainMediaContainer');
-      const thumbList = document.getElementById('ThumbList');
       const thumbs = document.querySelectorAll('.js-thumb');
       const mainPrev = document.getElementById('MainPrev');
       const mainNext = document.getElementById('MainNext');
-      const thumbPrev = document.getElementById('ThumbPrev');
-      const thumbNext = document.getElementById('ThumbNext');
       let currentIndex = 0;
 
       const updateMedia = (index) => {
         const target = thumbs[index];
         if (!target) return;
-
-        const type = target.getAttribute('data-media-type');
-        // 動画表示ロジックの修正（復活）
-        if (type === 'image') {
-          const src = target.getAttribute('data-src');
-          container.innerHTML = `<img src="${src}" class="w-full h-full object-cover">`;
-        } else {
-          const videoHtmlEscaped = target.getAttribute('data-video-html');
-          const txt = document.createElement('textarea');
-          txt.innerHTML = videoHtmlEscaped;
-          container.innerHTML = txt.value;
-          const v = container.querySelector('video');
-          if (v) v.play();
-        }
-
+        container.innerHTML = `<img src="${target.getAttribute('data-src')}" class="w-full h-full object-cover">`;
         thumbs.forEach((t) => t.classList.remove('is-active'));
         target.classList.add('is-active');
         currentIndex = index;
-        target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       };
 
       thumbs.forEach((thumb, index) => {
         thumb.onclick = () => updateMedia(index);
       });
-
-      // メイン画像矢印（画像切り替え）
       if (mainPrev) mainPrev.onclick = () => updateMedia((currentIndex - 1 + thumbs.length) % thumbs.length);
       if (mainNext) mainNext.onclick = () => updateMedia((currentIndex + 1) % thumbs.length);
-
-      // サムネイル矢印（スクロール機能の復活）
-      if (thumbPrev) thumbPrev.onclick = () => thumbList.scrollBy({ left: -200, behavior: 'smooth' });
-      if (thumbNext) thumbNext.onclick = () => thumbList.scrollBy({ left: 200, behavior: 'smooth' });
     };
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
