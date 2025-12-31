@@ -286,7 +286,14 @@
           <div class="matrix-variant-selector mt-6 mb-8">
             {% comment %} 1. ヘッダー部分（項目名を自動取得） {% endcomment %}
             <div class="grid grid-cols-12 gap-2 pb-2 border-b border-gray-200 text-[12px] font-bold text-gray-500 uppercase tracking-wider">
-              <div class="col-span-6">{{ product.options.first }}</div>
+              <div class="col-span-6">
+                {% if product.has_only_default_variant %}
+                  商品名
+                {% else %}
+                  {{ product.options.first }}
+                {% endif %}
+              </div>
+
               <div class="col-span-3 text-right">価格</div>
               <div class="col-span-3 text-center">個数</div>
             </div>
