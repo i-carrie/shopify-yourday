@@ -154,12 +154,7 @@
                   data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
                 {% endif %}
               >
-                <img src="{{ media | image_url: width: 240 }}" class="w-full h-full object-cover pointer-events-none">
-                {% if media.variants.size > 0 %}
-                  <span class="block text-[10px] text-center mt-1 leading-tight">
-                    {{ media.variants.first.title }}
-                  </span>
-                {% endif %}
+                {{ media.variants.first.title }}
 
                 {% if media.media_type contains 'video' %}
                   <div class="thumb-video-badge">
