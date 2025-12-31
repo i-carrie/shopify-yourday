@@ -145,8 +145,18 @@
 
           <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
             {% for media in product.media %}
+              {% comment %} 1. この画像に紐付いているバリエーション名を「探す」ロジックに変更 {% endcomment %}
+              {% assign variant_label = '' %}
+              {% for variant in product.variants %}
+                {% if variant.featured_media.id == media.id %}
+                  {% assign variant_label = variant.title %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+
+              {% comment %} 2. レイアウト用の箱（正方形は画像部分だけに適用） {% endcomment %}
               <div
-                class="js-thumb aspect-square w-[calc(20%-0.4rem)] flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} relative"
+                class="js-thumb w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
                 data-media-type="{{ media.media_type }}"
                 {% if media.media_type == 'image' %}
                   data-src="{{ media | image_url: width: 1200 }}"
@@ -154,19 +164,24 @@
                   data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
                 {% endif %}
               >
-                <img src="{{ media | image_url: width: 240 }}" class="w-full h-full object-cover pointer-events-none">
-                {% if media.variants.size > 0 %}
-                  <span class="block text-[10px] text-center mt-1 leading-tight">
-                    {{ media.variants.first.title }}
-                  </span>
-                {% endif %}
+                {% comment %} 画像が入る正方形のエリア {% endcomment %}
+                <div class="aspect-square w-full border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} relative overflow-hidden">
+                  <img src="{{ media | image_url: width: 240 }}" class="w-full h-full object-cover pointer-events-none">
 
-                {% if media.media_type contains 'video' %}
-                  <div class="thumb-video-badge">
-                    <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
-                    </svg>
-                  </div>
+                  {% if media.media_type contains 'video' %}
+                    <div class="thumb-video-badge absolute inset-0 flex items-center justify-center bg-black/10">
+                      <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                      </svg>
+                    </div>
+                  {% endif %}
+                </div>
+
+                {% comment %} 3. 画像の「外」にテキストを表示する（ショップチャンネル風） {% endcomment %}
+                {% if variant_label != '' %}
+                  <span class="block text-[10px] text-center mt-1 leading-tight text-gray-700">
+                    {{ variant_label }}
+                  </span>
                 {% endif %}
               </div>
             {% endfor %}
