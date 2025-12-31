@@ -145,7 +145,6 @@
 
           <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
             {% for media in product.media %}
-              {% comment %} 1. この画像に紐付いているバリエーション名を「探す」ロジックに変更 {% endcomment %}
               {% assign variant_label = '' %}
               {% for variant in product.variants %}
                 {% if variant.featured_media.id == media.id %}
@@ -154,7 +153,6 @@
                 {% endif %}
               {% endfor %}
 
-              {% comment %} 2. レイアウト用の箱（正方形は画像部分だけに適用） {% endcomment %}
               <div
                 class="js-thumb w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
                 data-media-type="{{ media.media_type }}"
@@ -164,8 +162,8 @@
                   data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
                 {% endif %}
               >
-                {% comment %} 画像が入る正方形のエリア {% endcomment %}
-                <div class="aspect-square w-full border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} relative overflow-hidden">
+                {% comment %} ↓ ここ！枠線を持っている div に js-thumb-border を付ける {% endcomment %}
+                <div class="js-thumb-border aspect-square w-full border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} relative overflow-hidden">
                   <img src="{{ media | image_url: width: 240 }}" class="w-full h-full object-cover pointer-events-none">
 
                   {% if media.media_type contains 'video' %}
@@ -177,10 +175,9 @@
                   {% endif %}
                 </div>
 
-                {% comment %} 3. 画像の「外」にテキストを表示する {% endcomment %}
                 {% if variant_label != '' %}
                   <span class="block text-[14px] text-center mt-1 leading-tight text-gray-700">
-                    {{ variant_label | truncate: 15, '...' }}
+                    {{ variant_label | truncate: 11, '...' }}
                   </span>
                 {% endif %}
               </div>
@@ -376,6 +373,75 @@
       if (thumbPrev) thumbPrev.addEventListener('click', () => thumbList.scrollBy({ left: -200, behavior: 'smooth' }));
       if (thumbNext) thumbNext.addEventListener('click', () => thumbList.scrollBy({ left: 200, behavior: 'smooth' }));
     };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
+<script>
+  (function () {
+    const init = () => {
+      const container = document.getElementById('MainMediaContainer');
+      const thumbList = document.getElementById('ThumbList');
+      const thumbs = document.querySelectorAll('.js-thumb');
+      const mainPrev = document.getElementById('MainPrev');
+      const mainNext = document.getElementById('MainNext');
+      const thumbPrev = document.getElementById('ThumbPrev');
+      const thumbNext = document.getElementById('ThumbNext');
+      let currentIndex = 0;
+
+      if (!thumbList) return;
+
+      const updateMedia = (index) => {
+        const target = thumbs[index];
+        if (!target) return;
+
+        // 1. メイン画像の切り替え
+        const type = target.getAttribute('data-media-type');
+        if (type === 'image') {
+          container.innerHTML = `<img src="${target.getAttribute('data-src')}" class="w-full h-full object-cover">`;
+        } else {
+          const txt = document.createElement('textarea');
+          txt.innerHTML = target.getAttribute('data-video-html');
+          container.innerHTML = txt.value;
+          const v = container.querySelector('video');
+          if (v) v.play();
+        }
+
+        // 2. 枠線のクラス付け替え（!importantなしのスマートな実装）
+        // まず全ての枠を透明にする
+        document.querySelectorAll('.js-thumb-border').forEach((borderBox) => {
+          borderBox.classList.remove('border-black');
+          borderBox.classList.add('border-transparent');
+        });
+        // クリックされたサムネイルの中にある枠だけを黒くする
+        const activeBorder = target.querySelector('.js-thumb-border');
+        if (activeBorder) {
+          activeBorder.classList.remove('border-transparent');
+          activeBorder.classList.add('border-black');
+        }
+
+        // 3. アクティブ状態の管理とスクロール
+        thumbs.forEach((t) => t.classList.remove('is-active'));
+        target.classList.add('is-active');
+        currentIndex = index;
+        target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      };
+
+      thumbs.forEach((thumb, index) => {
+        thumb.addEventListener('click', () => updateMedia(index));
+      });
+
+      if (mainPrev)
+        mainPrev.addEventListener('click', () => updateMedia((currentIndex - 1 + thumbs.length) % thumbs.length));
+      if (mainNext) mainNext.addEventListener('click', () => updateMedia((currentIndex + 1) % thumbs.length));
+      if (thumbPrev) thumbPrev.addEventListener('click', () => thumbList.scrollBy({ left: -200, behavior: 'smooth' }));
+      if (thumbNext) thumbNext.addEventListener('click', () => thumbList.scrollBy({ left: 200, behavior: 'smooth' }));
+    };
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
