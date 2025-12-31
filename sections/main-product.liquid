@@ -154,8 +154,6 @@
                   data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
                 {% endif %}
               >
-                {{ media.variants.first.title }}
-
                 {% if media.media_type contains 'video' %}
                   <div class="thumb-video-badge">
                     <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
