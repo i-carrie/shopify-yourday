@@ -329,26 +329,6 @@
           </div>
         </div>
 
-        {% if product.available %}
-          <div class="quantity-selector" style="margin-top: 20px; display: flex; align-items: center; gap: 15px;">
-            <label for="Quantity-{{ section.id }}" style="font-size: 14px; font-weight: bold; color: #333;">数量</label>
-            <div style="position: relative; width: 80px;">
-              <select
-                name="quantity"
-                id="Quantity-{{ section.id }}"
-                style="width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none;"
-              >
-                {% for i in (1..10) %}
-                  <option value="{{ i }}">{{ i }}</option>
-                {% endfor %}
-              </select>
-              <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 10px;">
-                ▼
-              </div>
-            </div>
-          </div>
-        {% endif %}
-
         <button class="w-full bg-black text-white py-4 font-bold text-sm hover:bg-gray-800 transition uppercase tracking-widest">
           ADD TO CART
         </button>
