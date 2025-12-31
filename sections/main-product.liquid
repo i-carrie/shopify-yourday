@@ -169,7 +169,6 @@
                   <img src="{{ media | image_url: width: 240 }}" class="w-full h-full object-cover pointer-events-none">
 
                   {% if media.media_type contains 'video' %}
-                    {% comment %} ↓ `js-thumb-border` を追加したよ！ {% endcomment %}
                     <div class="js-thumb-border aspect-square w-full border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} relative overflow-hidden">
                       <img
                         src="{{ media | image_url: width: 240 }}"
@@ -385,6 +384,29 @@
       init();
     }
   })();
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const thumbs = document.querySelectorAll('.js-thumb');
+
+    thumbs.forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        // 1. 全てのサムネイルから一度黒枠を消して、透明にする
+        document.querySelectorAll('.js-thumb-border').forEach((borderBox) => {
+          borderBox.classList.remove('border-black');
+          borderBox.classList.add('border-transparent');
+        });
+
+        // 2. 今クリックされたサムネイルの中にある箱（borderBox）だけに黒枠をつける
+        const selectedBorder = thumb.querySelector('.js-thumb-border');
+        if (selectedBorder) {
+          selectedBorder.classList.remove('border-transparent');
+          selectedBorder.classList.add('border-black');
+        }
+      });
+    });
+  });
 </script>
 
 {% schema %}
