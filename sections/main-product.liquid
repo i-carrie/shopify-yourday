@@ -149,7 +149,7 @@
                 class="js-thumb aspect-square w-[calc(20%-0.4rem)] flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} relative"
                 data-media-type="{{ media.media_type }}"
                 {% if media.media_type == 'image' %}
-                  data-src="{{ media | image_url: width: 1200 }}"あ
+                  data-src="{{ media | image_url: width: 1200 }}"
                 {% else %}
                   data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
                 {% endif %}
@@ -164,6 +164,7 @@
                 {% endif %}
               </div>
             {% endfor %}
+            あああ
           </div>
 
           <button
