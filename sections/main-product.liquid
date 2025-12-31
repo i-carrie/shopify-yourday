@@ -180,7 +180,7 @@
                 {% comment %} 3. 画像の「外」にテキストを表示する {% endcomment %}
                 {% if variant_label != '' %}
                   <span class="block text-[14px] text-center mt-1 leading-tight text-gray-700">
-                    {{ variant_label | truncate: 10, '...' }}
+                    {{ variant_label | truncate: 14, '...' }}
                   </span>
                 {% endif %}
               </div>
