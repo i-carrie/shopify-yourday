@@ -313,15 +313,24 @@
                     <span class="text-sm text-gray-600">{{ variant.price | money }}</span>
                   </div>
 
-                  {% comment %} 個数入力欄 {% endcomment %}
+                  {% comment %} 個数入力欄（プルダウンに変更） {% endcomment %}
                   <div class="col-span-3 flex justify-center">
-                    <input
-                      type="number"
-                      name="updates[{{ variant.id }}]"
-                      value="0"
-                      min="0"
-                      class="js-matrix-quantity w-16 text-center border border-gray-300 rounded-md py-1 text-sm focus:ring-black focus:border-black"
-                    >
+                    <div style="position: relative; width: 70px;">
+                      <select
+                        name="updates[{{ variant.id }}]"
+                        class="js-matrix-quantity"
+                        style="width: 100%; padding: 6px 24px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
+                      >
+                        {% comment %} 0から10までの選択肢を作成（デフォルトは0） {% endcomment %}
+                        {% for i in (0..10) %}
+                          <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                      </select>
+                      {% comment %} カスタムの下矢印（▼） {% endcomment %}
+                      <div style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 10px;">
+                        ▼
+                      </div>
+                    </div>
                   </div>
                 </div>
               {% endfor %}
