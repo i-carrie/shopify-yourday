@@ -282,7 +282,51 @@
       <div class="h-px bg-gray-100 w-full"></div>
       <div class="space-y-4">
         <div class="w-full h-12 bg-gray-50 border border-gray-200 flex items-center px-4 text-sm text-gray-400">
-          Variant Picker Placeholder
+          {% comment %} Variant Picker Placeholder {% endcomment %}
+          <div class="matrix-variant-selector mt-6 mb-8">
+            {% comment %} 1. ヘッダー部分（項目名を自動取得） {% endcomment %}
+            <div class="grid grid-cols-12 gap-2 pb-2 border-b border-gray-200 text-[12px] font-bold text-gray-500 uppercase tracking-wider">
+              <div class="col-span-6">{{ product.options.first }}</div>
+              <div class="col-span-3 text-right">価格</div>
+              <div class="col-span-3 text-center">個数</div>
+            </div>
+
+            {% comment %} 2. バリエーションごとの行をループで作成 {% endcomment %}
+            <div class="divide-y divide-gray-100">
+              {% for variant in product.variants %}
+                <div
+                  class="grid grid-cols-12 gap-2 py-4 items-center js-variant-row"
+                  data-variant-id="{{ variant.id }}"
+                >
+                  {% comment %} バリエーション名（若葉、あじさい、さくらなど） {% endcomment %}
+                  <div class="col-span-6 flex flex-col">
+                    <span class="text-sm font-bold text-gray-800">{{ variant.title }}</span>
+                    {% if variant.inventory_quantity <= 5 and variant.inventory_quantity > 0 %}
+                      <span class="text-[10px] text-red-500 font-bold"
+                        >残りわずか（{{ variant.inventory_quantity }}個）</span
+                      >
+                    {% endif %}
+                  </div>
+
+                  {% comment %} 価格表示 {% endcomment %}
+                  <div class="col-span-3 text-right">
+                    <span class="text-sm text-gray-600">{{ variant.price | money }}</span>
+                  </div>
+
+                  {% comment %} 個数入力欄 {% endcomment %}
+                  <div class="col-span-3 flex justify-center">
+                    <input
+                      type="number"
+                      name="updates[{{ variant.id }}]"
+                      value="0"
+                      min="0"
+                      class="js-matrix-quantity w-16 text-center border border-gray-300 rounded-md py-1 text-sm focus:ring-black focus:border-black"
+                    >
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
         </div>
 
         {% if product.available %}
