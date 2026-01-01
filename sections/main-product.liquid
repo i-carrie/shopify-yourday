@@ -37,7 +37,6 @@
     cursor: pointer;
   }
 
-  /* 3. デバイスごとの出し分け */
   @media (min-width: 1024px) {
     .mobile-nav-only {
       display: none;
@@ -49,7 +48,6 @@
     }
   }
 
-  /* 動画プレイバッジ */
   .thumb-video-badge {
     position: absolute;
     top: 50%;
@@ -67,6 +65,7 @@
 
 <section class="max-w-6xl mx-auto px-4 py-8 md:px-8 lg:py-12">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+    {% comment %} --- 左側：メディアエリア（truncate 15） --- {% endcomment %}
     <div class="flex flex-col gap-4 w-full">
       <div id="MainVisualArea" class="relative aspect-square w-full bg-gray-50 overflow-hidden border border-gray-100">
         <div id="MainMediaContainer" class="w-full h-full">
@@ -89,7 +88,6 @@
             {% endif %}
           {% endif %}
         </div>
-
         <button
           id="MainPrev"
           type="button"
@@ -142,30 +140,26 @@
               <path d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button>
-
           <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
             {% for media in product.media %}
               {% assign variant_label = '' %}
               {% for variant in product.variants %}
-                {% if variant.featured_media.id == media.id %}
-                  {% assign variant_label = variant.title %}
-                  {% break %}
-                {% endif %}
+                {% if variant.featured_media.id == media.id -%}
+                  {%- assign variant_label = variant.title -%}
+                  {%- break -%}
+                {%- endif %}
               {% endfor %}
-
               <div
                 class="js-thumb w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
                 data-media-type="{{ media.media_type }}"
                 {% if media.media_type == 'image' %}
                   data-src="{{ media | image_url: width: 1200 }}"
                 {% else %}
-                  data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
+                  data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: 'w-full h-full object-cover' | escape }}"
                 {% endif %}
               >
-                {% comment %} ↓ ここ！枠線を持っている div に js-thumb-border を付ける {% endcomment %}
                 <div class="js-thumb-border aspect-square w-full border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} relative overflow-hidden">
                   <img src="{{ media | image_url: width: 240 }}" class="w-full h-full object-cover pointer-events-none">
-
                   {% if media.media_type contains 'video' %}
                     <div class="thumb-video-badge absolute inset-0 flex items-center justify-center bg-black/10">
                       <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -174,7 +168,7 @@
                     </div>
                   {% endif %}
                 </div>
-
+                {% comment %} サムネイルのラベル（15文字でtruncate維持） {% endcomment %}
                 {% if variant_label != '' %}
                   <span class="block text-[14px] text-center mt-1 leading-tight text-gray-700">
                     {{ variant_label | truncate: 15, '...' }}
@@ -183,7 +177,6 @@
               </div>
             {% endfor %}
           </div>
-
           <button
             id="ThumbNext"
             type="button"
@@ -204,64 +197,52 @@
       {% endif %}
     </div>
 
+    {% comment %} --- 右側：商品情報エリア --- {% endcomment %}
     <div class="flex flex-col gap-6 w-full">
       <div class="space-y-3">
         <div class="flex flex-wrap gap-2 mb-4">
-          {% if product.compare_at_price > product.price %}
+          {% if product.compare_at_price > product.price -%}
             <span class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-tighter shadow-sm"
               >Sale</span
             >
-          {% endif %}
-
-          {% if product.metafields.custom.is_new.value == true %}
+          {%- endif %}
+          {% if product.metafields.custom.is_new.value == true -%}
             <span class="bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm">新着</span>
-          {% endif %}
-
-          {% if product.metafields.custom.is_limited.value == true %}
+          {%- endif %}
+          {% if product.metafields.custom.is_limited.value == true -%}
             <span class="border border-blue-400 text-blue-500 text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm"
               >期間限定価格</span
             >
-          {% endif %}
+          {%- endif %}
         </div>
 
         <h1 class="text-2xl md:text-3xl font-serif text-gray-900 leading-tight">{{ product.title }}</h1>
-
         {% if product.metafields.custom.product_subtitle != blank %}
           <p class="text-sm font-bold text-gray-700 leading-relaxed mt-2 mb-1">
             {{ product.metafields.custom.product_subtitle }}
           </p>
         {% endif %}
-
         {% assign current_variant = product.selected_or_first_available_variant %}
         {% if current_variant.sku != blank %}
           <p class="text-sm text-gray-600 mt-2 mb-2">商品番号：{{ current_variant.sku }}</p>
         {% endif %}
 
-        {% if product.metafields.custom.start_date.value and product.metafields.custom.end_date.value %}
-          {% assign start = product.metafields.custom.start_date.value %}
-          {% assign end = product.metafields.custom.end_date.value %}
-
-          {% comment %} 曜日の配列を作成（0=日, 1=月...） {% endcomment %}
+{% if product.metafields.custom.start_date.value and product.metafields.custom.end_date.value %}
           {% assign weekdays = '日,月,火,水,木,金,土' | split: ',' %}
-
-          {% comment %} 開始日の「月/日」と「曜日」を取得 {% endcomment %}
-          {% assign start_md = start | date: '%m/%-d' %}
-          {% assign start_w_idx = start | date: '%w' | plus: 0 %}
-          {% assign start_w = weekdays[start_w_idx] %}
-
-          {% comment %} 終了日の「月/日」と「曜日」を取得 {% endcomment %}
-          {% assign end_md = end | date: '%m/%-d' %}
-          {% assign end_w_idx = end | date: '%w' | plus: 0 %}
-          {% assign end_w = weekdays[end_w_idx] %}
-
+          {% assign start_day_index = product.metafields.custom.start_date.value | date: '%w' | plus: 0 %}
+          {% assign end_day_index = product.metafields.custom.end_date.value | date: '%w' | plus: 0 %}
           <div style="background-color: #f3f4f6; padding: 10px; border-left: 4px solid #0066ff; margin-bottom: 16px;">
             <p style="color: #0066ff; font-weight: bold; font-size: 13px; margin: 0; letter-spacing: -0.02em;">
-              期間限定：{{ start_md }}({{ start_w }}) 〜 {{ end_md }}({{ end_w }})
+              期間限定：{{ product.metafields.custom.start_date.value | date: '%m/%-d' }}(
+              {{- weekdays[start_day_index] -}}
+              ) 〜 {{ product.metafields.custom.end_date.value | date: '%m/%-d' }}(
+              {{- weekdays[end_day_index] -}}
+              )
             </p>
           </div>
         {% endif %}
 
-        <p class="text-xl text-gray-800">{{ product.price | money }}</p>
+        <p class="text-xl text-gray-800 font-bold">{{ product.price | money }}</p>
 
         {% if product.vendor != blank %}
           <div class="flex items-center gap-2 mt-4">
@@ -270,91 +251,73 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
               </svg>
             </span>
-            <a
+            
               href="{{ product.vendor | url_for_vendor }}"
-              class="text-sm text-gray-600 hover:text-pink-600 hover:underline transition"
+              class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
             >
               {{ product.vendor }}の商品一覧を見る
             </a>
           </div>
         {% endif %}
       </div>
-      <div class="h-px bg-gray-100 w-full"></div>
-      <div class="space-y-4">
-        <div class="w-full h-12 bg-gray-50 border border-gray-200 flex items-center px-4 text-sm text-gray-400">
-          {% comment %} Variant Picker Placeholder {% endcomment %}
-          <div class="matrix-variant-selector mt-6 mb-8">
-            {% comment %} 1. ヘッダー部分（項目名を自動取得） {% endcomment %}
-            <div class="grid grid-cols-12 gap-2 pb-2 border-b border-gray-200 text-[12px] font-bold text-gray-500 uppercase tracking-wider">
-              <div class="col-span-6">
-                {% if product.has_only_default_variant %}
-                  商品名
-                {% else %}
-                  {{ product.options.first }}
-                {% endif %}
-              </div>
 
-              <div class="col-span-3 text-right">価格</div>
-              <div class="col-span-3 text-center">個数</div>
-            </div>
+      <div class="h-px bg-gray-100 w-full mt-4"></div>
 
-            {% comment %} 2. バリエーションごとの行をループで作成 {% endcomment %}
-            <div class="divide-y divide-gray-100">
-              {% for variant in product.variants %}
-                <div
-                  class="grid grid-cols-12 gap-2 py-4 items-center js-variant-row"
-                  data-variant-id="{{ variant.id }}"
-                >
-                  {% comment %} バリエーション名（若葉、あじさい、さくらなど） {% endcomment %}
-                  <div class="col-span-6 flex flex-col">
-                    <span class="text-sm font-bold text-gray-800">
-                      {% if product.has_only_default_variant %}
-                        {{ product.title }}
-                      {% else %}
-                        {{ variant.title }}
-                      {% endif %}
-                    </span>
-
-                    {% if variant.inventory_quantity <= 5 and variant.inventory_quantity > 0 %}
-                      <span class="text-[10px] text-red-500 font-bold"
-                        >残りわずか（{{ variant.inventory_quantity }}個）</span
-                      >
-                    {% endif %}
-                  </div>
-
-                  {% comment %} 価格表示 {% endcomment %}
-                  <div class="col-span-3 text-right">
-                    <span class="text-sm text-gray-600">{{ variant.price | money }}</span>
-                  </div>
-
-                  {% comment %} 個数入力欄（プルダウンに変更） {% endcomment %}
-                  <div class="col-span-3 flex justify-center">
-                    <div style="position: relative; width: 70px;">
-                      <select
-                        name="updates[{{ variant.id }}]"
-                        class="js-matrix-quantity"
-                        style="width: 100%; padding: 6px 24px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
-                      >
-                        {% comment %} 0から10までの選択肢を作成（デフォルトは0） {% endcomment %}
-                        {% for i in (0..10) %}
-                          <option value="{{ i }}">{{ i }}</option>
-                        {% endfor %}
-                      </select>
-                      {% comment %} カスタムの下矢印（▼） {% endcomment %}
-                      <div style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 10px;">
-                        ▼
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
+      {% comment %} マトリックス・バリエーションセレクター {% endcomment %}
+      <div class="matrix-variant-selector pt-4 mt-4">
+        <div class="grid grid-cols-12 gap-2 pb-2 border-b border-gray-200 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+          <div class="col-span-6">
+            {% if product.has_only_default_variant %}商品名{% else %}{{ product.options.first }}{% endif %}
           </div>
+          <div class="col-span-3 text-right">価格</div>
+          <div class="col-span-3 text-center">個数</div>
         </div>
 
-        <button class="w-full bg-black text-white py-4 font-bold text-sm hover:bg-gray-800 transition uppercase tracking-widest">
-          ADD TO CART
-        </button>
+        {% comment %} バリエーションのループ処理 {% endcomment %}
+        <div class="space-y-0">
+          {% for variant in product.variants %}
+            <div class="grid grid-cols-12 gap-2 py-4 items-center border-b border-gray-100 js-variant-row" data-variant-id="{{ variant.id }}">
+              <div class="col-span-6 flex flex-col pr-2">
+                <span class="text-sm font-bold text-gray-800 leading-snug break-words">
+                  {% if product.has_only_default_variant %}{{ product.title }}{% else %}{{ variant.title }}{% endif %}
+                </span>
+                {% if variant.inventory_quantity <= 5 and variant.inventory_quantity > 0 %}
+                  <span class="text-[10px] text-red-500 font-bold mt-1"
+                    >残りわずか（{{ variant.inventory_quantity }}個）</span
+                  >
+                {% endif %}
+              </div>
+              <div class="col-span-3 text-right">
+                <span class="text-sm text-gray-600">{{ variant.price | money }}</span>
+              </div>
+              <div class="col-span-3 flex justify-center">
+                <div style="position: relative; width: 64px;">
+                  <select
+                    name="updates[{{ variant.id }}]"
+                    class="js-matrix-quantity"
+                    style="width: 100%; padding: 6px 20px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
+                  >
+                    {% for i in (0..10) %}
+                      <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                  </select>
+                  <div style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 8px;">
+                    ▼
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="mt-6">
+          <button
+            id="AddToCart"
+            class="w-full bg-black text-white py-4 font-bold text-sm hover:bg-gray-800 transition uppercase tracking-widest"
+          >
+            ADD TO CART
+          </button>
+        </div>
       </div>
 
       <div class="border-t border-gray-100 mt-2">
@@ -362,15 +325,15 @@
           <summary class="flex justify-between items-center py-4 cursor-pointer list-none">
             <span class="text-xs font-bold uppercase tracking-widest text-gray-900">商品詳細</span>
             <span class="transition-transform duration-300 group-open:rotate-180">
-              {% render 'icon-chevron-down' %}
+              {%- render 'icon-chevron-down' -%}
             </span>
           </summary>
           <div class="pb-6 text-sm leading-relaxed text-gray-600">
-            {% if product.description != blank %}
-              {{ product.description }}
-            {% else %}
+            {% if product.description != blank -%}
+              {{- product.description -}}
+            {%- else -%}
               <strong>商品詳細情報はありません。</strong>
-            {% endif %}
+            {%- endif %}
           </div>
         </details>
       </div>
@@ -405,73 +368,17 @@
           const v = container.querySelector('video');
           if (v) v.play();
         }
-        thumbs.forEach((t) => t.classList.remove('is-active'));
-        target.classList.add('is-active');
-        currentIndex = index;
-        target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      };
 
-      thumbs.forEach((thumb, index) => {
-        thumb.addEventListener('click', () => updateMedia(index));
-      });
-      if (mainPrev)
-        mainPrev.addEventListener('click', () => updateMedia((currentIndex - 1 + thumbs.length) % thumbs.length));
-      if (mainNext) mainNext.addEventListener('click', () => updateMedia((currentIndex + 1) % thumbs.length));
-      if (thumbPrev) thumbPrev.addEventListener('click', () => thumbList.scrollBy({ left: -200, behavior: 'smooth' }));
-      if (thumbNext) thumbNext.addEventListener('click', () => thumbList.scrollBy({ left: 200, behavior: 'smooth' }));
-    };
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
-  })();
-</script>
-
-<script>
-  (function () {
-    const init = () => {
-      const container = document.getElementById('MainMediaContainer');
-      const thumbList = document.getElementById('ThumbList');
-      const thumbs = document.querySelectorAll('.js-thumb');
-      const mainPrev = document.getElementById('MainPrev');
-      const mainNext = document.getElementById('MainNext');
-      const thumbPrev = document.getElementById('ThumbPrev');
-      const thumbNext = document.getElementById('ThumbNext');
-      let currentIndex = 0;
-
-      if (!thumbList) return;
-
-      const updateMedia = (index) => {
-        const target = thumbs[index];
-        if (!target) return;
-
-        // 1. メイン画像の切り替え
-        const type = target.getAttribute('data-media-type');
-        if (type === 'image') {
-          container.innerHTML = `<img src="${target.getAttribute('data-src')}" class="w-full h-full object-cover">`;
-        } else {
-          const txt = document.createElement('textarea');
-          txt.innerHTML = target.getAttribute('data-video-html');
-          container.innerHTML = txt.value;
-          const v = container.querySelector('video');
-          if (v) v.play();
-        }
-
-        // 2. 枠線のクラス付け替え（!importantなしのスマートな実装）
-        // まず全ての枠を透明にする
         document.querySelectorAll('.js-thumb-border').forEach((borderBox) => {
           borderBox.classList.remove('border-black');
           borderBox.classList.add('border-transparent');
         });
-        // クリックされたサムネイルの中にある枠だけを黒くする
         const activeBorder = target.querySelector('.js-thumb-border');
         if (activeBorder) {
           activeBorder.classList.remove('border-transparent');
           activeBorder.classList.add('border-black');
         }
 
-        // 3. アクティブ状態の管理とスクロール
         thumbs.forEach((t) => t.classList.remove('is-active'));
         target.classList.add('is-active');
         currentIndex = index;
@@ -481,7 +388,6 @@
       thumbs.forEach((thumb, index) => {
         thumb.addEventListener('click', () => updateMedia(index));
       });
-
       if (mainPrev)
         mainPrev.addEventListener('click', () => updateMedia((currentIndex - 1 + thumbs.length) % thumbs.length));
       if (mainNext) mainNext.addEventListener('click', () => updateMedia((currentIndex + 1) % thumbs.length));
@@ -503,6 +409,10 @@
   "tag": "section",
   "class": "section",
   "settings": [],
-  "presets": [{ "name": "メイン商品" }]
+  "presets": [
+    {
+      "name": "メイン商品"
+    }
+  ]
 }
 {% endschema %}
