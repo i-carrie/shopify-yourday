@@ -122,7 +122,11 @@
         </button>
       </div>
 
-      {% if product.media.size > 1 %}
+      {% comment %} ★まずセット品の情報を取得 {% endcomment %}
+      {% assign related_set = product.metafields.custom.related_set.value %}
+
+      {% comment %} ★条件を「画像が2枚以上、またはセット品がある時」に変更 {% endcomment %}
+      {% if product.media.size > 1 or related_set != blank %}
         <div class="relative w-full group">
           <button
             id="ThumbPrev"
@@ -140,7 +144,9 @@
               <path d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button>
+
           <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
+            {% comment %} 1. 通常の商品画像をループ {% endcomment %}
             {% for media in product.media %}
               {% assign variant_label = '' %}
               {% for variant in product.variants %}
@@ -159,7 +165,11 @@
                 {% endif %}
               >
                 <div class="js-thumb-border aspect-square w-full border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} relative overflow-hidden">
-                  <img src="{{ media | image_url: width: 240 }}" class="w-full h-full object-cover pointer-events-none">
+                  <img
+                    src="{{ media | image_url: width: 240 }}"
+                    class="w-full h-full object-cover pointer-events-none"
+                    loading="lazy"
+                  >
                   {% if media.media_type contains 'video' %}
                     <div class="thumb-video-badge absolute inset-0 flex items-center justify-center bg-black/10">
                       <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -168,7 +178,6 @@
                     </div>
                   {% endif %}
                 </div>
-                {% comment %} サムネイルのラベル（15文字でtruncate維持） {% endcomment %}
                 {% if variant_label != '' %}
                   <span class="block text-[14px] text-center mt-1 leading-tight text-gray-700">
                     {{ variant_label | truncate: 15, '...' }}
@@ -177,8 +186,7 @@
               </div>
             {% endfor %}
 
-            {% comment %} 2. ★セット商品のサムネイルを追加 {% endcomment %}
-            {% assign related_set = product.metafields.custom.related_set.value %}
+            {% comment %} 2. ★セット商品のサムネイル（紐付けがある場合のみ） {% endcomment %}
             {% if related_set != blank and related_set.featured_media %}
               {% assign set_media = related_set.featured_media %}
               <div
@@ -210,6 +218,7 @@
               </div>
             {% endif %}
           </div>
+
           <button
             id="ThumbNext"
             type="button"
