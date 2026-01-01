@@ -320,7 +320,8 @@
               class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-pink-100 bg-pink-50/20 js-variant-row"
               data-variant-id="{{ set_variant.id }}"
             >
-              <div class="col-span-6 flex flex-col pr-2 pl-2">
+              {% comment %} ★ pl-2 を削除して、上の行と開始位置を統一したよ {% endcomment %}
+              <div class="col-span-6 flex flex-col pr-2">
                 <span class="text-sm font-bold text-gray-900 leading-snug"> {{ related_set.title }} </span>
                 <p class="text-[12px] text-gray-500 mt-1">{{ related_set.metafields.custom.product_subtitle }}</p>
               </div>
