@@ -176,6 +176,39 @@
                 {% endif %}
               </div>
             {% endfor %}
+
+            {% comment %} 2. ★セット商品のサムネイルを追加 {% endcomment %}
+            {% assign related_set = product.metafields.custom.related_set.value %}
+            {% if related_set != blank and related_set.featured_media %}
+              {% assign set_media = related_set.featured_media %}
+              <div
+                class="js-thumb w-[calc(33.333%-0.4rem)] lg:w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
+                data-media-type="{{ set_media.media_type }}"
+                {% if set_media.media_type == 'image' %}
+                  data-src="{{ set_media | image_url: width: 1200 }}"
+                {% else %}
+                  data-video-html="{{ set_media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: 'w-full h-full object-cover' | escape }}"
+                {% endif %}
+              >
+                <div class="js-thumb-border aspect-square w-full border-2 border-transparent relative overflow-hidden">
+                  <img
+                    src="{{ set_media | image_url: width: 240 }}"
+                    class="w-full h-full object-cover pointer-events-none"
+                    loading="lazy"
+                  >
+                  {% if set_media.media_type contains 'video' %}
+                    <div class="thumb-video-badge absolute inset-0 flex items-center justify-center bg-black/10">
+                      <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                      </svg>
+                    </div>
+                  {% endif %}
+                </div>
+                <span class="block text-[14px] text-center mt-1 leading-tight text-gray-700">
+                  {{ related_set.title | truncate: 15, '...' }}
+                </span>
+              </div>
+            {% endif %}
           </div>
           <button
             id="ThumbNext"
