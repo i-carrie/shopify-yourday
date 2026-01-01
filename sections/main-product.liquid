@@ -227,7 +227,7 @@
           <p class="text-sm text-gray-600 mt-2 mb-2">商品番号：{{ current_variant.sku }}</p>
         {% endif %}
 
-{% if product.metafields.custom.start_date.value and product.metafields.custom.end_date.value %}
+        {% if product.metafields.custom.start_date.value and product.metafields.custom.end_date.value %}
           {% assign weekdays = '日,月,火,水,木,金,土' | split: ',' %}
           {% assign start_day_index = product.metafields.custom.start_date.value | date: '%w' | plus: 0 %}
           {% assign end_day_index = product.metafields.custom.end_date.value | date: '%w' | plus: 0 %}
@@ -251,7 +251,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
               </svg>
             </span>
-            
+
+            <a
               href="{{ product.vendor | url_for_vendor }}"
               class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
             >
@@ -276,7 +277,10 @@
         {% comment %} バリエーションのループ処理 {% endcomment %}
         <div class="space-y-0">
           {% for variant in product.variants %}
-            <div class="grid grid-cols-12 gap-2 py-4 items-center border-b border-gray-100 js-variant-row" data-variant-id="{{ variant.id }}">
+            <div
+              class="grid grid-cols-12 gap-2 py-4 items-center border-b border-gray-100 js-variant-row"
+              data-variant-id="{{ variant.id }}"
+            >
               <div class="col-span-6 flex flex-col pr-2">
                 <span class="text-sm font-bold text-gray-800 leading-snug break-words">
                   {% if product.has_only_default_variant %}{{ product.title }}{% else %}{{ variant.title }}{% endif %}
