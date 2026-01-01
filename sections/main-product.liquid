@@ -262,9 +262,8 @@
         {% endif %}
       </div>
 
-      {% comment %} <div class="h-px bg-gray-100 w-full mt-4"></div> {% endcomment %}
-
       {% comment %} マトリックス・バリエーションセレクター {% endcomment %}
+      {% comment %} --- バリエーションのマトリックス表 --- {% endcomment %}
       <div class="matrix-variant-selector pt-1 mt-1">
         <div class="grid grid-cols-12 gap-2 pb-2 border-b border-gray-200 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
           <div class="col-span-6">
@@ -312,6 +311,45 @@
               </div>
             </div>
           {% endfor %}
+
+          {% comment %} 2. ★セット商品（related_set）があれば、特別な行として追加 {% endcomment %}
+          {% assign related_set = product.metafields.custom.related_set.value %}
+          {% if related_set != blank %}
+            {% assign set_variant = related_set.first_available_variant %}
+            <div
+              class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-pink-100 bg-pink-50/20 js-variant-row"
+              data-variant-id="{{ set_variant.id }}"
+            >
+              <div class="col-span-6 flex flex-col pr-2 pl-2">
+                <span class="text-sm font-bold text-pink-700 leading-snug">
+                  【お得なセット】{{ related_set.title }}
+                </span>
+                <p class="text-[10px] text-gray-500 mt-1">バスボム3種とソルトの贅沢セット</p>
+              </div>
+              <div class="col-span-3 text-right">
+                <div class="flex flex-col">
+                  <span class="text-[10px] text-gray-400 line-through">{{ related_set.compare_at_price | money }}</span>
+                  <span class="text-sm font-bold text-pink-700">{{ related_set.price | money }}</span>
+                </div>
+              </div>
+              <div class="col-span-3 flex justify-center">
+                <div style="position: relative; width: 64px;">
+                  <select
+                    name="updates[{{ set_variant.id }}]"
+                    class="js-matrix-quantity"
+                    style="width: 100%; padding: 6px 20px 6px 8px; border: 2px solid #fbcfe8; border-radius: 4px; background-color: #fff; color: #be185d; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
+                  >
+                    {% for i in (0..10) %}
+                      <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                  </select>
+                  <div style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #be185d; font-size: 8px;">
+                    ▼
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
         </div>
 
         <div class="mt-6">
