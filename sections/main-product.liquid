@@ -150,7 +150,7 @@
                 {%- endif %}
               {% endfor %}
               <div
-                class="js-thumb w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
+                class="js-thumb w-[calc(33.333%-0.4rem)] lg:w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
                 data-media-type="{{ media.media_type }}"
                 {% if media.media_type == 'image' %}
                   data-src="{{ media | image_url: width: 1200 }}"

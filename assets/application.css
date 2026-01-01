@@ -428,6 +428,9 @@
   .w-\[calc\(20\%-0\.4rem\)\] {
     width: calc(20% - 0.4rem);
   }
+  .w-\[calc\(33\.333\%-0\.4rem\)\] {
+    width: calc(33.333% - 0.4rem);
+  }
   .w-full {
     width: 100%;
   }
@@ -1109,6 +1112,11 @@
   .lg\:grid {
     @media (width >= 64rem) {
       display: grid;
+    }
+  }
+  .lg\:w-\[calc\(20\%-0\.4rem\)\] {
+    @media (width >= 64rem) {
+      width: calc(20% - 0.4rem);
     }
   }
   .lg\:grid-cols-2 {
