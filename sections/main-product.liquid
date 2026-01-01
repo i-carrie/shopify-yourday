@@ -144,10 +144,10 @@
             {% for media in product.media %}
               {% assign variant_label = '' %}
               {% for variant in product.variants %}
-                {% if variant.featured_media.id == media.id -%}
-                  {%- assign variant_label = variant.title -%}
-                  {%- break -%}
-                {%- endif %}
+                {% if variant.featured_media.id == media.id %}
+                  {% assign variant_label = variant.title %}
+                  {% break %}
+                {% endif %}
               {% endfor %}
               <div
                 class="js-thumb w-[calc(33.333%-0.4rem)] lg:w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
@@ -201,19 +201,19 @@
     <div class="flex flex-col gap-6 w-full">
       <div class="space-y-3">
         <div class="flex flex-wrap gap-2 mb-4">
-          {% if product.compare_at_price > product.price -%}
+          {% if product.compare_at_price > product.price %}
             <span class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-tighter shadow-sm"
               >Sale</span
             >
-          {%- endif %}
-          {% if product.metafields.custom.is_new.value == true -%}
+          {% endif %}
+          {% if product.metafields.custom.is_new.value == true %}
             <span class="bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm">新着</span>
-          {%- endif %}
-          {% if product.metafields.custom.is_limited.value == true -%}
+          {% endif %}
+          {% if product.metafields.custom.is_limited.value == true %}
             <span class="border border-blue-400 text-blue-500 text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm"
               >期間限定価格</span
             >
-          {%- endif %}
+          {% endif %}
         </div>
 
         <h1 class="text-2xl md:text-3xl font-serif text-gray-900 leading-tight">{{ product.title }}</h1>
@@ -329,15 +329,15 @@
           <summary class="flex justify-between items-center py-4 cursor-pointer list-none">
             <span class="text-xs font-bold uppercase tracking-widest text-gray-900">商品詳細</span>
             <span class="transition-transform duration-300 group-open:rotate-180">
-              {%- render 'icon-chevron-down' -%}
+              {% render 'icon-chevron-down' %}
             </span>
           </summary>
           <div class="pb-6 text-sm leading-relaxed text-gray-600">
-            {% if product.description != blank -%}
-              {{- product.description -}}
-            {%- else -%}
+            {% if product.description != blank %}
+              {{ product.description }}
+            {% else %}
               <strong>商品詳細情報はありません。</strong>
-            {%- endif %}
+            {% endif %}
           </div>
         </details>
       </div>
