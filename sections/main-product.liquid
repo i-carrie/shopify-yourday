@@ -349,22 +349,28 @@
             </div>
           {% endfor %}
 
-          {% comment %} 2. ★セット商品（related_set）があれば、特別な行として追加 {% endcomment %}
+          {% comment %} 2. ★セット商品（related_set）があれば、追加 {% endcomment %}
           {% assign related_set = product.metafields.custom.related_set.value %}
           {% if related_set != blank %}
             {% assign set_variant = related_set.first_available_variant %}
             <div
-              class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-pink-100 bg-pink-50/20 js-variant-row"
+              class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-gray-100 js-variant-row"
               data-variant-id="{{ set_variant.id }}"
             >
-              {% comment %} ★ pl-2 を削除して、上の行と開始位置を統一したよ {% endcomment %}
               <div class="col-span-6 flex flex-col pr-2">
                 <span class="text-sm font-bold text-gray-900 leading-snug"> {{ related_set.title }} </span>
-                <p class="text-[12px] text-gray-500 mt-1">{{ related_set.metafields.custom.product_subtitle }}</p>
+                {% if related_set.metafields.custom.product_subtitle != blank %}
+                  <p class="text-[12px] text-gray-500 mt-1">{{ related_set.metafields.custom.product_subtitle }}</p>
+                {% endif %}
               </div>
               <div class="col-span-3 text-right">
                 <div class="flex flex-col">
-                  <span class="text-[14px] text-pink-700 line-through">{{ related_set.compare_at_price | money }}</span>
+                  {% if related_set.compare_at_price > related_set.price %}
+                    <span class="text-[10px] text-gray-400 line-through">
+                      {{- related_set.compare_at_price | money -}}
+                    </span>
+                  {% endif %}
+                  {% comment %} 価格のカラーを他の行と同じ gray-600 に統一 {% endcomment %}
                   <span class="text-sm text-gray-600">{{ related_set.price | money }}</span>
                 </div>
               </div>
