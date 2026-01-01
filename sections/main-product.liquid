@@ -37,7 +37,6 @@
     cursor: pointer;
   }
 
-  /* 3. デバイスごとの出し分け */
   @media (min-width: 1024px) {
     .mobile-nav-only {
       display: none;
@@ -49,7 +48,6 @@
     }
   }
 
-  /* 動画プレイバッジ */
   .thumb-video-badge {
     position: absolute;
     top: 50%;
@@ -67,6 +65,7 @@
 
 <section class="max-w-6xl mx-auto px-4 py-8 md:px-8 lg:py-12">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+    {% comment %} --- 左側：メディアエリア（truncate 15） --- {% endcomment %}
     <div class="flex flex-col gap-4 w-full">
       <div id="MainVisualArea" class="relative aspect-square w-full bg-gray-50 overflow-hidden border border-gray-100">
         <div id="MainMediaContainer" class="w-full h-full">
@@ -89,7 +88,6 @@
             {% endif %}
           {% endif %}
         </div>
-
         <button
           id="MainPrev"
           type="button"
@@ -124,7 +122,11 @@
         </button>
       </div>
 
-      {% if product.media.size > 1 %}
+      {% comment %} ★まずセット品の情報を取得 {% endcomment %}
+      {% assign related_set = product.metafields.custom.related_set.value %}
+
+      {% comment %} ★条件を「画像が2枚以上、またはセット品がある時」に変更 {% endcomment %}
+      {% if product.media.size > 1 or related_set != blank %}
         <div class="relative w-full group">
           <button
             id="ThumbPrev"
@@ -144,26 +146,77 @@
           </button>
 
           <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
+            {% comment %} 1. 通常の商品画像をループ {% endcomment %}
             {% for media in product.media %}
+              {% assign variant_label = '' %}
+              {% for variant in product.variants %}
+                {% if variant.featured_media.id == media.id %}
+                  {% assign variant_label = variant.title %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
               <div
-                class="js-thumb aspect-square w-[calc(20%-0.4rem)] flex-shrink-0 border-2 {% if media == featured_media %}is-active{% else %}border-transparent{% endif %} relative"
+                class="js-thumb w-[calc(33.333%-0.4rem)] lg:w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
                 data-media-type="{{ media.media_type }}"
                 {% if media.media_type == 'image' %}
                   data-src="{{ media | image_url: width: 1200 }}"
                 {% else %}
-                  data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: "w-full h-full object-cover" | escape }}"
+                  data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: 'w-full h-full object-cover' | escape }}"
                 {% endif %}
               >
-                <img src="{{ media | image_url: width: 240 }}" class="w-full h-full object-cover pointer-events-none">
-                {% if media.media_type contains 'video' %}
-                  <div class="thumb-video-badge">
-                    <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
-                    </svg>
-                  </div>
+                <div class="js-thumb-border aspect-square w-full border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} relative overflow-hidden">
+                  <img
+                    src="{{ media | image_url: width: 240 }}"
+                    class="w-full h-full object-cover pointer-events-none"
+                    loading="lazy"
+                  >
+                  {% if media.media_type contains 'video' %}
+                    <div class="thumb-video-badge absolute inset-0 flex items-center justify-center bg-black/10">
+                      <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                      </svg>
+                    </div>
+                  {% endif %}
+                </div>
+                {% if variant_label != '' %}
+                  <span class="block text-[14px] text-center mt-1 leading-tight text-gray-700">
+                    {{ variant_label | truncate: 15, '...' }}
+                  </span>
                 {% endif %}
               </div>
             {% endfor %}
+
+            {% comment %} 2. ★セット商品のサムネイル（紐付けがある場合のみ） {% endcomment %}
+            {% if related_set != blank and related_set.featured_media %}
+              {% assign set_media = related_set.featured_media %}
+              <div
+                class="js-thumb w-[calc(33.333%-0.4rem)] lg:w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
+                data-media-type="{{ set_media.media_type }}"
+                {% if set_media.media_type == 'image' %}
+                  data-src="{{ set_media | image_url: width: 1200 }}"
+                {% else %}
+                  data-video-html="{{ set_media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: 'w-full h-full object-cover' | escape }}"
+                {% endif %}
+              >
+                <div class="js-thumb-border aspect-square w-full border-2 border-transparent relative overflow-hidden">
+                  <img
+                    src="{{ set_media | image_url: width: 240 }}"
+                    class="w-full h-full object-cover pointer-events-none"
+                    loading="lazy"
+                  >
+                  {% if set_media.media_type contains 'video' %}
+                    <div class="thumb-video-badge absolute inset-0 flex items-center justify-center bg-black/10">
+                      <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                      </svg>
+                    </div>
+                  {% endif %}
+                </div>
+                <span class="block text-[14px] text-center mt-1 leading-tight text-gray-700">
+                  {{ related_set.title | truncate: 15, '...' }}
+                </span>
+              </div>
+            {% endif %}
           </div>
 
           <button
@@ -186,6 +239,7 @@
       {% endif %}
     </div>
 
+    {% comment %} --- 右側：商品情報エリア --- {% endcomment %}
     <div class="flex flex-col gap-6 w-full">
       <div class="space-y-3">
         <div class="flex flex-wrap gap-2 mb-4">
@@ -194,11 +248,9 @@
               >Sale</span
             >
           {% endif %}
-
           {% if product.metafields.custom.is_new.value == true %}
             <span class="bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm">新着</span>
           {% endif %}
-
           {% if product.metafields.custom.is_limited.value == true %}
             <span class="border border-blue-400 text-blue-500 text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm"
               >期間限定価格</span
@@ -207,43 +259,32 @@
         </div>
 
         <h1 class="text-2xl md:text-3xl font-serif text-gray-900 leading-tight">{{ product.title }}</h1>
-
         {% if product.metafields.custom.product_subtitle != blank %}
           <p class="text-sm font-bold text-gray-700 leading-relaxed mt-2 mb-1">
             {{ product.metafields.custom.product_subtitle }}
           </p>
         {% endif %}
-
         {% assign current_variant = product.selected_or_first_available_variant %}
         {% if current_variant.sku != blank %}
           <p class="text-sm text-gray-600 mt-2 mb-2">商品番号：{{ current_variant.sku }}</p>
         {% endif %}
 
         {% if product.metafields.custom.start_date.value and product.metafields.custom.end_date.value %}
-          {% assign start = product.metafields.custom.start_date.value %}
-          {% assign end = product.metafields.custom.end_date.value %}
-
-          {% comment %} 曜日の配列を作成（0=日, 1=月...） {% endcomment %}
           {% assign weekdays = '日,月,火,水,木,金,土' | split: ',' %}
-
-          {% comment %} 開始日の「月/日」と「曜日」を取得 {% endcomment %}
-          {% assign start_md = start | date: '%m/%-d' %}
-          {% assign start_w_idx = start | date: '%w' | plus: 0 %}
-          {% assign start_w = weekdays[start_w_idx] %}
-
-          {% comment %} 終了日の「月/日」と「曜日」を取得 {% endcomment %}
-          {% assign end_md = end | date: '%m/%-d' %}
-          {% assign end_w_idx = end | date: '%w' | plus: 0 %}
-          {% assign end_w = weekdays[end_w_idx] %}
-
+          {% assign start_day_index = product.metafields.custom.start_date.value | date: '%w' | plus: 0 %}
+          {% assign end_day_index = product.metafields.custom.end_date.value | date: '%w' | plus: 0 %}
           <div style="background-color: #f3f4f6; padding: 10px; border-left: 4px solid #0066ff; margin-bottom: 16px;">
             <p style="color: #0066ff; font-weight: bold; font-size: 13px; margin: 0; letter-spacing: -0.02em;">
-              期間限定：{{ start_md }}({{ start_w }}) 〜 {{ end_md }}({{ end_w }})
+              期間限定：{{ product.metafields.custom.start_date.value | date: '%m/%-d' }}(
+              {{- weekdays[start_day_index] -}}
+              ) 〜 {{ product.metafields.custom.end_date.value | date: '%m/%-d' }}(
+              {{- weekdays[end_day_index] -}}
+              )
             </p>
           </div>
         {% endif %}
 
-        <p class="text-xl text-gray-800">{{ product.price | money }}</p>
+        <p class="text-xl text-gray-800 font-bold">{{ product.price | money }}</p>
 
         {% if product.vendor != blank %}
           <div class="flex items-center gap-2 mt-4">
@@ -252,44 +293,118 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
               </svg>
             </span>
+
             <a
               href="{{ product.vendor | url_for_vendor }}"
-              class="text-sm text-gray-600 hover:text-pink-600 hover:underline transition"
+              class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
             >
               {{ product.vendor }}の商品一覧を見る
             </a>
           </div>
         {% endif %}
       </div>
-      <div class="h-px bg-gray-100 w-full"></div>
-      <div class="space-y-4">
-        <div class="w-full h-12 bg-gray-50 border border-gray-200 flex items-center px-4 text-sm text-gray-400">
-          Variant Picker Placeholder
+
+      {% comment %} マトリックス・バリエーションセレクター {% endcomment %}
+      {% comment %} --- バリエーションのマトリックス表 --- {% endcomment %}
+      <div class="matrix-variant-selector pt-1 mt-1">
+        <div class="grid grid-cols-12 gap-2 pb-2 border-b border-gray-200 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+          <div class="col-span-6">
+            {% if product.has_only_default_variant %}商品名{% else %}{{ product.options.first }}{% endif %}
+          </div>
+          <div class="col-span-3 text-right">価格</div>
+          <div class="col-span-3 text-center">個数</div>
         </div>
 
-        {% if product.available %}
-          <div class="quantity-selector" style="margin-top: 20px; display: flex; align-items: center; gap: 15px;">
-            <label for="Quantity-{{ section.id }}" style="font-size: 14px; font-weight: bold; color: #333;">数量</label>
-            <div style="position: relative; width: 80px;">
-              <select
-                name="quantity"
-                id="Quantity-{{ section.id }}"
-                style="width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none;"
-              >
-                {% for i in (1..10) %}
-                  <option value="{{ i }}">{{ i }}</option>
-                {% endfor %}
-              </select>
-              <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 10px;">
-                ▼
+        {% comment %} バリエーションのループ処理 {% endcomment %}
+        <div class="space-y-0">
+          {% for variant in product.variants %}
+            <div
+              class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-gray-100 js-variant-row"
+              data-variant-id="{{ variant.id }}"
+            >
+              <div class="col-span-6 flex flex-col pr-2">
+                <span class="text-sm font-bold text-gray-800 leading-snug break-words">
+                  {% if product.has_only_default_variant %}
+                    {{ product.title }}
+                  {% else %}
+                    {{ variant.title }}
+                  {% endif %}
+                </span>
+                {% if variant.inventory_quantity <= 5 and variant.inventory_quantity > 0 %}
+                  <span class="text-[10px] text-red-500 font-bold mt-1"
+                    >残りわずか（{{ variant.inventory_quantity }}個）</span
+                  >
+                {% endif %}
+              </div>
+              <div class="col-span-3 text-right">
+                <span class="text-sm text-gray-700">{{ variant.price | money }}</span>
+              </div>
+              <div class="col-span-3 flex justify-center">
+                <div style="position: relative; width: 64px;">
+                  <select
+                    name="updates[{{ variant.id }}]"
+                    class="js-matrix-quantity"
+                    style="width: 100%; padding: 6px 20px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
+                  >
+                    {% for i in (0..10) %}
+                      <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                  </select>
+                  <div style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 8px;">
+                    ▼
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        {% endif %}
+          {% endfor %}
 
-        <button class="w-full bg-black text-white py-4 font-bold text-sm hover:bg-gray-800 transition uppercase tracking-widest">
-          ADD TO CART
-        </button>
+          {% comment %} 2. ★セット商品（related_set）があれば、特別な行として追加 {% endcomment %}
+          {% assign related_set = product.metafields.custom.related_set.value %}
+          {% if related_set != blank %}
+            {% assign set_variant = related_set.first_available_variant %}
+            <div
+              class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-gray-100 js-variant-row"
+              data-variant-id="{{ set_variant.id }}"
+            >
+              {% comment %} ★ pl-2 を削除して、上の行と開始位置を統一したよ {% endcomment %}
+              <div class="col-span-6 flex flex-col pr-2">
+                <span class="text-sm font-bold text-gray-900 leading-snug"> {{ related_set.title }} </span>
+                <p class="text-[12px] text-gray-500 mt-1">{{ related_set.metafields.custom.product_subtitle }}</p>
+              </div>
+              <div class="col-span-3 text-right">
+                <div class="flex flex-col">
+                  <span class="text-[14px] text-pink-700 line-through">{{ related_set.compare_at_price | money }}</span>
+                  <span class="text-sm text-gray-600">{{ related_set.price | money }}</span>
+                </div>
+              </div>
+              <div class="col-span-3 flex justify-center">
+                <div style="position: relative; width: 64px;">
+                  <select
+                    name="updates[{{ set_variant.id }}]"
+                    class="js-matrix-quantity"
+                    style="width: 100%; padding: 6px 20px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
+                  >
+                    {% for i in (0..10) %}
+                      <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                  </select>
+                  <div style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 8px;">
+                    ▼
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="mt-6">
+          <button
+            id="AddToCart"
+            class="w-full bg-black text-white py-4 font-bold text-sm hover:bg-gray-800 transition uppercase tracking-widest"
+          >
+            ADD TO CART
+          </button>
+        </div>
       </div>
 
       <div class="border-t border-gray-100 mt-2">
@@ -340,6 +455,17 @@
           const v = container.querySelector('video');
           if (v) v.play();
         }
+
+        document.querySelectorAll('.js-thumb-border').forEach((borderBox) => {
+          borderBox.classList.remove('border-black');
+          borderBox.classList.add('border-transparent');
+        });
+        const activeBorder = target.querySelector('.js-thumb-border');
+        if (activeBorder) {
+          activeBorder.classList.remove('border-transparent');
+          activeBorder.classList.add('border-black');
+        }
+
         thumbs.forEach((t) => t.classList.remove('is-active'));
         target.classList.add('is-active');
         currentIndex = index;
@@ -355,6 +481,7 @@
       if (thumbPrev) thumbPrev.addEventListener('click', () => thumbList.scrollBy({ left: -200, behavior: 'smooth' }));
       if (thumbNext) thumbNext.addEventListener('click', () => thumbList.scrollBy({ left: 200, behavior: 'smooth' }));
     };
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
@@ -369,6 +496,10 @@
   "tag": "section",
   "class": "section",
   "settings": [],
-  "presets": [{ "name": "メイン商品" }]
+  "presets": [
+    {
+      "name": "メイン商品"
+    }
+  ]
 }
 {% endschema %}
