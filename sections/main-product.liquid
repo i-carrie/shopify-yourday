@@ -440,7 +440,7 @@
             {% if product.description != blank %}
               {{ product.description }}
             {% else %}
-              <strong>商品詳細情報はありません。</strong>
+              <strong>商品情報はありません。</strong>
             {% endif %}
           </div>
         </details>
@@ -449,7 +449,7 @@
       <div class="border-t border-gray-100">
         <details class="group">
           <summary class="flex justify-between items-center py-4 cursor-pointer list-none">
-            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">内容成分</span>
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">成分情報</span>
             <span class="transition-transform duration-300 group-open:rotate-180">
               {% render 'icon-chevron-down' %}
             </span>
@@ -458,7 +458,7 @@
             {% if product.description != blank %}
               {{ product.description }}
             {% else %}
-              <strong>商品詳細情報はありません。</strong>
+              <strong>成分情報はありません。</strong>
             {% endif %}
           </div>
         </details>
