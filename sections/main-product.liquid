@@ -303,7 +303,7 @@
           </div>
         {% endif %}
 
-        {% comment %} ★メタフィールドのキーを related_set に修正したよ {% endcomment %}
+        {% comment %} ★1行目のキーを related_set に「完全一致」させたよ {% endcomment %}
         {% assign related_p = product.metafields.custom.related_set.value %}
 
         {% if related_p != blank %}
@@ -312,7 +312,7 @@
               href="{{ related_p.url }}"
               class="flex items-center text-[14px] text-gray-700 hover:opacity-70 transition-opacity group"
             >
-              {% comment %} かおるちゃんが教えてくれたデザイン {% endcomment %}
+              {% comment %} かおるちゃんのピンク丸デザイン {% endcomment %}
               <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full mr-2 flex-shrink-0">
                 <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
