@@ -445,6 +445,24 @@
           </div>
         </details>
       </div>
+
+      <div class="border-t border-gray-100 mt-2">
+        <details class="group">
+          <summary class="flex justify-between items-center py-4 cursor-pointer list-none">
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">商品情報</span>
+            <span class="transition-transform duration-300 group-open:rotate-180">
+              {% render 'icon-chevron-down' %}
+            </span>
+          </summary>
+          <div class="pb-6 text-sm leading-relaxed text-gray-600">
+            {% if product.description != blank %}
+              {{ product.description }}
+            {% else %}
+              <strong>商品詳細情報はありません。</strong>
+            {% endif %}
+          </div>
+        </details>
+      </div>
     </div>
   </div>
 </section>
