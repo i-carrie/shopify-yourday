@@ -455,6 +455,8 @@
             </span>
           </summary>
           <div class="pb-6 text-sm leading-relaxed text-gray-600">
+            {% assign ingredients_list = product.metafields.custom.key_ingredients.value %}
+
             {% if ingredients_list != blank %}
               {% for item in ingredients_list %}
                 <div class="mb-4 last:mb-0">
