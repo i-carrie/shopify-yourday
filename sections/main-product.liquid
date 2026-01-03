@@ -610,13 +610,17 @@
       <div class="border-t border-gray-200 -mt-4">
         <details class="group">
           <summary class="flex justify-between items-center py-2 cursor-pointer list-none">
-            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">返品・交換について</span>
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">
+              {{- section.settings.return_policy_label }}について</span
+            >
             <span class="transition-transform duration-300 group-open:rotate-180">
               {% render 'icon-chevron-down' %}
             </span>
           </summary>
           <div class="pb-6 text-sm leading-relaxed text-gray-600">
-            <p><strong>返品・交換をご希望の場合：</strong></p>
+            <p>
+              <strong>{{ section.settings.return_policy_label }}をご希望の場合：</strong>
+            </p>
             <ul class="list-disc pl-5 mt-2 space-y-1">
               <li>商品到着後7日以内にご連絡ください</li>
               <li>未開封・未使用の商品に限ります</li>
@@ -639,7 +643,9 @@
       <div class="border-t border-gray-200 -mt-4">
         <details class="group">
           <summary class="flex justify-between items-center py-2 cursor-pointer list-none">
-            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">配送について</span>
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">
+              {{- section.settings.shipping_info_label -}}
+            </span>
             <span class="transition-transform duration-300 group-open:rotate-180">
               {% render 'icon-chevron-down' %}
             </span>
@@ -848,6 +854,18 @@
       "id": "ingredients_label",
       "label": "成分情報のラベル名",
       "default": "成分情報"
+    },
+    {
+      "type": "text",
+      "id": "return_policy_label",
+      "label": "返品・交換のラベル名",
+      "default": "返品・交換"
+    },
+    {
+      "type": "text",
+      "id": "shipping_info_label",
+      "label": "配送情報のラベル名",
+      "default": "配送について"
     }
   ],
   "presets": [
