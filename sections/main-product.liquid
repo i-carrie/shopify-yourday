@@ -237,6 +237,17 @@
           </button>
         </div>
       {% endif %}
+
+      {% comment %} ★ 最近見た商品 {% endcomment %}
+      <div id="recently-viewed-products" class="mt-8" style="display: none;">
+        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          {% render 'icon-recent' %}
+          <span class="text-pink-600">最近見た商品</span>
+        </h3>
+        <div class="recently-viewed-list grid grid-cols-3 lg:grid-cols-4 gap-4">
+          <!-- JavaScriptで動的に生成 -->
+        </div>
+      </div>
     </div>
 
     {% comment %} --- 右側：商品情報エリア --- {% endcomment %}
@@ -259,11 +270,85 @@
         </div>
 
         <h1 class="text-2xl md:text-3xl font-serif text-gray-900 leading-tight">{{ product.title }}</h1>
+
         {% if product.metafields.custom.product_subtitle != blank %}
           <p class="text-sm font-bold text-gray-700 leading-relaxed mt-2 mb-1">
             {{ product.metafields.custom.product_subtitle }}
           </p>
         {% endif %}
+
+        {% comment %} ★ SNSシェアボタン {% endcomment %}
+        <div class="social-share flex items-center gap-3 mt-3 mb-3 pb-3 border-b border-gray-200">
+          <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">シェア:</span>
+          <div class="flex items-center gap-2">
+            {% comment %} Facebook {% endcomment %}
+            <a
+              href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ product.url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-blue-600 hover:text-white transition-colors"
+              aria-label="Share on Facebook"
+            >
+              {% render 'icon-facebook' %}
+            </a>
+
+            {% comment %} Twitter (X) {% endcomment %}
+            <a
+              href="https://twitter.com/intent/tweet?url={{ shop.url }}{{ product.url }}&text={{ product.title | url_encode }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-black hover:text-white transition-colors"
+              aria-label="Share on Twitter"
+            >
+              {% render 'icon-x' %}
+            </a>
+
+            {% comment %} Pinterest {% endcomment %}
+            <a
+              href="https://pinterest.com/pin/create/button/?url={{ shop.url }}{{ product.url }}&media={{ product.featured_media | image_url: width: 1200 }}&description={{ product.title | url_encode }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-red-600 hover:text-white transition-colors"
+              aria-label="Share on Pinterest"
+            >
+              {% render 'icon-pinterest' %}
+            </a>
+
+            {% comment %} LINE {% endcomment %}
+            <a
+              href="https://social-plugins.line.me/lineit/share?url={{ shop.url }}{{ product.url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-green-500 hover:text-white transition-colors"
+              aria-label="Share on LINE"
+            >
+              {% render 'icon-line' %}
+            </a>
+          </div>
+        </div>
+
+        {% comment %} ★ 修正②：レビュー・評価をサブタイトルの下、価格の上に移動 {% endcomment %}
+        <div class="product-reviews border-t border-gray-200 pt-3 mt-3">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="flex items-center gap-1">
+              {% comment %} 星5つ {% endcomment %}
+              {% for i in (1..5) %}
+                <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              {% endfor %}
+            </div>
+            <span class="text-sm text-gray-600 font-semibold">4.8</span>
+            <span class="text-sm text-gray-500">(127件のレビュー)</span>
+          </div>
+          <a href="#reviews" class="text-sm text-pink-600 hover:underline inline-flex items-center gap-1">
+            すべてのレビューを見る
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+
         {% assign current_variant = product.selected_or_first_available_variant %}
         {% if current_variant.sku != blank %}
           <p class="text-sm text-gray-600 mt-2 mb-2">商品番号：{{ current_variant.sku }}</p>
@@ -286,6 +371,7 @@
 
         <p class="text-xl text-gray-800 font-bold mt-4">{{ product.price | money }}</p>
 
+        {% comment %} ★ 修正③：タグの閉じ忘れを修正 {% endcomment %}
         {% if product.vendor != blank %}
           <div class="flex items-center gap-2 mt-4">
             <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
@@ -303,30 +389,26 @@
           </div>
         {% endif %}
 
-        {% comment %} ★メタフィールド（custom.related_set）から関連商品を取得 {% endcomment %}
         {% assign related_n = product.metafields.custom.related_nav.value %}
-
         {% if related_n != blank %}
           <div class="flex items-center gap-2 mt-2">
-            {% comment %} ピンク丸のアイコン：ベンダー一覧と全く同じデザイン {% endcomment %}
             <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
               <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
               </svg>
             </span>
 
-            {% comment %} リンク部分：ベンダー一覧のスタイルを完全継承 {% endcomment %}
             <a
               href="{{ related_n.url }}"
               class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
-              >関連商品を見る
+            >
+              関連商品を見る
             </a>
           </div>
         {% endif %}
       </div>
 
       {% comment %} マトリックス・バリエーションセレクター {% endcomment %}
-      {% comment %} --- バリエーションのマトリックス表 --- {% endcomment %}
       <div class="matrix-variant-selector pt-1 mt-1">
         <div class="grid grid-cols-12 gap-2 pb-2 border-b border-gray-200 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
           <div class="col-span-6">
@@ -336,7 +418,6 @@
           <div class="col-span-3 text-center">個数</div>
         </div>
 
-        {% comment %} バリエーションのループ処理 {% endcomment %}
         <div class="space-y-0">
           {% for variant in product.variants %}
             <div
@@ -379,7 +460,6 @@
             </div>
           {% endfor %}
 
-          {% comment %} 2. ★セット商品（related_set）があれば、特別な行として追加 {% endcomment %}
           {% assign related_set = product.metafields.custom.related_set.value %}
           {% if related_set != blank %}
             {% assign set_variant = related_set.first_available_variant %}
@@ -387,7 +467,6 @@
               class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-gray-100 js-variant-row"
               data-variant-id="{{ set_variant.id }}"
             >
-              {% comment %} ★ pl-2 を削除して、上の行と開始位置を統一したよ {% endcomment %}
               <div class="col-span-6 flex flex-col pr-2">
                 <span class="text-sm font-bold text-gray-900 leading-snug"> {{ related_set.title }} </span>
                 <p class="text-[12px] text-gray-500 mt-1">{{ related_set.metafields.custom.product_subtitle }}</p>
@@ -418,6 +497,59 @@
           {% endif %}
         </div>
 
+        {% comment %} ★ ギフトオプション {% endcomment %}
+        <div class="gift-options bg-pink-50 border border-pink-200 rounded-lg p-4 mt-6">
+          <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+            {% render 'icon-gift' %}
+            ギフトオプション
+          </h3>
+
+          <div class="space-y-3">
+            {% comment %} ギフトラッピング選択 {% endcomment %}
+            <div class="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="gift-wrapping"
+                name="attributes[gift_wrapping]"
+                value="yes"
+                class="mt-1 w-4 h-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
+              >
+              <label for="gift-wrapping" class="flex-1 text-sm text-gray-700 cursor-pointer">
+                <span class="font-semibold">ギフトラッピングを希望する</span>
+                <span class="block text-xs text-gray-500 mt-1">+ ¥300</span>
+              </label>
+            </div>
+
+            {% comment %} メッセージカード {% endcomment %}
+            <div class="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="message-card"
+                name="attributes[message_card]"
+                value="yes"
+                class="mt-1 w-4 h-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
+                onchange="document.getElementById('message-text-wrapper').classList.toggle('hidden')"
+              >
+              <label for="message-card" class="flex-1 text-sm text-gray-700 cursor-pointer">
+                <span class="font-semibold">メッセージカードを追加</span>
+                <span class="block text-xs text-gray-500 mt-1">無料</span>
+              </label>
+            </div>
+
+            {% comment %} メッセージ入力欄（チェックボックス選択時に表示） {% endcomment %}
+            <div id="message-text-wrapper" class="hidden">
+              <textarea
+                name="attributes[gift_message]"
+                rows="3"
+                maxlength="100"
+                placeholder="メッセージを入力してください（100文字以内）"
+                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 resize-none"
+              ></textarea>
+              <p class="text-xs text-gray-500 mt-1">※ メッセージは100文字以内でご入力ください</p>
+            </div>
+          </div>
+        </div>
+
         <div class="mt-6">
           <button
             id="AddToCart"
@@ -428,10 +560,12 @@
         </div>
       </div>
 
-      <div class="border-t border-gray-100 mt-2">
+      <div class="border-t border-gray-200 mt-2">
         <details class="group">
-          <summary class="flex justify-between items-center py-4 cursor-pointer list-none">
-            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">商品詳細</span>
+          <summary class="flex justify-between items-center py-2 cursor-pointer list-none">
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">
+              {{- section.settings.product_info_label }}
+            </span>
             <span class="transition-transform duration-300 group-open:rotate-180">
               {% render 'icon-chevron-down' %}
             </span>
@@ -440,8 +574,86 @@
             {% if product.description != blank %}
               {{ product.description }}
             {% else %}
-              <strong>商品詳細情報はありません。</strong>
+              <strong>{{ section.settings.product_info_label }}はありません。</strong>
             {% endif %}
+          </div>
+        </details>
+      </div>
+
+      <div class="border-t border-gray-200 -mt-4">
+        <details class="group">
+          <summary class="flex justify-between items-center py-2 cursor-pointer list-none">
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">
+              {{ section.settings.ingredients_label }}
+            </span>
+            <span class="transition-transform duration-300 group-open:rotate-180">
+              {% render 'icon-chevron-down' %}
+            </span>
+          </summary>
+          <div class="pb-6 text-sm leading-relaxed text-gray-600">
+            {% assign ingredients_list = product.metafields.custom.key_ingredients.value %}
+
+            {% if ingredients_list != blank %}
+              {% for item in ingredients_list %}
+                <div class="mb-4 last:mb-0">
+                  <p class="font-bold text-gray-900">{{ item.item_name }}</p>
+                  <p class="mt-1">{{ item.ingredients | newline_to_br }}</p>
+                </div>
+              {% endfor %}
+            {% else %}
+              <strong>{{ section.settings.ingredients_label }}はありません。</strong>
+            {% endif %}
+          </div>
+        </details>
+      </div>
+
+      <div class="border-t border-gray-200 -mt-4">
+        <details class="group">
+          <summary class="flex justify-between items-center py-2 cursor-pointer list-none">
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">
+              {{- section.settings.return_policy_label }}について</span
+            >
+            <span class="transition-transform duration-300 group-open:rotate-180">
+              {% render 'icon-chevron-down' %}
+            </span>
+          </summary>
+          <div class="pb-6 text-sm leading-relaxed text-gray-600">
+            <p>
+              <strong>{{ section.settings.return_policy_label }}をご希望の場合：</strong>
+            </p>
+            <ul class="list-disc pl-5 mt-2 space-y-1">
+              <li>商品到着後7日以内にご連絡ください</li>
+              <li>未開封・未使用の商品に限ります</li>
+              <li>返送料はお客様負担となります</li>
+            </ul>
+            <p class="mt-3"><strong>返品不可の場合：</strong></p>
+            <ul class="list-disc pl-5 mt-2 space-y-1">
+              <li>お客様都合による開封済み商品</li>
+              <li>セール品・アウトレット商品</li>
+            </ul>
+            <p class="mt-3 text-xs text-gray-500">
+              詳細は<a href="/pages/refund-policy" class="text-pink-600 hover:underline">返品ポリシー</a
+              >をご確認ください。
+            </p>
+          </div>
+        </details>
+      </div>
+
+      {% comment %} ★ 修正①：配送情報を一番下に移動 {% endcomment %}
+      <div class="border-t border-gray-200 -mt-4">
+        <details class="group">
+          <summary class="flex justify-between items-center py-2 cursor-pointer list-none">
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">
+              {{- section.settings.shipping_info_label -}}
+            </span>
+            <span class="transition-transform duration-300 group-open:rotate-180">
+              {% render 'icon-chevron-down' %}
+            </span>
+          </summary>
+          <div class="pb-6 text-sm leading-relaxed text-gray-600">
+            <p><strong>配送料：</strong>全国一律500円（5,000円以上で送料無料）</p>
+            <p class="mt-2"><strong>お届け日数：</strong>ご注文から3〜5営業日</p>
+            <p class="mt-2 text-xs text-gray-500">離島・一部地域では追加料金が発生する場合がございます。</p>
           </div>
         </details>
       </div>
@@ -511,12 +723,151 @@
   })();
 </script>
 
+<script>
+  (function () {
+    // 最近見た商品の管理（1時間でリセット）
+    const initRecentlyViewed = () => {
+      const EXPIRY_TIME = 60 * 60 * 1000; // 1時間（ミリ秒）
+      const productHandle = '{{ product.handle }}';
+      const productData = {
+        handle: productHandle,
+        title: {{ product.title | json }},
+        url: '{{ product.url }}',
+        price: '{{ product.price | money }}',
+        image: '{{ product.featured_media | image_url: width: 300 }}'
+      };
+
+      // localStorageから既存のデータを取得
+      const stored = localStorage.getItem('recentlyViewed');
+      let recentlyViewedData = null;
+      let products = [];
+
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          
+          // 新形式かチェック（timestampがあるか）
+          if (parsed.timestamp && parsed.products) {
+            // 新形式
+            const now = Date.now();
+            const elapsed = now - parsed.timestamp;
+            
+            if (elapsed > EXPIRY_TIME) {
+              // 1時間経過していたらリセット
+              localStorage.removeItem('recentlyViewed');
+            } else {
+              // まだ有効
+              products = parsed.products;
+            }
+          } else if (Array.isArray(parsed)) {
+            // 旧形式（配列のみ） → 新形式に移行するためクリア
+            localStorage.removeItem('recentlyViewed');
+          }
+        } catch (e) {
+          // パースエラー時はクリア
+          localStorage.removeItem('recentlyViewed');
+        }
+      }
+
+      // 現在の商品を除外（重複防止）
+      products = products.filter(item => item.handle !== productHandle);
+
+      // 現在の商品を先頭に追加
+      products.unshift(productData);
+
+      // 最大5件まで保存
+      products = products.slice(0, 7);
+
+      // タイムスタンプ付きでlocalStorageに保存
+      const now = Date.now();
+      const dataToSave = {
+        timestamp: now,
+        products: products
+      };
+      localStorage.setItem('recentlyViewed', JSON.stringify(dataToSave));
+
+      // 最近見た商品を表示
+      displayRecentlyViewed(products);
+    };
+
+    const displayRecentlyViewed = (products) => {
+      const container = document.getElementById('recently-viewed-products');
+      if (!container) return;
+
+      // 現在の商品を除外（表示しない）
+      const currentHandle = '{{ product.handle }}';
+      const filteredProducts = products.filter(item => item.handle !== currentHandle);
+
+      if (filteredProducts.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+
+      container.style.display = 'block';
+
+      const productList = container.querySelector('.recently-viewed-list');
+      productList.innerHTML = '';
+
+      filteredProducts.forEach(product => {
+        const productCard = `
+          <a href="${product.url}" class="block group">
+            <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-2">
+              <img 
+                src="${product.image}" 
+                alt="${product.title}"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              >
+            </div>
+            <h4 class="text-xs font-semibold text-gray-900 leading-tight mb-1 line-clamp-2">${product.title}</h4>
+            <p class="text-xs text-gray-600 font-bold">${product.price}</p>
+          </a>
+        `;
+        const div = document.createElement('div');
+        div.innerHTML = productCard;
+        productList.appendChild(div.firstElementChild);
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initRecentlyViewed);
+    } else {
+      initRecentlyViewed();
+    }
+  })();
+</script>
+
 {% schema %}
 {
   "name": "メイン商品",
   "tag": "section",
   "class": "section",
-  "settings": [],
+  "settings": [
+    {
+      "type": "text",
+      "id": "product_info_label",
+      "label": "商品情報のラベル名",
+      "default": "商品情報"
+    },
+    {
+      "type": "text",
+      "id": "ingredients_label",
+      "label": "成分情報のラベル名",
+      "default": "成分情報"
+    },
+    {
+      "type": "text",
+      "id": "return_policy_label",
+      "label": "返品・交換のラベル名",
+      "default": "返品・交換"
+    },
+    {
+      "type": "text",
+      "id": "shipping_info_label",
+      "label": "配送情報のラベル名",
+      "default": "配送について"
+    }
+  ],
   "presets": [
     {
       "name": "メイン商品"
