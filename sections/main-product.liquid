@@ -719,9 +719,8 @@
 
 <script>
   (function () {
-    // 最近見た商品の管理（1時間でリセット）
+    // 最近見た商品の管理
     const initRecentlyViewed = () => {
-      const EXPIRY_TIME = 60 * 60 * 1000; // 1時間（ミリ秒）
       const productHandle = '{{ product.handle }}';
       const productData = {
         handle: productHandle,
@@ -731,42 +730,23 @@
         image: '{{ product.featured_media | image_url: width: 300 }}'
       };
 
-      // localStorageから既存のデータを取得
-      const stored = localStorage.getItem('recentlyViewed');
-      let recentlyViewedData = stored ? JSON.parse(stored) : null;
-
-      // データの有効期限をチェック
-      const now = Date.now();
-      if (recentlyViewedData && recentlyViewedData.timestamp) {
-        const elapsed = now - recentlyViewedData.timestamp;
-        if (elapsed > EXPIRY_TIME) {
-          // 1時間経過していたらリセット
-          recentlyViewedData = null;
-          localStorage.removeItem('recentlyViewed');
-        }
-      }
-
-      // 商品リストを取得（または初期化）
-      let products = recentlyViewedData ? recentlyViewedData.products : [];
+      // localStorageから既存の履歴を取得
+      let recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
 
       // 現在の商品を除外（重複防止）
-      products = products.filter(item => item.handle !== productHandle);
+      recentlyViewed = recentlyViewed.filter(item => item.handle !== productHandle);
 
       // 現在の商品を先頭に追加
-      products.unshift(productData);
+      recentlyViewed.unshift(productData);
 
       // 最大5件まで保存
-      products = products.slice(0, 5);
+      recentlyViewed = recentlyViewed.slice(0, 5);
 
-      // タイムスタンプ付きでlocalStorageに保存
-      const dataToSave = {
-        timestamp: now,
-        products: products
-      };
-      localStorage.setItem('recentlyViewed', JSON.stringify(dataToSave));
+      // localStorageに保存
+      localStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewed));
 
       // 最近見た商品を表示
-      displayRecentlyViewed(products);
+      displayRecentlyViewed(recentlyViewed);
     };
 
     const displayRecentlyViewed = (products) => {
