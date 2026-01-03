@@ -455,8 +455,15 @@
             </span>
           </summary>
           <div class="pb-6 text-sm leading-relaxed text-gray-600">
-            {% if custom.key_ingredients != blank %}
-              {{ custom.key_ingredients }}
+            {% assign ingredients_list = product.metafields.custom.key_ingredients.value %}
+
+            {% if ingredients_list != blank %}
+              {% for item in ingredients_list %}
+                <div class="mb-4 last:mb-0">
+                  <p class="font-bold text-gray-900">{{ item.item_name }}</p>
+                  <p class="mt-1">{{ item.ingredients | newline_to_br }}</p>
+                </div>
+              {% endfor %}
             {% else %}
               <strong>成分情報はありません。</strong>
             {% endif %}
