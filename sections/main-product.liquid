@@ -240,7 +240,11 @@
     </div>
 
     {% comment %} --- 右側：商品情報エリア --- {% endcomment %}
-    {% assign ingred_label = product.metafield_definitions.product.custom.key_ingredients.name %}
+
+    {% comment %} 「ラベル名」をショップの設定から直接引っ張ってくる {% endcomment %}
+    {% assign ingred_label = shop.metafield_definitions.product.custom.key_ingredients.name %}
+    {% comment %} 「中身のリスト」は今まで通り {% endcomment %}
+    {% assign ingredients_list = product.metafields.custom.key_ingredients.value %}
 
     <div class="flex flex-col gap-6 w-full">
       <div class="space-y-3">
