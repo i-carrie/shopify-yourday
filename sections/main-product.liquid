@@ -446,38 +446,26 @@
         </details>
       </div>
 
-<div class="border-t border-gray-200 -mt-4">
-  {% assign ingred_meta = product.metafields.custom.key_ingredients %}
-  {% assign ingredients_list = ingred_meta.value %}
-  
-  {% comment %} データがある時だけアコーディオンを表示する {% endcomment %}
-  {% if ingredients_list != blank %}
-    <details class="group">
-      <summary class="flex justify-between items-center py-2 cursor-pointer list-none">
-        <span class="text-xs font-bold uppercase tracking-widest text-gray-900">
-          {% comment %} 中身のリストではなく「定義名（成分情報）」を表示する {% endcomment %}
-          {{ ingred_meta.definition.name }}
-        </span>
-        <span class="transition-transform duration-300 group-open:rotate-180">
-          {% render 'icon-chevron-down' %}
-        </span>
-      </summary>
-      
-      <div class="pb-6 text-sm leading-relaxed text-gray-600">
-        {% for item in ingredients_list %}
-          <div class="mb-4 last:mb-0">
-            <p class="font-bold text-gray-900">{{ item.item_name }}</p>
-            <p class="mt-1">{{ item.ingredients | newline_to_br }}</p>
-          </div>
-        {% endfor %}
-      </div>
-    </details>
-  {% else %}
-    {% comment %} 
-      データがない時に線も消したいなら、この if 文を 
-      <div class="border-t..."> のさらに外側に持ってくるのが正解だよ！
-    {% endcomment %}
-  {% endif %}
+      <div class="border-t border-gray-200 -mt-4">
+        {% assign ingredients_list = product.metafields.custom.key_ingredients.value %}
+        <details class="group">
+          <summary class="flex justify-between items-center py-2 cursor-pointer list-none">
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">{{ ingredients_list }}</span>
+            <span class="transition-transform duration-300 group-open:rotate-180">
+              {% render 'icon-chevron-down' %}
+            </span>
+          </summary>
+          <div class="pb-6 text-sm leading-relaxed text-gray-600">
+            {% if ingredients_list != blank %}
+              {% for item in ingredients_list %}
+                <div class="mb-4 last:mb-0">
+                  <p class="font-bold text-gray-900">{{ item.item_name }}</p>
+                  <p class="mt-1">{{ item.ingredients | newline_to_br }}</p>
+                </div>
+              {% endfor %}
+            {% else %}
+              <strong>成分情報はありません。</strong>
+            {% endif %}
           </div>
         </details>
       </div>
