@@ -304,9 +304,9 @@
         {% endif %}
 
         {% comment %} ★メタフィールド（custom.related_set）から関連商品を取得 {% endcomment %}
-        {% assign related_p = product.metafields.custom.related_set.value %}
+        {% assign related_n = product.metafields.custom.related_nav.value %}
 
-        {% if related_p != blank %}
+        {% if related_n != blank %}
           <div class="flex items-center gap-2 mt-2">
             {% comment %} ピンク丸のアイコン：ベンダー一覧と全く同じデザイン {% endcomment %}
             <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
@@ -317,7 +317,7 @@
 
             {% comment %} リンク部分：ベンダー一覧のスタイルを完全継承 {% endcomment %}
             <a
-              href="{{ related_p.url }}"
+              href="{{ related_n.url }}"
               class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
               >関連商品を見る
             </a>
