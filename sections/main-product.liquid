@@ -719,17 +719,6 @@
 
 <script>
   (function () {
-    console.log('=== 最近見た商品デバッグ開始 ===');
-    
-    // localStorageの中身を確認
-    const stored = localStorage.getItem('recentlyViewed');
-    console.log('localStorage内容:', stored);
-    
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      console.log('パース後:', parsed);
-    }
-    
     // 最近見た商品の管理（1時間でリセット）
     const initRecentlyViewed = () => {
       const EXPIRY_TIME = 60 * 60 * 1000; // 1時間（ミリ秒）
@@ -742,33 +731,37 @@
         image: '{{ product.featured_media | image_url: width: 300 }}'
       };
 
-      console.log('現在の商品:', productData);
-
       // localStorageから既存のデータを取得
       const stored = localStorage.getItem('recentlyViewed');
-      let recentlyViewedData = stored ? JSON.parse(stored) : null;
+      let recentlyViewedData = null;
+      let products = [];
 
-      console.log('取得したデータ:', recentlyViewedData);
-
-      // データの有効期限をチェック
-      const now = Date.now();
-      if (recentlyViewedData && recentlyViewedData.timestamp) {
-        const elapsed = now - recentlyViewedData.timestamp;
-        console.log('経過時間（ミリ秒）:', elapsed);
-        console.log('有効期限（ミリ秒）:', EXPIRY_TIME);
-        
-        if (elapsed > EXPIRY_TIME) {
-          console.log('期限切れ - リセットします');
-          recentlyViewedData = null;
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          
+          // 新形式かチェック（timestampがあるか）
+          if (parsed.timestamp && parsed.products) {
+            // 新形式
+            const now = Date.now();
+            const elapsed = now - parsed.timestamp;
+            
+            if (elapsed > EXPIRY_TIME) {
+              // 1時間経過していたらリセット
+              localStorage.removeItem('recentlyViewed');
+            } else {
+              // まだ有効
+              products = parsed.products;
+            }
+          } else if (Array.isArray(parsed)) {
+            // 旧形式（配列のみ） → 新形式に移行するためクリア
+            localStorage.removeItem('recentlyViewed');
+          }
+        } catch (e) {
+          // パースエラー時はクリア
           localStorage.removeItem('recentlyViewed');
-        } else {
-          console.log('まだ有効です');
         }
       }
-
-      // 商品リストを取得（または初期化）
-      let products = recentlyViewedData ? recentlyViewedData.products : [];
-      console.log('商品リスト:', products);
 
       // 現在の商品を除外（重複防止）
       products = products.filter(item => item.handle !== productHandle);
@@ -779,9 +772,8 @@
       // 最大5件まで保存
       products = products.slice(0, 5);
 
-      console.log('保存する商品リスト:', products);
-
       // タイムスタンプ付きでlocalStorageに保存
+      const now = Date.now();
       const dataToSave = {
         timestamp: now,
         products: products
@@ -794,21 +786,13 @@
 
     const displayRecentlyViewed = (products) => {
       const container = document.getElementById('recently-viewed-products');
-      console.log('コンテナ要素:', container);
-      
-      if (!container) {
-        console.log('コンテナが見つかりません');
-        return;
-      }
+      if (!container) return;
 
       // 現在の商品を除外（表示しない）
       const currentHandle = '{{ product.handle }}';
       const filteredProducts = products.filter(item => item.handle !== currentHandle);
 
-      console.log('表示する商品数:', filteredProducts.length);
-
       if (filteredProducts.length === 0) {
-        console.log('表示する商品がないため非表示にします');
         container.style.display = 'none';
         return;
       }
@@ -819,7 +803,6 @@
       productList.innerHTML = '';
 
       filteredProducts.forEach(product => {
-        console.log('商品を追加:', product.title);
         const productCard = `
           <a href="${product.url}" class="block group">
             <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-2">
