@@ -33,8 +33,30 @@
         "id": "color_new_badge",
         "label": "新着バッジの色",
         "default": "#ec4899"
+      }
+    ]
+  },
+  {
+    "name": "SNSシェア設定",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_share_facebook",
+        "label": "Facebookを表示",
+        "default": true
       },
-      
+      {
+        "type": "checkbox",
+        "id": "show_share_x",
+        "label": "X (Twitter)を表示",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_share_line",
+        "label": "LINEを表示",
+        "default": true
+      }
     ]
   }
 ]
