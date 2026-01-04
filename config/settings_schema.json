@@ -6,5 +6,34 @@
     "theme_version": "0.1.0",
     "theme_documentation_url": "https://github.com/yourname/yourday",
     "theme_support_url": "https://github.com/yourname/yourday/issues"
+  },
+  {
+    "name": "商品バッジ",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_sale_badge",
+        "label": "Saleバッジを表示",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "color_sale_badge",
+        "label": "Saleバッジの色",
+        "default": "#dc2626"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_new_badge",
+        "label": "新着バッジを表示",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "color_new_badge",
+        "label": "新着バッジの色",
+        "default": "#ec4899"
+      }
+    ]
   }
 ]

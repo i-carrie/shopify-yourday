@@ -1,0 +1,25 @@
+<div class="flex flex-wrap gap-2">
+  {% if settings.show_sale_badge and product.compare_at_price > product.price %}
+    <span
+      class="text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-tighter shadow-sm"
+      style="background-color: {{ settings.color_sale_badge }};"
+    >
+      Sale
+    </span>
+  {% endif %}
+
+  {% if settings.show_new_badge and product.metafields.custom.is_new.value == true %}
+    <span
+      class="text-white text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm"
+      style="background-color: {{ settings.color_new_badge }};"
+    >
+      新着
+    </span>
+  {% endif %}
+
+  {% if product.metafields.custom.is_limited.value == true %}
+    <span class="border border-blue-400 text-blue-500 text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm">
+      期間限定価格
+    </span>
+  {% endif %}
+</div>
