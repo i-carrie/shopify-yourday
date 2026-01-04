@@ -745,7 +745,10 @@
 
       products = products.filter(item => item.handle !== productHandle);
       products.unshift(productData);
-      products = products.slice(0, 10);
+
+      // ★ここを修正！保存しておく数を「12」に増やしたよ
+      // これで「6つ表示＋予備」をしっかり確保できるね
+      products = products.slice(0, 12);
 
       localStorage.setItem('recentlyViewed', JSON.stringify({
         timestamp: Date.now(),
@@ -759,10 +762,14 @@
       const container = document.getElementById('recently-viewed-products');
       if (!container) return;
 
+      // スライダーの数値を取得。取れない場合はデフォルト4
       const displayLimit = parseInt(container.getAttribute('data-limit')) || 4;
       const currentHandle = '{{ product.handle }}';
+      
+      // 今見ている商品を除外したリストを作る
       const filteredProducts = products.filter(item => item.handle !== currentHandle);
       
+      // ★スライダーの数（2〜6）に合わせて切り取る！
       const limitedProducts = filteredProducts.slice(0, displayLimit);
 
       if (limitedProducts.length === 0) {
