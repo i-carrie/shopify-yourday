@@ -313,6 +313,41 @@
           </p>
         {% endif %}
 
+        {% if product.vendor != blank %}
+          <div class="flex items-center gap-2 mt-4">
+            <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
+              <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+
+            <a
+              href="{{ product.vendor | url_for_vendor }}"
+              class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
+            >
+              {{ product.vendor }}の商品一覧を見る
+            </a>
+          </div>
+        {% endif %}
+
+        {% assign related_n = product.metafields.custom.related_nav.value %}
+        {% if related_n != blank %}
+          <div class="flex items-center gap-2 mt-2">
+            <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
+              <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+
+            <a
+              href="{{ related_n.url }}"
+              class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
+            >
+              関連商品を見る
+            </a>
+          </div>
+        {% endif %}
+
         {% comment %} ★ SNSシェアボタン {% endcomment %}
         {% if settings.show_social_share %}
           <div class="social-share flex items-center gap-3 mt-3 mb-3 pb-3 border-b border-gray-200">
@@ -367,41 +402,42 @@
 
         <p class="text-xl text-gray-800 font-bold mt-4">{{ product.price | money }}</p>
 
-        {% comment %} ★ 修正③：タグの閉じ忘れを修正 {% endcomment %}
-        {% if product.vendor != blank %}
-          <div class="flex items-center gap-2 mt-4">
-            <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
-              <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-              </svg>
-            </span>
+        {% comment %}
+          {% if product.vendor != blank %}
+            <div class="flex items-center gap-2 mt-4">
+              <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
+                <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
 
-            <a
-              href="{{ product.vendor | url_for_vendor }}"
-              class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
-            >
-              {{ product.vendor }}の商品一覧を見る
-            </a>
-          </div>
-        {% endif %}
+              <a
+                href="{{ product.vendor | url_for_vendor }}"
+                class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
+              >
+                {{ product.vendor }}の商品一覧を見る
+              </a>
+            </div>
+          {% endif %}
 
-        {% assign related_n = product.metafields.custom.related_nav.value %}
-        {% if related_n != blank %}
-          <div class="flex items-center gap-2 mt-2">
-            <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
-              <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-              </svg>
-            </span>
+          {% assign related_n = product.metafields.custom.related_nav.value %}
+          {% if related_n != blank %}
+            <div class="flex items-center gap-2 mt-2">
+              <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
+                <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
 
-            <a
-              href="{{ related_n.url }}"
-              class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
-            >
-              関連商品を見る
-            </a>
-          </div>
-        {% endif %}
+              <a
+                href="{{ related_n.url }}"
+                class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
+              >
+                関連商品を見る
+              </a>
+            </div>
+          {% endif %}
+        {% endcomment %}
       </div>
 
       {% comment %} マトリックス・バリエーションセレクター {% endcomment %}
