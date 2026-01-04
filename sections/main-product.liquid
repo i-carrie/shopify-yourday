@@ -284,7 +284,7 @@
           {% render 'icon-recent' %}
           <span class="text-pink-600">最近見た商品</span>
         </h3>
-        <div class="recently-viewed-list grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+        <div class="recently-viewed-list grid grid-cols-3 lg:grid-cols-4 gap-4"></div>
       </div>
 
       {% comment %}
@@ -710,9 +710,8 @@
 
 <script>
   (function () {
-    // 最近見た商品の管理（1時間でリセット）
     const initRecentlyViewed = () => {
-      const EXPIRY_TIME = 60 * 60 * 1000; // 1時間（ミリ秒）
+      const EXPIRY_TIME = 60 * 60 * 1000;
       const productHandle = '{{ product.handle }}';
       const productData = {
         handle: productHandle,
@@ -722,63 +721,37 @@
         image: '{{ product.featured_media | image_url: width: 300 }}'
       };
 
-      // localStorageから既存のデータを取得
       const stored = localStorage.getItem('recentlyViewed');
-      let recentlyViewedData = null;
       let products = [];
 
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
-          
-          // 新形式かチェック（timestampがあるか）
           if (parsed.timestamp && parsed.products) {
-            // 新形式
             const now = Date.now();
-            const elapsed = now - parsed.timestamp;
-  
-            if (elapsed > EXPIRY_TIME) {
-              // 1時間経過していたらリセット
+            if (now - parsed.timestamp > EXPIRY_TIME) {
               localStorage.removeItem('recentlyViewed');
-              // ★ここから下を追加：画面から消して、処理を終了させるよ
               const container = document.getElementById('recently-viewed-products');
               if (container) container.style.display = 'none';
-              return;
-            {% comment %} if (elapsed > EXPIRY_TIME) {
-              // 1時間経過していたらリセット
-              localStorage.removeItem('recentlyViewed'); {% endcomment %}
+              return; 
             } else {
-              // まだ有効
               products = parsed.products;
             }
-          } else if (Array.isArray(parsed)) {
-            // 旧形式（配列のみ） → 新形式に移行するためクリア
-            localStorage.removeItem('recentlyViewed');
           }
         } catch (e) {
-          // パースエラー時はクリア
           localStorage.removeItem('recentlyViewed');
         }
       }
 
-      // 現在の商品を除外（重複防止）
       products = products.filter(item => item.handle !== productHandle);
-
-      // 現在の商品を先頭に追加
       products.unshift(productData);
-
-      // 最大5件まで保存
       products = products.slice(0, 10);
 
-      // タイムスタンプ付きでlocalStorageに保存
-      const now = Date.now();
-      const dataToSave = {
-        timestamp: now,
+      localStorage.setItem('recentlyViewed', JSON.stringify({
+        timestamp: Date.now(),
         products: products
-      };
-      localStorage.setItem('recentlyViewed', JSON.stringify(dataToSave));
+      }));
 
-      // 最近見た商品を表示
       displayRecentlyViewed(products);
     };
 
@@ -786,14 +759,10 @@
       const container = document.getElementById('recently-viewed-products');
       if (!container) return;
 
-      // エディタで設定した「表示制限数」を取得するよ（デフォルトは4）
-      const displayLimit = parseInt(container.getAttribute('data-limit')) || 6;
-
-      // 現在の商品を除外
+      const displayLimit = parseInt(container.getAttribute('data-limit')) || 4;
       const currentHandle = '{{ product.handle }}';
       const filteredProducts = products.filter(item => item.handle !== currentHandle);
-
-      // ★ここで設定した数だけに絞り込む（sliceを使うよ！）
+      
       const limitedProducts = filteredProducts.slice(0, displayLimit);
 
       if (limitedProducts.length === 0) {
@@ -802,24 +771,17 @@
       }
 
       container.style.display = 'block';
-
       const productList = container.querySelector('.recently-viewed-list');
       productList.innerHTML = '';
 
-      // limitedProducts（絞り込み後）でループを回すよ
       limitedProducts.forEach(product => {
         const productCard = `
           <a href="${product.url}" class="block group">
             <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-2">
-              <img 
-                src="${product.image}" 
-                alt="${product.title}"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              >
+              <img src="${product.image}" alt="${product.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
             </div>
-            <h4 class="text-xs font-semibold text-gray-900 leading-tight mb-1 line-clamp-2">${product.title}</h4>
-            <p class="text-xs text-gray-600 font-bold">${product.price}</p>
+            <h4 class="text-[10px] md:text-xs font-semibold text-gray-900 leading-tight mb-1 line-clamp-2">${product.title}</h4>
+            <p class="text-[10px] md:text-xs text-gray-600 font-bold">${product.price}</p>
           </a>
         `;
         const div = document.createElement('div');
@@ -827,45 +789,6 @@
         productList.appendChild(div.firstElementChild);
       });
     };
-
-    {% comment %} const displayRecentlyViewed = (products) => {
-      const container = document.getElementById('recently-viewed-products');
-      if (!container) return;
-
-      // 現在の商品を除外（表示しない）
-      const currentHandle = '{{ product.handle }}';
-      const filteredProducts = products.filter(item => item.handle !== currentHandle);
-
-      if (filteredProducts.length === 0) {
-        container.style.display = 'none';
-        return;
-      }
-
-      container.style.display = 'block';
-
-      const productList = container.querySelector('.recently-viewed-list');
-      productList.innerHTML = '';
-
-      filteredProducts.forEach(product => {
-        const productCard = `
-          <a href="${product.url}" class="block group">
-            <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-2">
-              <img 
-                src="${product.image}" 
-                alt="${product.title}"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              >
-            </div>
-            <h4 class="text-xs font-semibold text-gray-900 leading-tight mb-1 line-clamp-2">${product.title}</h4>
-            <p class="text-xs text-gray-600 font-bold">${product.price}</p>
-          </a>
-        `;
-        const div = document.createElement('div');
-        div.innerHTML = productCard;
-        productList.appendChild(div.firstElementChild);
-      });
-    }; {% endcomment %}
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initRecentlyViewed);
