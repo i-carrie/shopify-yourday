@@ -1,0 +1,33 @@
+<div class="flex gap-4 mt-6 border-t pt-6">
+  <span class="text-sm text-gray-500">Share:</span>
+
+  {% if settings.show_share_facebook %}
+    <a
+      href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url | append: product.url }}"
+      target="_blank"
+      class="text-gray-400 hover:text-[#1877F2] transition-colors"
+    >
+      {% render 'icon-facebook' %}
+    </a>
+  {% endif %}
+
+  {% if settings.show_share_x %}
+    <a
+      href="https://twitter.com/intent/tweet?text={{ product.title | url_param_escape }}&url={{ shop.url | append: product.url }}"
+      target="_blank"
+      class="text-gray-400 hover:text-black transition-colors"
+    >
+      {% render 'icon-x' %}
+    </a>
+  {% endif %}
+
+  {% if settings.show_share_line %}
+    <a
+      href="https://social-plugins.line.me/lineit/share?url={{ shop.url | append: product.url }}"
+      target="_blank"
+      class="text-gray-400 hover:text-[#06C755] transition-colors"
+    >
+      {% render 'icon-line' %}
+    </a>
+  {% endif %}
+</div>
