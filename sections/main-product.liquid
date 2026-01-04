@@ -591,28 +591,6 @@
           >
             {{ section.settings.return_policy_body }}
           </div>
-
-          {% comment %}
-            <div class="pb-6 text-sm leading-relaxed text-gray-600">
-              <p>
-                <strong>{{ section.settings.return_policy_label }}をご希望の場合：</strong>
-              </p>
-              <ul class="list-disc pl-5 mt-2 space-y-1">
-                <li>商品到着後7日以内にご連絡ください</li>
-                <li>未開封・未使用の商品に限ります</li>
-                <li>返送料はお客様負担となります</li>
-              </ul>
-              <p class="mt-3"><strong>返品不可の場合：</strong></p>
-              <ul class="list-disc pl-5 mt-2 space-y-1">
-                <li>お客様都合による開封済み商品</li>
-                <li>セール品・アウトレット商品</li>
-              </ul>
-              <p class="mt-3 text-xs text-gray-500">
-                詳細は<a href="/pages/refund-policy" class="text-pink-600 hover:underline">返品ポリシー</a
-                >をご確認ください。
-              </p>
-            </div>
-          {% endcomment %}
         </details>
       </div>
 
@@ -899,44 +877,3 @@
   ]
 }
 {% endschema %}
-
-{% comment %}
-  {% schema %}
-  {
-    "name": "メイン商品",
-    "tag": "section",
-    "class": "section",
-    "settings": [
-      {
-        "type": "text",
-        "id": "product_info_label",
-        "label": "商品情報のラベル名",
-        "default": "商品情報"
-      },
-      {
-        "type": "text",
-        "id": "ingredients_label",
-        "label": "成分情報のラベル名",
-        "default": "成分情報"
-      },
-      {
-        "type": "text",
-        "id": "return_policy_label",
-        "label": "返品・交換のラベル名",
-        "default": "返品・交換"
-      },
-      {
-        "type": "text",
-        "id": "shipping_info_label",
-        "label": "配送情報のラベル名",
-        "default": "配送について"
-      }
-    ],
-    "presets": [
-      {
-        "name": "メイン商品"
-      }
-    ]
-  }
-  {% endschema %}
-{% endcomment %}
