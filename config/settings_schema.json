@@ -56,6 +56,12 @@
         "id": "show_share_line",
         "label": "LINEを表示",
         "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_share_pinterest",
+        "label": "Pinterestを表示",
+        "default": true
       }
     ]
   }
