@@ -6,6 +6,9 @@
 <div class="flex items-center gap-2">
   
   {% comment %} Facebookボタン {% endcomment %}
+<div class="flex items-center gap-2">
+  
+  {% comment %} Facebookボタン {% endcomment %}
   {% if share_facebook %}
     <a href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url | append: product.url }}" target="_blank" class="...">
       {% render 'icon-facebook' %}
@@ -32,6 +35,8 @@
       {% render 'icon-pinterest' %}
     </a>
   {% endif %}
+
+</div>
 
 {% comment %} {% if settings.show_share_facebook %}
   <a
