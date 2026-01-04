@@ -93,11 +93,12 @@
       "type": "richtext", 
       "label": "本文", "default": "<p><strong>配送料：</strong>全国一律500円</p>" 
     },
-      { "id": "ship_color", 
+    { "id": "ship_color", 
       "type": "color", 
       "label": "文字色", 
-      "default": "#4b5563" },
-      { "id": "ship_size", 
+      "default": "#4b5563"
+    },
+    { "id": "ship_size", 
       "type": "range", 
       "label": "文字サイズ", 
       "min": 10, 
