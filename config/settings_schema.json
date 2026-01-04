@@ -33,7 +33,8 @@
         "id": "color_new_badge",
         "label": "新着バッジの色",
         "default": "#ec4899"
-      }
+      },
+      
     ]
   }
 ]
