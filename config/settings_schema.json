@@ -40,11 +40,11 @@
     "name": "SNSシェア設定",
     "settings": [
       {
-  "type": "checkbox",
-  "id": "show_social_share",
-  "label": "SNSシェア全体を表示する",
-  "default": true
-},
+        "type": "checkbox",
+        "id": "show_social_share",
+        "label": "SNSシェア全体を表示する",
+        "default": true
+      },
       {
         "type": "checkbox",
         "id": "show_share_facebook",
