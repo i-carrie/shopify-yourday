@@ -268,48 +268,7 @@
           <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">シェア:</span>
           <div class="flex items-center gap-2">
             {% comment %} Facebook {% endcomment %}
-            <a
-              href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ product.url }}"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-blue-600 hover:text-white transition-colors"
-              aria-label="Share on Facebook"
-            >
-              {% render 'icon-facebook' %}
-            </a>
-
-            {% comment %} Twitter (X) {% endcomment %}
-            <a
-              href="https://twitter.com/intent/tweet?url={{ shop.url }}{{ product.url }}&text={{ product.title | url_encode }}"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-black hover:text-white transition-colors"
-              aria-label="Share on Twitter"
-            >
-              {% render 'icon-x' %}
-            </a>
-
-            {% comment %} Pinterest {% endcomment %}
-            <a
-              href="https://pinterest.com/pin/create/button/?url={{ shop.url }}{{ product.url }}&media={{ product.featured_media | image_url: width: 1200 }}&description={{ product.title | url_encode }}"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-red-600 hover:text-white transition-colors"
-              aria-label="Share on Pinterest"
-            >
-              {% render 'icon-pinterest' %}
-            </a>
-
-            {% comment %} LINE {% endcomment %}
-            <a
-              href="https://social-plugins.line.me/lineit/share?url={{ shop.url }}{{ product.url }}"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-green-500 hover:text-white transition-colors"
-              aria-label="Share on LINE"
-            >
-              {% render 'icon-line' %}
-            </a>
+            ハロー
           </div>
         </div>
 
