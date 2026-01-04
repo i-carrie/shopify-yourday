@@ -63,10 +63,28 @@
   }
 
   .policy-richtext p:not(:first-child) {
-    margin-top: 0.5rem; /* Tailwindの mt-2 相当 */
+    margin-top: 0.75rem;
   }
+
+  /* 2. リンク(a)：かおるちゃんのスクショに合わせて、ピンク色にしたよ */
   .policy-richtext a {
     text-decoration: underline;
+    color: #db2777; /* スクショの「返品ポリシー」の色だね */
+    font-weight: 500;
+  }
+  .policy-richtext a:hover {
+    opacity: 0.8;
+  }
+
+  /* 3. 箇条書き(ul/li)：エディタで「・」をつけた時に、綺麗に並ぶ設定だよ */
+  .policy-richtext ul {
+    list-style-type: disc;
+    padding-left: 1.25rem; /* pl-5 相当 */
+    margin-top: 0.5rem; /* mt-2 相当 */
+    margin-bottom: 0.5rem;
+  }
+  .policy-richtext li {
+    margin-bottom: 0.25rem; /* space-y-1 相当 */
   }
 </style>
 
