@@ -599,11 +599,19 @@
               {% render 'icon-chevron-down' %}
             </span>
           </summary>
-          <div class="pb-6 text-sm leading-relaxed text-gray-600">
-            <p><strong>配送料：</strong>全国一律500円（5,000円以上で送料無料）</p>
-            <p class="mt-2"><strong>お届け日数：</strong>ご注文から3〜5営業日</p>
-            <p class="mt-2 text-xs text-gray-500">離島・一部地域では追加料金が発生する場合がございます。</p>
+          <div
+            class="pb-6 leading-relaxed policy-richtext"
+            style="color: {{ section.settings.shipping_info_color }}; font-size: {{ section.settings.shipping_info_size }}px;"
+          >
+            {{ section.settings.shipping_info_body }}
           </div>
+          {% comment %}
+            <div class="pb-6 text-sm leading-relaxed text-gray-600">
+              <p><strong>配送料：</strong>全国一律500円（5,000円以上で送料無料）</p>
+              <p class="mt-2"><strong>お届け日数：</strong>ご注文から3〜5営業日</p>
+              <p class="mt-2 text-xs text-gray-500">離島・一部地域では追加料金が発生する場合がございます。</p>
+            </div>
+          {% endcomment %}
         </details>
       </div>
     </div>
