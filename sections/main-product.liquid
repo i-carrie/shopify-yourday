@@ -66,17 +66,17 @@
     margin-top: 0.75rem;
   }
 
-  /* 2. リンク(a)：かおるちゃんのスクショに合わせて、ピンク色にしたよ */
+  /* 2. リンク(a)：ピンク */
   .policy-richtext a {
     text-decoration: underline;
-    color: #db2777; /* スクショの「返品ポリシー」の色だね */
+    color: #db2777; /* スクショの「返品ポリシー」の色 */
     font-weight: 500;
   }
   .policy-richtext a:hover {
     opacity: 0.8;
   }
 
-  /* 3. 箇条書き(ul/li)：エディタで「・」をつけた時に、綺麗に並ぶ設定だよ */
+  /* 3. 箇条書き(ul/li)：エディタで「・」をつけた時の設定 */
   .policy-richtext ul {
     list-style-type: disc;
     padding-left: 1.25rem; /* pl-5 相当 */
@@ -858,13 +858,13 @@
       "type": "text",
       "id": "return_policy_label",
       "label": "返品・交換のラベル名",
-      "default": "返品・交換"
+      "default": "返品・交換について"
     },
     {
       "type": "richtext",
       "id": "return_policy_body",
       "label": "返品・交換の本文",
-      "default": "<p>商品到着後7日以内であれば<strong>返品・交換が可能です。</strong></p>"
+      "default": "<p><strong>返品・交換をご希望の場合：</strong></p><ul><li>商品到着後7日以内にご連絡ください</li><li>未開封・未使用の商品に限ります</li><li>返送料はお客様負担となります</li></ul><p><strong>返品不可の場合：</strong></p><ul><li>お客様都合による開封済み商品</li><li>セール品・アウトレット商品</li></ul><p>詳細は<a href='/pages/refund-policy'>返品ポリシー</a>をご確認ください。</p>"
     },
     {
       "type": "color",
