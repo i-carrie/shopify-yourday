@@ -12,8 +12,8 @@
     "main": {
       "type": "main-product",
       "settings": {
-        "thumbnail_limit": 15,
-        "products_to_show": 4,
+        "thumbnail_limit": 12,
+        "products_to_show": 5,
         "product_info_label": "商品情報",
         "ingredients_label": "成分情報",
         "shipping_info_label": "配送について",
