@@ -761,7 +761,7 @@
       products.unshift(productData);
 
       // 最大5件まで保存
-      products = products.slice(0, 7);
+      products = products.slice(0, 10);
 
       // タイムスタンプ付きでlocalStorageに保存
       const now = Date.now();
@@ -775,7 +775,7 @@
       displayRecentlyViewed(products);
     };
 
-const displayRecentlyViewed = (products) => {
+    const displayRecentlyViewed = (products) => {
       const container = document.getElementById('recently-viewed-products');
       if (!container) return;
 
