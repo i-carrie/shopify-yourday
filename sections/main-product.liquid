@@ -586,7 +586,7 @@
         <details class="group">
           <summary class="flex justify-between items-center py-2 cursor-pointer list-none">
             <span class="text-xs font-bold uppercase tracking-widest text-gray-900">
-              {{- section.settings.shipping_info_label -}}
+              {{ section.settings.shipping_info_label }}
             </span>
             <span class="transition-transform duration-300 group-open:rotate-180">
               {% render 'icon-chevron-down' %}
@@ -797,6 +797,36 @@
       "label": "成分情報のラベル名",
       "default": "成分情報"
     },
+    { "type": "header", "content": "配送について" },
+    {
+      "type": "text",
+      "id": "shipping_info_label",
+      "label": "配送情報のラベル名",
+      "default": "配送について"
+    },
+    {
+      "type": "richtext",
+      "id": "shipping_info_body",
+      "label": "配送情報の本文",
+      "default": "<p><strong>配送料：</strong>全国一律500円（5,000円以上で送料無料）</p><p><strong>お届け日数：</strong>ご注文から3〜5営業日</p>"
+    },
+    {
+      "type": "color",
+      "id": "shipping_info_color",
+      "label": "文字色",
+      "default": "#4b5563"
+    },
+    {
+      "type": "range",
+      "id": "shipping_info_size",
+      "label": "文字サイズ",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    { "type": "header", "content": "返品・交換について" },
     {
       "type": "text",
       "id": "return_policy_label",
@@ -804,10 +834,26 @@
       "default": "返品・交換"
     },
     {
-      "type": "text",
-      "id": "shipping_info_label",
-      "label": "配送情報のラベル名",
-      "default": "配送について"
+      "type": "richtext",
+      "id": "return_policy_body",
+      "label": "返品・交換の本文",
+      "default": "<p>商品到着後7日以内であれば<strong>返品・交換が可能です。</strong></p>"
+    },
+    {
+      "type": "color",
+      "id": "return_policy_color",
+      "label": "文字色",
+      "default": "#4b5563"
+    },
+    {
+      "type": "range",
+      "id": "return_policy_size",
+      "label": "文字サイズ",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
     }
   ],
   "presets": [
@@ -817,3 +863,44 @@
   ]
 }
 {% endschema %}
+
+{% comment %}
+  {% schema %}
+  {
+    "name": "メイン商品",
+    "tag": "section",
+    "class": "section",
+    "settings": [
+      {
+        "type": "text",
+        "id": "product_info_label",
+        "label": "商品情報のラベル名",
+        "default": "商品情報"
+      },
+      {
+        "type": "text",
+        "id": "ingredients_label",
+        "label": "成分情報のラベル名",
+        "default": "成分情報"
+      },
+      {
+        "type": "text",
+        "id": "return_policy_label",
+        "label": "返品・交換のラベル名",
+        "default": "返品・交換"
+      },
+      {
+        "type": "text",
+        "id": "shipping_info_label",
+        "label": "配送情報のラベル名",
+        "default": "配送について"
+      }
+    ],
+    "presets": [
+      {
+        "name": "メイン商品"
+      }
+    ]
+  }
+  {% endschema %}
+{% endcomment %}
