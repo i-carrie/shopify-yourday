@@ -3,42 +3,7 @@
   <span class="text-sm text-gray-500">Share:</span>
 {% endcomment %}
 
-<div class="flex items-center gap-2">
-  
-  {% comment %} Facebookボタン {% endcomment %}
-<div class="flex items-center gap-2">
-  
-  {% comment %} Facebookボタン {% endcomment %}
-  {% if share_facebook %}
-    <a href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url | append: product.url }}" target="_blank" class="...">
-      {% render 'icon-facebook' %}
-    </a>
-  {% endif %}
-
-  {% comment %} X (Twitter)ボタン {% endcomment %}
-  {% if share_x %}
-    <a href="https://twitter.com/share?url={{ shop.url | append: product.url }}" target="_blank" class="...">
-      {% render 'icon-x' %}
-    </a>
-  {% endif %}
-
-  {% comment %} LINEボタン {% endcomment %}
-  {% if share_line %}
-    <a href="https://social-plugins.line.me/lineit/share?url={{ shop.url | append: product.url }}" target="_blank" class="...">
-      {% render 'icon-line' %}
-    </a>
-  {% endif %}
-
-  {% comment %} Pinterestボタン {% endcomment %}
-  {% if share_pinterest %}
-    <a href="https://pinterest.com/pin/create/button/?url={{ shop.url | append: product.url }}" target="_blank" class="...">
-      {% render 'icon-pinterest' %}
-    </a>
-  {% endif %}
-
-</div>
-
-{% comment %} {% if settings.show_share_facebook %}
+{% if settings.show_share_facebook %}
   <a
     href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url | append: product.url }}"
     target="_blank"
@@ -77,5 +42,5 @@
   >
     {% render 'icon-pinterest' %}
   </a>
-{% endif %} {% endcomment %}
+{% endif %}
 {% comment %} </div> {% endcomment %}
