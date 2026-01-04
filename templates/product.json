@@ -1,7 +1,36 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
-      "type": "main-product"
+      "type": "main-product",
+      "settings": {
+        "thumbnail_limit": 6,
+        "product_info_label": "商品情報",
+        "ingredients_label": "成分情報",
+        "shipping_info_label": "配送について",
+        "shipping_info_body": "<p><strong>配送料：</strong>全国一律500円（5,000円以上で送料無料）</p><p><strong>お届け日数：</strong>ご注文から3〜5営業日</p>",
+        "shipping_info_color": "#4b5563",
+        "shipping_info_size": 14,
+        "return_policy_label": "返品・交換について",
+        "return_policy_body": "<p><strong>返品・交換をご希望の場合：</strong></p><ul><li>商品到着後7日以内にご連絡ください</li><li>未開封・未使用の商品に限ります</li><li>返送料はお客様負担となります</li></ul><p><strong>返品不可の場合：</strong></p><ul><li>お客様都合による開封済み商品</li><li>セール品・アウトレット商品</li></ul><p>詳細は<a href=\"/pages/refund-policy\">返品ポリシー</a>をご確認ください。</p>",
+        "return_policy_color": "#4b5563",
+        "return_policy_size": 14,
+        "gift_title": "ギフトオプション",
+        "gift_wrapping_label": "ギフトラッピングを希望する",
+        "gift_wrapping_note": "+ ¥300",
+        "gift_message_label": "メッセージカードを追加",
+        "gift_message_note": "無料",
+        "gift_placeholder": "メッセージを入力してください (100文字以内)",
+        "gift_warning_text": "※ メッセージは100文字以内でご入力ください"
+      }
     }
   },
   "order": [
