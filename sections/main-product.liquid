@@ -61,6 +61,31 @@
     align-items: center;
     justify-content: center;
   }
+
+  .policy-richtext p:not(:first-child) {
+    margin-top: 0.75rem;
+  }
+
+  /* 2. リンク(a)：ピンク */
+  .policy-richtext a {
+    text-decoration: underline;
+    color: #db2777; /* スクショの「返品ポリシー」の色 */
+    font-weight: 500;
+  }
+  .policy-richtext a:hover {
+    opacity: 0.8;
+  }
+
+  /* 3. 箇条書き(ul/li)：エディタで「・」をつけた時の設定 */
+  .policy-richtext ul {
+    list-style-type: disc;
+    padding-left: 1.25rem; /* pl-5 相当 */
+    margin-top: 0.5rem; /* mt-2 相当 */
+    margin-bottom: 0.5rem;
+  }
+  .policy-richtext li {
+    margin-bottom: 0.25rem; /* space-y-1 相当 */
+  }
 </style>
 
 <section class="max-w-6xl mx-auto px-4 py-8 md:px-8 lg:py-12">
@@ -122,10 +147,7 @@
         </button>
       </div>
 
-      {% comment %} ★まずセット品の情報を取得 {% endcomment %}
       {% assign related_set = product.metafields.custom.related_set.value %}
-
-      {% comment %} ★条件を「画像が2枚以上、またはセット品がある時」に変更 {% endcomment %}
       {% if product.media.size > 1 or related_set != blank %}
         <div class="relative w-full group">
           <button
@@ -146,48 +168,56 @@
           </button>
 
           <div id="ThumbList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style="scroll-behavior: smooth;">
+            {% comment %} ★ 表示制限のためのカウンター設定 {% endcomment %}
+            {% assign thumb_limit = section.settings.thumbnail_limit %}
+            {% assign thumb_count = 0 %}
+
             {% comment %} 1. 通常の商品画像をループ {% endcomment %}
             {% for media in product.media %}
-              {% assign variant_label = '' %}
-              {% for variant in product.variants %}
-                {% if variant.featured_media.id == media.id %}
-                  {% assign variant_label = variant.title %}
-                  {% break %}
-                {% endif %}
-              {% endfor %}
-              <div
-                class="js-thumb w-[calc(33.333%-0.4rem)] lg:w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
-                data-media-type="{{ media.media_type }}"
-                {% if media.media_type == 'image' %}
-                  data-src="{{ media | image_url: width: 1200 }}"
-                {% else %}
-                  data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: 'w-full h-full object-cover' | escape }}"
-                {% endif %}
-              >
-                <div class="js-thumb-border aspect-square w-full border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} relative overflow-hidden">
-                  <img
-                    src="{{ media | image_url: width: 240 }}"
-                    class="w-full h-full object-cover pointer-events-none"
-                    loading="lazy"
-                  >
-                  {% if media.media_type contains 'video' %}
-                    <div class="thumb-video-badge absolute inset-0 flex items-center justify-center bg-black/10">
-                      <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
-                      </svg>
-                    </div>
+              {% if thumb_count < thumb_limit %}
+                {% assign variant_label = '' %}
+                {% for variant in product.variants %}
+                  {% if variant.featured_media.id == media.id %}
+                    {% assign variant_label = variant.title %}
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+                <div
+                  class="js-thumb w-[calc(33.333%-0.4rem)] lg:w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
+                  data-media-type="{{ media.media_type }}"
+                  {% if media.media_type == 'image' %}
+                    data-src="{{ media | image_url: width: 1200 }}"
+                  {% else %}
+                    data-video-html="{{ media | video_tag: controls: true, autoplay: true, muted: true, loop: true, class: 'w-full h-full object-cover' | escape }}"
+                  {% endif %}
+                >
+                  <div class="js-thumb-border aspect-square w-full border-2 {% if media == featured_media %}border-black{% else %}border-transparent{% endif %} relative overflow-hidden">
+                    <img
+                      src="{{ media | image_url: width: 240 }}"
+                      class="w-full h-full object-cover pointer-events-none"
+                      loading="lazy"
+                    >
+                    {% if media.media_type contains 'video' %}
+                      <div class="thumb-video-badge absolute inset-0 flex items-center justify-center bg-black/10">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                        </svg>
+                      </div>
+                    {% endif %}
+                  </div>
+                  {% if variant_label != '' %}
+                    <span class="block text-[14px] text-center mt-1 leading-tight text-gray-700">
+                      {{ variant_label | truncate: 15, '...' }}
+                    </span>
                   {% endif %}
                 </div>
-                {% if variant_label != '' %}
-                  <span class="block text-[14px] text-center mt-1 leading-tight text-gray-700">
-                    {{ variant_label | truncate: 15, '...' }}
-                  </span>
-                {% endif %}
-              </div>
+                {% comment %} 表示した枚数をカウントアップ {% endcomment %}
+                {% assign thumb_count = thumb_count | plus: 1 %}
+              {% endif %}
             {% endfor %}
 
-            {% comment %} 2. ★セット商品のサムネイル（紐付けがある場合のみ） {% endcomment %}
-            {% if related_set != blank and related_set.featured_media %}
+            {% comment %} 2. ★セット商品のサムネイル（上限に達していない場合のみ表示） {% endcomment %}
+            {% if related_set != blank and related_set.featured_media and thumb_count < thumb_limit %}
               {% assign set_media = related_set.featured_media %}
               <div
                 class="js-thumb w-[calc(33.333%-0.4rem)] lg:w-[calc(20%-0.4rem)] flex-shrink-0 flex flex-col items-center"
@@ -216,6 +246,7 @@
                   {{ related_set.title | truncate: 15, '...' }}
                 </span>
               </div>
+              {% assign thumb_count = thumb_count | plus: 1 %}
             {% endif %}
           </div>
 
@@ -239,35 +270,25 @@
       {% endif %}
 
       {% comment %} ★ 最近見た商品 {% endcomment %}
-      <div id="recently-viewed-products" class="mt-8" style="display: none;">
+      {% comment %} data-limit を追加して、設定値をJSに渡す{% endcomment %}
+      <div
+        id="recently-viewed-products"
+        class="mt-8"
+        style="display: none;"
+        data-limit="{{ section.settings.products_to_show }}"
+      >
         <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
           {% render 'icon-recent' %}
           <span class="text-pink-600">最近見た商品</span>
         </h3>
-        <div class="recently-viewed-list grid grid-cols-3 lg:grid-cols-4 gap-4">
-          <!-- JavaScriptで動的に生成 -->
-        </div>
+        <div class="recently-viewed-list grid grid-cols-3 lg:grid-cols-4 gap-4"></div>
       </div>
     </div>
 
     {% comment %} --- 右側：商品情報エリア --- {% endcomment %}
     <div class="flex flex-col gap-6 w-full">
       <div class="space-y-3">
-        <div class="flex flex-wrap gap-2 mb-4">
-          {% if product.compare_at_price > product.price %}
-            <span class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-tighter shadow-sm"
-              >Sale</span
-            >
-          {% endif %}
-          {% if product.metafields.custom.is_new.value == true %}
-            <span class="bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm">新着</span>
-          {% endif %}
-          {% if product.metafields.custom.is_limited.value == true %}
-            <span class="border border-blue-400 text-blue-500 text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm"
-              >期間限定価格</span
-            >
-          {% endif %}
-        </div>
+        <div class="flex flex-wrap gap-2 mb-4">{% render 'product-badge', product: product %}</div>
 
         <h1 class="text-2xl md:text-3xl font-serif text-gray-900 leading-tight">{{ product.title }}</h1>
 
@@ -277,58 +298,53 @@
           </p>
         {% endif %}
 
-        {% comment %} ★ SNSシェアボタン {% endcomment %}
-        <div class="social-share flex items-center gap-3 mt-3 mb-3 pb-3 border-b border-gray-200">
-          <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">シェア:</span>
-          <div class="flex items-center gap-2">
-            {% comment %} Facebook {% endcomment %}
-            <a
-              href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ product.url }}"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-blue-600 hover:text-white transition-colors"
-              aria-label="Share on Facebook"
-            >
-              {% render 'icon-facebook' %}
-            </a>
+        {% if product.vendor != blank %}
+          <div class="flex items-center gap-2 mt-4">
+            <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
+              <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
 
-            {% comment %} Twitter (X) {% endcomment %}
             <a
-              href="https://twitter.com/intent/tweet?url={{ shop.url }}{{ product.url }}&text={{ product.title | url_encode }}"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-black hover:text-white transition-colors"
-              aria-label="Share on Twitter"
+              href="{{ product.vendor | url_for_vendor }}"
+              class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
             >
-              {% render 'icon-x' %}
-            </a>
-
-            {% comment %} Pinterest {% endcomment %}
-            <a
-              href="https://pinterest.com/pin/create/button/?url={{ shop.url }}{{ product.url }}&media={{ product.featured_media | image_url: width: 1200 }}&description={{ product.title | url_encode }}"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-red-600 hover:text-white transition-colors"
-              aria-label="Share on Pinterest"
-            >
-              {% render 'icon-pinterest' %}
-            </a>
-
-            {% comment %} LINE {% endcomment %}
-            <a
-              href="https://social-plugins.line.me/lineit/share?url={{ shop.url }}{{ product.url }}"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-green-500 hover:text-white transition-colors"
-              aria-label="Share on LINE"
-            >
-              {% render 'icon-line' %}
+              {{ product.vendor }}の商品一覧を見る
             </a>
           </div>
-        </div>
+        {% endif %}
+
+        {% assign related_n = product.metafields.custom.related_nav.value %}
+        {% if related_n != blank %}
+          <div class="flex items-center gap-2 mt-2">
+            <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
+              <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+
+            <a
+              href="{{ related_n.url }}"
+              class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
+            >
+              関連商品を見る
+            </a>
+          </div>
+        {% endif %}
+
+        {% comment %} ★ SNSシェアボタン {% endcomment %}
+        {% if settings.show_social_share %}
+          <div class="social-share flex items-center gap-3 mt-3 mb-3 pb-3 border-b border-gray-200">
+            <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">シェア:</span>
+            <div class="flex items-center gap-2">
+              {% render 'share-buttons' %}
+            </div>
+          </div>
+        {% endif %}
 
         {% comment %} ★ 修正②：レビュー・評価をサブタイトルの下、価格の上に移動 {% endcomment %}
-        <div class="product-reviews border-t border-gray-200 pt-3 mt-3">
+        <div class="product-reviews pt-1 mt-3">
           <div class="flex items-center gap-3 mb-2">
             <div class="flex items-center gap-1">
               {% comment %} 星5つ {% endcomment %}
@@ -368,44 +384,7 @@
             </p>
           </div>
         {% endif %}
-
         <p class="text-xl text-gray-800 font-bold mt-4">{{ product.price | money }}</p>
-
-        {% comment %} ★ 修正③：タグの閉じ忘れを修正 {% endcomment %}
-        {% if product.vendor != blank %}
-          <div class="flex items-center gap-2 mt-4">
-            <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
-              <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-              </svg>
-            </span>
-
-            <a
-              href="{{ product.vendor | url_for_vendor }}"
-              class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
-            >
-              {{ product.vendor }}の商品一覧を見る
-            </a>
-          </div>
-        {% endif %}
-
-        {% assign related_n = product.metafields.custom.related_nav.value %}
-        {% if related_n != blank %}
-          <div class="flex items-center gap-2 mt-2">
-            <span class="flex items-center justify-center w-5 h-5 bg-pink-100 rounded-full">
-              <svg class="w-3 h-3 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-              </svg>
-            </span>
-
-            <a
-              href="{{ related_n.url }}"
-              class="text-xs text-gray-600 hover:text-pink-600 hover:underline transition"
-            >
-              関連商品を見る
-            </a>
-          </div>
-        {% endif %}
       </div>
 
       {% comment %} マトリックス・バリエーションセレクター {% endcomment %}
@@ -497,11 +476,11 @@
           {% endif %}
         </div>
 
-        {% comment %} ★ ギフトオプション {% endcomment %}
+        {% comment %} ギフトオプション {% endcomment %}
         <div class="gift-options bg-pink-50 border border-pink-200 rounded-lg p-4 mt-6">
           <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
             {% render 'icon-gift' %}
-            ギフトオプション
+            {{ section.settings.gift_title }}
           </h3>
 
           <div class="space-y-3">
@@ -515,8 +494,8 @@
                 class="mt-1 w-4 h-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
               >
               <label for="gift-wrapping" class="flex-1 text-sm text-gray-700 cursor-pointer">
-                <span class="font-semibold">ギフトラッピングを希望する</span>
-                <span class="block text-xs text-gray-500 mt-1">+ ¥300</span>
+                <span class="font-semibold">{{ section.settings.gift_wrapping_label }}</span>
+                <span class="block text-xs text-gray-500 mt-1">{{ section.settings.gift_wrapping_note }}</span>
               </label>
             </div>
 
@@ -531,21 +510,21 @@
                 onchange="document.getElementById('message-text-wrapper').classList.toggle('hidden')"
               >
               <label for="message-card" class="flex-1 text-sm text-gray-700 cursor-pointer">
-                <span class="font-semibold">メッセージカードを追加</span>
-                <span class="block text-xs text-gray-500 mt-1">無料</span>
+                <span class="font-semibold">{{ section.settings.gift_message_label }}</span>
+                <span class="block text-xs text-gray-500 mt-1">{{ section.settings.gift_message_note }}</span>
               </label>
             </div>
 
-            {% comment %} メッセージ入力欄（チェックボックス選択時に表示） {% endcomment %}
+            {% comment %} メッセージ入力欄 {% endcomment %}
             <div id="message-text-wrapper" class="hidden">
               <textarea
                 name="attributes[gift_message]"
                 rows="3"
                 maxlength="100"
-                placeholder="メッセージを入力してください（100文字以内）"
+                placeholder="{{ section.settings.gift_placeholder }}"
                 class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 resize-none"
               ></textarea>
-              <p class="text-xs text-gray-500 mt-1">※ メッセージは100文字以内でご入力ください</p>
+              <p class="text-xs text-gray-500 mt-1">{{ section.settings.gift_warning_text }}</p>
             </div>
           </div>
         </div>
@@ -617,24 +596,12 @@
               {% render 'icon-chevron-down' %}
             </span>
           </summary>
-          <div class="pb-6 text-sm leading-relaxed text-gray-600">
-            <p>
-              <strong>{{ section.settings.return_policy_label }}をご希望の場合：</strong>
-            </p>
-            <ul class="list-disc pl-5 mt-2 space-y-1">
-              <li>商品到着後7日以内にご連絡ください</li>
-              <li>未開封・未使用の商品に限ります</li>
-              <li>返送料はお客様負担となります</li>
-            </ul>
-            <p class="mt-3"><strong>返品不可の場合：</strong></p>
-            <ul class="list-disc pl-5 mt-2 space-y-1">
-              <li>お客様都合による開封済み商品</li>
-              <li>セール品・アウトレット商品</li>
-            </ul>
-            <p class="mt-3 text-xs text-gray-500">
-              詳細は<a href="/pages/refund-policy" class="text-pink-600 hover:underline">返品ポリシー</a
-              >をご確認ください。
-            </p>
+
+          <div
+            class="pb-6 text-sm leading-relaxed policy-richtext"
+            style="color: {{ section.settings.return_policy_color }}; font-size: {{ section.settings.return_policy_size }}px;"
+          >
+            {{ section.settings.return_policy_body }}
           </div>
         </details>
       </div>
@@ -644,16 +611,17 @@
         <details class="group">
           <summary class="flex justify-between items-center py-2 cursor-pointer list-none">
             <span class="text-xs font-bold uppercase tracking-widest text-gray-900">
-              {{- section.settings.shipping_info_label -}}
+              {{ section.settings.shipping_info_label }}
             </span>
             <span class="transition-transform duration-300 group-open:rotate-180">
               {% render 'icon-chevron-down' %}
             </span>
           </summary>
-          <div class="pb-6 text-sm leading-relaxed text-gray-600">
-            <p><strong>配送料：</strong>全国一律500円（5,000円以上で送料無料）</p>
-            <p class="mt-2"><strong>お届け日数：</strong>ご注文から3〜5営業日</p>
-            <p class="mt-2 text-xs text-gray-500">離島・一部地域では追加料金が発生する場合がございます。</p>
+          <div
+            class="pb-6 leading-relaxed policy-richtext"
+            style="color: {{ section.settings.shipping_info_color }}; font-size: {{ section.settings.shipping_info_size }}px;"
+          >
+            {{ section.settings.shipping_info_body }}
           </div>
         </details>
       </div>
@@ -725,9 +693,11 @@
 
 <script>
   (function () {
-    // 最近見た商品の管理（1時間でリセット）
     const initRecentlyViewed = () => {
-      const EXPIRY_TIME = 60 * 60 * 1000; // 1時間（ミリ秒）
+      const container = document.getElementById('recently-viewed-products');
+      if (!container) return;
+
+      const EXPIRY_TIME = 60 * 60 * 1000;
       const productHandle = '{{ product.handle }}';
       const productData = {
         handle: productHandle,
@@ -737,103 +707,88 @@
         image: '{{ product.featured_media | image_url: width: 300 }}'
       };
 
-      // localStorageから既存のデータを取得
       const stored = localStorage.getItem('recentlyViewed');
-      let recentlyViewedData = null;
       let products = [];
 
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
-          
-          // 新形式かチェック（timestampがあるか）
           if (parsed.timestamp && parsed.products) {
-            // 新形式
-            const now = Date.now();
-            const elapsed = now - parsed.timestamp;
-            
-            if (elapsed > EXPIRY_TIME) {
-              // 1時間経過していたらリセット
+            if (Date.now() - parsed.timestamp > EXPIRY_TIME) {
               localStorage.removeItem('recentlyViewed');
-            } else {
-              // まだ有効
-              products = parsed.products;
+              container.style.display = 'none';
+              return; 
             }
-          } else if (Array.isArray(parsed)) {
-            // 旧形式（配列のみ） → 新形式に移行するためクリア
-            localStorage.removeItem('recentlyViewed');
+            products = parsed.products;
           }
         } catch (e) {
-          // パースエラー時はクリア
           localStorage.removeItem('recentlyViewed');
         }
       }
 
-      // 現在の商品を除外（重複防止）
       products = products.filter(item => item.handle !== productHandle);
-
-      // 現在の商品を先頭に追加
       products.unshift(productData);
+      
+      // 保存数は15をキープ、「最大6表示」の材料を確保
+      products = products.slice(0, 15);
 
-      // 最大5件まで保存
-      products = products.slice(0, 7);
-
-      // タイムスタンプ付きでlocalStorageに保存
-      const now = Date.now();
-      const dataToSave = {
-        timestamp: now,
+      localStorage.setItem('recentlyViewed', JSON.stringify({
+        timestamp: Date.now(),
         products: products
-      };
-      localStorage.setItem('recentlyViewed', JSON.stringify(dataToSave));
+      }));
 
-      // 最近見た商品を表示
-      displayRecentlyViewed(products);
+      displayRecentlyViewed(products, container);
     };
 
-    const displayRecentlyViewed = (products) => {
-      const container = document.getElementById('recently-viewed-products');
-      if (!container) return;
+    const displayRecentlyViewed = (products, container) => {
+      // エディタのスライダーの数字（2〜6）をリアルタイムに読み取る
+      const displayLimit = parseInt(container.getAttribute('data-limit')) || 6; 
 
-      // 現在の商品を除外（表示しない）
       const currentHandle = '{{ product.handle }}';
       const filteredProducts = products.filter(item => item.handle !== currentHandle);
+      
+      // スライダーの数に合わせて正確に切り取る
+      const limitedProducts = filteredProducts.slice(0, displayLimit);
 
-      if (filteredProducts.length === 0) {
+      if (limitedProducts.length === 0) {
         container.style.display = 'none';
         return;
       }
 
       container.style.display = 'block';
-
       const productList = container.querySelector('.recently-viewed-list');
-      productList.innerHTML = '';
-
-      filteredProducts.forEach(product => {
-        const productCard = `
-          <a href="${product.url}" class="block group">
-            <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-2">
-              <img 
-                src="${product.image}" 
-                alt="${product.title}"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              >
-            </div>
-            <h4 class="text-xs font-semibold text-gray-900 leading-tight mb-1 line-clamp-2">${product.title}</h4>
-            <p class="text-xs text-gray-600 font-bold">${product.price}</p>
-          </a>
-        `;
-        const div = document.createElement('div');
-        div.innerHTML = productCard;
-        productList.appendChild(div.firstElementChild);
-      });
+      if (productList) {
+        productList.innerHTML = '';
+        limitedProducts.forEach(product => {
+          const productCard = `
+            <a href="${product.url}" class="block group">
+              <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-2">
+                <img src="${product.image}" alt="${product.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+              </div>
+              <h4 class="text-[10px] md:text-xs font-semibold text-gray-900 leading-tight mb-1 line-clamp-2">${product.title}</h4>
+              <p class="text-[10px] md:text-xs text-gray-600 font-bold">${product.price}</p>
+            </a>
+          `;
+          const div = document.createElement('div');
+          div.innerHTML = productCard;
+          productList.appendChild(div.firstElementChild);
+        });
+      }
     };
 
+    // 初回実行（ページを開いた時）
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initRecentlyViewed);
     } else {
       initRecentlyViewed();
     }
+
+    // エディタで数字を動かした時の挙動
+    document.addEventListener('shopify:section:load', (event) => {
+      if (event.target.querySelector('#recently-viewed-products')) {
+        initRecentlyViewed();
+      }
+    });
   })();
 </script>
 
@@ -843,6 +798,32 @@
   "tag": "section",
   "class": "section",
   "settings": [
+    {
+      "type": "header",
+      "content": "商品画像ギャラリー設定"
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_limit",
+      "min": 2,
+      "max": 15,
+      "step": 1,
+      "label": "サムネイルの表示上限数",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "閲覧履歴設定"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "最近見た商品の閲覧数",
+      "default": 6
+    },
     {
       "type": "text",
       "id": "product_info_label",
@@ -855,22 +836,109 @@
       "label": "成分情報のラベル名",
       "default": "成分情報"
     },
-    {
-      "type": "text",
-      "id": "return_policy_label",
-      "label": "返品・交換のラベル名",
-      "default": "返品・交換"
-    },
+    { "type": "header", "content": "配送について" },
     {
       "type": "text",
       "id": "shipping_info_label",
       "label": "配送情報のラベル名",
       "default": "配送について"
-    }
-  ],
-  "presets": [
+    },
     {
-      "name": "メイン商品"
+      "type": "richtext",
+      "id": "shipping_info_body",
+      "label": "配送情報の本文",
+      "default": "<p><strong>配送料：</strong>全国一律500円（5,000円以上で送料無料）</p><p><strong>お届け日数：</strong>ご注文から3〜5営業日</p>"
+    },
+    {
+      "type": "color",
+      "id": "shipping_info_color",
+      "label": "文字色",
+      "default": "#4b5563"
+    },
+    {
+      "type": "range",
+      "id": "shipping_info_size",
+      "label": "文字サイズ",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    { "type": "header", "content": "返品・交換について" },
+    {
+      "type": "text",
+      "id": "return_policy_label",
+      "label": "返品・交換のラベル名",
+      "default": "返品・交換について"
+    },
+    {
+      "type": "richtext",
+      "id": "return_policy_body",
+      "label": "返品・交換の本文",
+      "default": "<p><strong>返品・交換をご希望の場合：</strong></p><ul><li>商品到着後7日以内にご連絡ください</li><li>未開封・未使用の商品に限ります</li><li>返送料はお客様負担となります</li></ul><p><strong>返品不可の場合：</strong></p><ul><li>お客様都合による開封済み商品</li><li>セール品・アウトレット商品</li></ul><p>詳細は<a href='/pages/refund-policy'>返品ポリシー</a>をご確認ください。</p>"
+    },
+    {
+      "type": "color",
+      "id": "return_policy_color",
+      "label": "文字色",
+      "default": "#4b5563"
+    },
+    {
+      "type": "range",
+      "id": "return_policy_size",
+      "label": "文字サイズ",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "ギフトオプション設定"
+    },
+    {
+      "type": "text",
+      "id": "gift_title",
+      "label": "タイトル",
+      "default": "ギフトオプション"
+    },
+    {
+      "type": "text",
+      "id": "gift_wrapping_label",
+      "label": "ラッピングの項目名",
+      "default": "ギフトラッピングを希望する"
+    },
+    {
+      "type": "text",
+      "id": "gift_wrapping_note",
+      "label": "ラッピングの価格注釈",
+      "default": "+ ¥300"
+    },
+    {
+      "type": "text",
+      "id": "gift_message_label",
+      "label": "メッセージカードの項目名",
+      "default": "メッセージカードを追加"
+    },
+    {
+      "type": "text",
+      "id": "gift_message_note",
+      "label": "メッセージカードの注釈",
+      "default": "無料"
+    },
+    {
+      "type": "text",
+      "id": "gift_placeholder",
+      "label": "メッセージのプレースホルダ",
+      "default": "メッセージを入力してください (100文字以内)"
+    },
+    {
+      "type": "text",
+      "id": "gift_warning_text",
+      "label": "メッセージ入力の注意書き",
+      "default": "※ メッセージは100文字以内でご入力ください"
     }
   ]
 }

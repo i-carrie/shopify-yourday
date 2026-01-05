@@ -6,5 +6,69 @@
     "theme_version": "0.1.0",
     "theme_documentation_url": "https://github.com/yourname/yourday",
     "theme_support_url": "https://github.com/yourname/yourday/issues"
+  },
+  {
+    "name": "商品バッジ",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_sale_badge",
+        "label": "Saleバッジを表示",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "color_sale_badge",
+        "label": "Saleバッジの色",
+        "default": "#dc2626"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_new_badge",
+        "label": "新着バッジを表示",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "color_new_badge",
+        "label": "新着バッジの色",
+        "default": "#ec4899"
+      }
+    ]
+  },
+  {
+    "name": "SNSシェア設定",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_social_share",
+        "label": "SNSシェア全体を表示する",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_share_facebook",
+        "label": "Facebookを表示",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_share_x",
+        "label": "X (Twitter)を表示",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_share_line",
+        "label": "LINEを表示",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_share_pinterest",
+        "label": "Pinterestを表示",
+        "default": true
+      }
+    ]
   }
 ]
