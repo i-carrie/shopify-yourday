@@ -1,0 +1,154 @@
+<section class="max-w-5xl mx-auto px-4 py-12 md:px-8 text-left">
+  {% if section.settings.title != blank %}
+    <div class="text-center mb-12">
+      <h2 class="text-lg md:text-xl font-serif text-gray-800 tracking-widest">
+        {{ section.settings.title }}
+      </h2>
+    </div>
+  {% endif %}
+
+  <div class="flex flex-col gap-16 md:gap-24">
+    {% for block in section.blocks %}
+      {% assign collection = collections[block.settings.collection] %}
+
+      {% comment %} 2. レイアウト：PCは1:1、スマホは縦積み。反転フラグに対応 {% endcomment %}
+      <div
+        class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start justify-items-start text-left"
+        {{ block.shopify_attributes }}
+      >
+        {% comment %} --- 画像エリア --- {% endcomment %}
+        <div class="w-full {% if block.settings.layout_invert %}lg:order-last{% endif %}">
+          <div class="aspect-square bg-gray-100 rounded-2xl overflow-hidden relative">
+            {% if block.settings.collection != blank %}
+              {% assign selected_collection = block.settings.collection %}
+              {% assign featured_img = selected_collection.featured_image | default: selected_collection.image %}
+
+              {% if featured_img != blank %}
+                <img
+                  src="{{ featured_img | image_url: width: 1000 }}"
+                  alt="{{ selected_collection.title | escape }}"
+                  class="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                  loading="lazy"
+                >
+              {% else %}
+                {% comment %} コレクションはあるけど画像がない場合の案内 {% endcomment %}
+                <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs md:text-sm px-4 text-center">
+                  画像が設定されていません
+                </div>
+              {% endif %}
+
+            {% else %}
+              <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs md:text-sm px-4 text-center">
+                コレクションを選択してください
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        {% comment %} --- テキストエリア --- {% endcomment %}
+        <div class="flex flex-col justify-start space-y-4 items-start w-full">
+          {% comment %} --- 1. タイトル部分 --- {% endcomment %}
+          {% if block.settings.custom_title == blank and block.settings.custom_description == blank %}
+            <h3 class="text-xl md:text-2xl font-serif text-gray-400 leading-tight w-full text-center pt-2">[見出し]</h3>
+          {% elsif block.settings.custom_title != blank %}
+            <h3 class="text-xl md:text-2xl font-serif text-gray-900 leading-tight w-full text-center pt-2">
+              {{ block.settings.custom_title }}
+            </h3>
+          {% endif %}
+
+          {% comment %} --- 2. 情報部分（プレースホルダーは左寄せ） --- {% endcomment %}
+          {% if block.settings.custom_title == blank and block.settings.custom_description == blank %}
+            <div class="pt-2 text-gray-400 text-sm md:text-base leading-relaxed w-full text-left">
+              [コレクション情報]
+            </div>
+          {% elsif block.settings.custom_description != blank %}
+            <div class="pt-2 text-gray-600 text-sm md:text-base leading-relaxed">
+              {{ block.settings.custom_description }}
+            </div>
+          {% endif %}
+
+          {% comment %} --- 3. リンク部分（request.design_modeを削除） --- {% endcomment %}
+          <div class="w-full text-center">
+            {% if block.settings.custom_title == blank and block.settings.custom_description == blank %}
+              <div class="pt-2">
+                <span class="text-xs md:text-sm text-gray-400 underline underline-offset-4">
+                  [コレクションページへのリンク]
+                </span>
+              </div>
+            {% endif %}
+
+            {% comment %} フォールバック：接続を切ってもリンクを常に表示 {% endcomment %}
+            {% if block.settings.collection != blank %}
+              <div class="pt-2">
+                <a
+                  href="{{ collection.url }}"
+                  class="text-xs md:text-sm text-gray-500 underline underline-offset-4 hover:text-black transition-colors"
+                >
+                  {{ block.settings.link_text | default: '特集collectionを見る' }}
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "おすすめコレクション",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "セクション全体のタイトル",
+      "default": "Your Dayおすすめコレクション"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_block",
+      "name": "コレクション",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "コレクションを選択"
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "見出し",
+          "info": "見出しを入力してください"
+        },
+        {
+          "type": "textarea",
+          "id": "custom_description",
+          "label": "コレクション情報",
+          "placeholder": "コレクション情報入力"
+        },
+        {
+          "type": "checkbox",
+          "id": "layout_invert",
+          "label": "PCで画像とテキストを左右反転する",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "link_text",
+          "label": "リンクのラベル",
+          "default": "特集collectionを見る"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "おすすめコレクション",
+      "blocks": [{ "type": "collection_block" }]
+    }
+  ]
+}
+{% endschema %}

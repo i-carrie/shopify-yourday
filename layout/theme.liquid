@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja">
+<html lang="{{ request.locale.iso_code }}">
   <head>
     <title>{{ page_title }}</title>
     <meta charset="utf-8">
@@ -7,7 +7,7 @@
     <meta name="description" content="{{ page_description | escape }}">
     <link rel="canonical" href="{{ canonical_url }}">
     <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
-
+    <meta property="og:locale" content="{{ request.locale.iso_code }}">
     {{ content_for_header }}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">

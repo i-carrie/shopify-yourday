@@ -1,0 +1,66 @@
+<section
+  id="home-recently-viewed"
+  style="display: none;"
+  class="max-w-6xl mx-auto px-4 py-12 md:px-8"
+  data-limit="{{ section.settings.products_to_show }}"
+>
+  <div class="text-center mb-8">
+    {% comment %} 文字サイズ：text-lg / md:text-xl (最新版) [cite: 2026-01-05] {% endcomment %}
+    <h2 class="text-lg md:text-xl font-serif text-gray-800 flex items-center justify-center gap-2">
+      {% comment %} アイコン位置：0.6px / 1px (最新版) [cite: 2026-01-05] {% endcomment %}
+      <span class="inline-flex transform translate-y-[0.6px] md:translate-y-[1px] w-5 h-5 md:w-6 md:h-6">
+        {% render 'icon-recent' %}
+      </span>
+
+      <span>{{ section.settings.recently_viewed_label }}</span>
+    </h2>
+  </div>
+
+  <div class="recently-viewed-list grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8">
+    {% comment %} ここに JS で商品が入る {% endcomment %}
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.RecentlyViewed) {
+      RecentlyViewed.render('home-recently-viewed');
+    }
+  });
+
+  document.addEventListener('shopify:section:load', (e) => {
+    if (window.RecentlyViewed) {
+      RecentlyViewed.render('home-recently-viewed');
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "最近見た商品（Home用）",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "recently_viewed_label",
+      "label": "最近見た商品のラベル名",
+      "default": "最近閲覧した商品"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "表示件数（最大）",
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "最近見た商品（Home用）"
+    }
+  ]
+}
+{% endschema %}

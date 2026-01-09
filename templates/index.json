@@ -1,8 +1,168 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
-      "type": "main-index"
+      "type": "main-index",
+      "settings": {}
+    },
+    "recently_viewed_RJNd3r": {
+      "type": "recently-viewed",
+      "name": "最近見た商品（Home用）",
+      "settings": {
+        "recently_viewed_label": "最近閲覧した商品",
+        "products_to_show": 4
+      }
+    },
+    "home_categories_trUizN": {
+      "type": "home-categories",
+      "blocks": {
+        "collection_ETyK6a": {
+          "type": "collection",
+          "settings": {
+            "collection": "relaxation"
+          }
+        },
+        "collection_YXH6g9": {
+          "type": "collection",
+          "settings": {
+            "collection": "bath"
+          }
+        },
+        "collection_jmWPhJ": {
+          "type": "collection",
+          "settings": {
+            "collection": "room"
+          }
+        },
+        "collection_NHVyX3": {
+          "type": "collection",
+          "settings": {
+            "collection": "hands"
+          }
+        }
+      },
+      "block_order": [
+        "collection_ETyK6a",
+        "collection_YXH6g9",
+        "collection_jmWPhJ",
+        "collection_NHVyX3"
+      ],
+      "name": "カテゴリー一覧",
+      "settings": {
+        "title": "カテゴリー"
+      }
+    },
+    "home_brands_gWGm3F": {
+      "type": "home-brands",
+      "blocks": {
+        "brand_hfFajq": {
+          "type": "brand",
+          "settings": {
+            "brand_entry": "natural-co"
+          }
+        },
+        "brand_6XYcdY": {
+          "type": "brand",
+          "settings": {
+            "brand_entry": "j-trading"
+          }
+        },
+        "brand_ffaf3J": {
+          "type": "brand",
+          "settings": {
+            "brand_entry": "the-organic"
+          }
+        },
+        "brand_aNgkfh": {
+          "type": "brand",
+          "settings": {
+            "brand_entry": "forest"
+          }
+        },
+        "brand_pCzcEc": {
+          "type": "brand",
+          "settings": {
+            "brand_entry": ""
+          }
+        },
+        "brand_jpL9Az": {
+          "type": "brand",
+          "settings": {
+            "brand_entry": ""
+          }
+        }
+      },
+      "block_order": [
+        "brand_hfFajq",
+        "brand_6XYcdY",
+        "brand_ffaf3J",
+        "brand_aNgkfh",
+        "brand_pCzcEc",
+        "brand_jpL9Az"
+      ],
+      "name": "ブランド一覧",
+      "settings": {
+        "title": "ブランド"
+      }
+    },
+    "home_sales_6KUhRV": {
+      "type": "home-sales",
+      "name": "セール品",
+      "settings": {
+        "title": "Sale",
+        "description": "今だけの特別価格アイテムをチェック。",
+        "collection": "sale",
+        "link_text": "Sale中の商品をもっと見る"
+      }
+    },
+    "home_yourday_collections_HFY83D": {
+      "type": "home-yourday-collections",
+      "blocks": {
+        "collection_block_cmmTr4": {
+          "type": "collection_block",
+          "settings": {
+            "collection": "special-diffuser",
+            "custom_title": "アロマ特集",
+            "custom_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tristique scelerisque nisi eu hendrerit. Aenean et nulla dui. Integer imperdiet vestibulum mollis. Integer id est ac odio maximus egestas. Nunc at purus molestie diam mollis sagittis at ut ligula. Sed eget fermentum mauris. Nam a nisl sed nisi tristique interdum sed vel augue. Aliquam enim eros, vestibulum at magna nec, tristique pretium ligula. Vivamus mattis turpis nec elit sagittis rutrum.",
+            "layout_invert": false,
+            "link_text": "特集collectionを見る"
+          }
+        },
+        "collection_block_jeNrBc": {
+          "type": "collection_block",
+          "settings": {
+            "collection": "special-bathsalt",
+            "custom_title": "バスソルト特集",
+            "custom_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tristique scelerisque nisi eu hendrerit. Aenean et nulla dui. Integer imperdiet vestibulum mollis. Integer id est ac odio maximus egestas. Nunc at purus molestie diam mollis sagittis at ut ligula. Sed eget fermentum mauris. Nam a nisl sed nisi tristique interdum sed vel augue. Aliquam enim eros, vestibulum at magna nec, tristique pretium ligula. Vivamus mattis turpis nec elit sagittis rutrum.",
+            "layout_invert": true,
+            "link_text": "特集collectionを見る"
+          }
+        }
+      },
+      "block_order": [
+        "collection_block_cmmTr4",
+        "collection_block_jeNrBc"
+      ],
+      "name": "おすすめコレクション",
+      "settings": {
+        "title": "Your Dayおすすめコレクション"
+      }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main",
+    "recently_viewed_RJNd3r",
+    "home_categories_trUizN",
+    "home_brands_gWGm3F",
+    "home_sales_6KUhRV",
+    "home_yourday_collections_HFY83D"
+  ]
 }

@@ -1,0 +1,78 @@
+<section class="max-w-6xl mx-auto px-4 py-12 md:px-8">
+  <div class="text-center mb-8">
+    <h2 class="text-lg md:text-xl font-serif text-gray-800 tracking-wide">{{ section.settings.title }}</h2>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+    {% for block in section.blocks %}
+      {% assign collection = collections[block.settings.collection] %}
+
+      <div class="flex flex-col items-center" {{ block.shopify_attributes }}>
+        {% if collection != blank %}
+          <a href="{{ collection.url }}" class="w-full group">
+            <div class="aspect-[4/5] bg-gray-100 rounded-2xl overflow-hidden relative">
+              {% if collection.image %}
+                <img
+                  src="{{ collection.image | image_url: width: 600 }}"
+                  alt="{{ collection.title }}"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                >
+              {% endif %}
+
+              <div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-300"></div>
+
+              <div class="absolute inset-0 flex items-center justify-center p-4">
+                <h3 class="text-white text-base md:text-lg font-serif tracking-widest text-center drop-shadow-md">
+                  {{ collection.title }}
+                </h3>
+              </div>
+            </div>
+          </a>
+        {% else %}
+          {% if request.design_mode %}
+            <div class="w-full aspect-[4/5] bg-gray-200 rounded-2xl flex items-center justify-center p-4 text-center">
+              <span class="text-gray-500 text-[10px] md:text-xs"> カテゴリを選択してください </span>
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "カテゴリー一覧",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "セクション見出し",
+      "default": "カテゴリー"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "カテゴリー",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "表示するコレクション"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "カテゴリー一覧",
+      "blocks": [{ "type": "collection" }, { "type": "collection" }, { "type": "collection" }, { "type": "collection" }]
+    }
+  ]
+}
+{% endschema %}
