@@ -18,12 +18,12 @@
     {% comment %} ① 上段：固定バー - 内容が切り替わる {% endcomment %}
     <div
       style="position: fixed; top: 0; left: 0; right: 0; z-index: 100;"
-      class="bg-[#C2A992] text-sm border-b border-black/5 transition-all duration-300"
+      class="bg-[#C2A992] text-sm border-b border-black/5 transition-all duration-150"
       :class="scrolled ? 'py-4' : 'py-2'"
     >
       <div class="max-w-6xl mx-auto px-4 md:px-8 flex justify-between items-center">
         {% comment %} スクロール前の内容 {% endcomment %}
-        <div x-show="!scrolled" class="flex items-center space-x-4">
+        <div x-show="!scrolled" x-transition class="flex items-center space-x-4">
           <div class="relative">
             <button
               @click="myMenuOpen = !myMenuOpen"
@@ -53,7 +53,7 @@
         </div>
 
         {% comment %} スクロール後の内容: ロゴ | 検索 | text × 5 | カート {% endcomment %}
-        <div x-show="scrolled" class="flex items-center justify-between w-full">
+        <div x-show="scrolled" x-transition class="flex items-center justify-between w-full">
           <div class="flex items-center space-x-2">
             {% comment %} 左：ロゴ {% endcomment %}
             <div class="flex-shrink-0">
