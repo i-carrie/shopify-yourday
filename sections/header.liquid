@@ -1,200 +1,149 @@
-{% comment %}
-  isSticky: スクロール時に真になるフラグ
-  150px以上スクロールしたら 1段表示に切り替えるよ
-{% endcomment %}
 <header
   x-data="
     {
       mobileMenuOpen: false,
-      myMenuOpen: false,
-      isSticky: false
+      myMenuOpen: false
     }
   "
-  x-init="window.addEventListener('scroll', () => { isSticky = window.scrollY > 150 })"
-  class="sticky top-0 z-50 w-full font-serif transition-all duration-300"
-  :class="isSticky ? 'shadow-md' : ''"
+  class="sticky top-0 z-50 w-full font-serif"
 >
-  {% comment %} --- PC用レイアウト (lg以上) --- {% endcomment %}
+  {% comment %} --- PC用：3段構成 (lgサイズ以上で表示) --- {% endcomment %}
   <div class="hidden lg:block">
-    {% comment %}
-      通常時の3段レイアウト
-      isSticky が真のときは非表示（高さも 0 にして消す）
-    {% endcomment %}
-    <div
-      x-show="!isSticky"
-      x-transition:enter="transition ease-out duration-300"
-      x-transition:enter-start="opacity-0"
-      x-transition:enter-end="opacity-100"
-    >
-      {% comment %} ① 上段：ユーティリティバー {% endcomment %}
-      <div class="bg-[#C2A992] text-sm py-2 border-b border-black/5">
-        <div class="max-w-6xl mx-auto px-4 md:px-8 flex justify-between items-center">
-          <div class="flex items-center space-x-4">
-            <div class="relative">
-              <button
-                @click="myMenuOpen = !myMenuOpen"
-                @click.away="myMenuOpen = false"
-                class="flex items-center bg-white px-3 py-1 border border-gray-300 rounded text-gray-700"
-              >
-                <span>マイメニュー</span>
-                <span class="ml-1 w-4 h-4 text-gray-400">{% render 'icon-chevron-down' %}</span>
-              </button>
-              <div x-show="myMenuOpen" x-cloak class="absolute left-0 mt-2 w-40 bg-white border shadow-lg py-2 z-50">
-                <a href="/account" class="block px-4 py-2 hover:bg-gray-100">ログイン</a>
-                <a href="/account" class="block px-4 py-2 hover:bg-gray-100">注文履歴</a>
-              </div>
-            </div>
-            <a href="/account/register" class="bg-white px-3 py-1 border border-gray-300 rounded text-gray-700"
-              >新規会員登録</a
+    {% comment %} ① 上段：ユーティリティバー（背景色：#C2A992） {% endcomment %}
+    <div class="bg-[#C2A992] text-sm py-2 border-b border-black/5">
+      <div class="max-w-6xl mx-auto px-4 md:px-8 flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <button
+              @click="myMenuOpen = !myMenuOpen"
+              @click.away="myMenuOpen = false"
+              class="flex items-center bg-white px-3 py-1 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition"
             >
-          </div>
-          <div class="flex items-center">
-            <a href="{{ routes.cart_url }}" class="relative text-white">
-              <div class="w-8 h-8">{% render 'icon-cart' %}</div>
-              {% if cart.item_count > 0 %}
-                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                  {{- cart.item_count -}}
-                </span>
-              {% endif %}
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {% comment %} 中段：ロゴ & 検索バー {% endcomment %}
-      <div class="bg-white py-4">
-        <div class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center min-h-[64px]">
-          <div class="z-10 bg-[#FDFBF7] px-4 py-2 flex-shrink-0">
-            <a href="/" class="flex items-center">
-              {% if section.settings.logo != blank %}
-                <img
-                  src="{{ section.settings.logo | image_url: width: 500 }}"
-                  alt="{{ section.settings.logo.alt }}"
-                  style="width: {{ section.settings.logo_width }}px;"
-                  class="h-auto"
-                >
-              {% else %}
-                <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider ml-1">
-                  {{- section.settings.logo_text | default: 'Your day' -}}
-                </span>
-              {% endif %}
-            </a>
-          </div>
-          <div class="absolute inset-0 flex items-center justify-center pointer-events-none px-4">
-            <form
-              action="{{ routes.search_url }}"
-              method="get"
-              class="relative flex items-center border border-gray-400 rounded overflow-hidden w-full max-w-md pointer-events-auto"
-            >
-              <input
-                type="text"
-                name="q"
-                placeholder="{{ section.settings.search_placeholder }}"
-                class="w-full px-4 py-2 outline-none text-sm"
-              >
-              <button type="submit" class="bg-gray-400 p-2 text-white flex items-center justify-center">
-                <div class="w-5 h-5">{% render 'icon-search' %}</div>
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      {% comment %} ② 下段：ナビゲーション {% endcomment %}
-      <nav class="bg-[#EAE1D8] border-t border-b border-black/5">
-        <div class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center h-12">
-          <div class="flex-grow flex justify-center space-x-12">
-            <span class="text-sm font-medium text-gray-800">text</span>
-            <span class="text-sm font-medium text-gray-800">text</span>
-            <span class="text-sm font-medium text-gray-800">text</span>
-            <span class="text-sm font-medium text-gray-800">text</span>
-            <span class="text-sm font-medium text-gray-800">text</span>
-          </div>
-          <div class="absolute right-4 md:right-8">
-            <a href="#" class="text-sm font-medium text-gray-800 hover:text-[#C2A992]">お買い物ガイド</a>
-          </div>
-        </div>
-      </nav>
-    </div>
-
-    {% comment %}
-      固定時（isSticky = 真）の1段コンパクトレイアウト
-    {% endcomment %}
-    <div
-      x-show="isSticky"
-      x-cloak
-      x-transition:enter="transition ease-out duration-300"
-      x-transition:enter-start="opacity-0 -translate-y-full"
-      x-transition:enter-end="opacity-100 translate-y-0"
-      class="bg-white border-b border-gray-200 py-2"
-    >
-      <div class="max-w-6xl mx-auto px-4 md:px-8 flex items-center justify-between">
-        {% comment %} 左：ロゴ + 検索窓 {% endcomment %}
-        <div class="flex items-center space-x-6 flex-1">
-          <a href="/" class="flex-shrink-0">
-            {% if section.settings.logo != blank %}
-              <img
-                src="{{ section.settings.logo | image_url: width: 200 }}"
-                alt="{{ section.settings.logo.alt }}"
-                style="width: 80px;"
-                class="h-auto"
-              >
-            {% else %}
-              <span class="text-lg font-serif font-bold text-[#C2A992]">Your day</span>
-            {% endif %}
-          </a>
-          <form
-            action="{{ routes.search_url }}"
-            method="get"
-            class="relative flex items-center border border-gray-300 rounded overflow-hidden w-full max-w-[240px]"
-          >
-            <input type="text" name="q" placeholder="検索" class="w-full px-3 py-1 outline-none text-xs">
-            <button type="submit" class="bg-gray-400 px-2 py-1 text-white">
-              <div class="w-4 h-4">{% render 'icon-search' %}</div>
+              <span>マイメニュー</span>
+              <span class="ml-1 w-4 h-4 text-gray-400">
+                {% render 'icon-chevron-down' %}
+              </span>
             </button>
-          </form>
+            <div
+              x-show="myMenuOpen"
+              x-cloak
+              class="absolute left-0 mt-2 w-40 bg-white border border-gray-200 shadow-lg py-2 z-50"
+            >
+              <a href="/account" class="block px-4 py-2 hover:bg-gray-100">ログイン</a>
+              <a href="/account" class="block px-4 py-2 hover:bg-gray-100">注文履歴</a>
+            </div>
+          </div>
+          <a
+            href="/account/register"
+            class="bg-white px-3 py-1 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition"
+          >
+            新規会員登録
+          </a>
         </div>
 
-        {% comment %} 中央：text, text... {% endcomment %}
-        <div class="flex justify-center space-x-8 flex-1">
-          <span class="text-xs font-medium text-gray-700">text</span>
-          <span class="text-xs font-medium text-gray-700">text</span>
-          <span class="text-xs font-medium text-gray-700">text</span>
-          <span class="text-xs font-medium text-gray-700">text</span>
-          <span class="text-xs font-medium text-gray-700">text</span>
-        </div>
-
-        {% comment %} 右：カート {% endcomment %}
-        <div class="flex justify-end flex-1">
-          <a href="{{ routes.cart_url }}" class="relative text-gray-700">
-            <div class="w-7 h-7">{% render 'icon-cart' %}</div>
+        <div class="flex items-center">
+          <a href="{{ routes.cart_url }}" class="relative text-white hover:opacity-80 transition">
+            <div class="w-8 h-8">
+              {% render 'icon-cart' %}
+            </div>
             {% if cart.item_count > 0 %}
-              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                {{- cart.item_count -}}
+              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                {{ cart.item_count }}
               </span>
             {% endif %}
           </a>
         </div>
       </div>
     </div>
+
+    {% comment %} 中段：ロゴ & 検索バー（背景色：ホワイト） {% endcomment %}
+    <div class="bg-white py-4">
+      <div class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center min-h-[64px]">
+        {% comment %} 左：ロゴエリア（絶対配置にせず、フレックスの先頭に置く） {% endcomment %}
+        <div class="z-10 bg-[#FDFBF7] px-4 py-2 flex-shrink-0">
+          <a href="/" class="flex items-center">
+            {% if section.settings.logo != blank %}
+              <img
+                src="{{ section.settings.logo | image_url: width: 500 }}"
+                alt="{{ section.settings.logo.alt | default: shop.name }}"
+                style="width: {{ section.settings.logo_width }}px;"
+                class="h-auto"
+              >
+            {% else %}
+              <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider ml-1">
+                {{ section.settings.logo_text | default: 'Your day' }}
+              </span>
+            {% endif %}
+          </a>
+        </div>
+
+        {% comment %} 中央：検索窓（コンテナに対して完全にセンターへ） {% endcomment %}
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none px-4">
+          <form
+            action="{{ routes.search_url }}"
+            method="get"
+            class="relative flex items-center border border-gray-400 rounded overflow-hidden w-full max-w-md pointer-events-auto"
+          >
+            <input
+              type="text"
+              name="q"
+              placeholder="{{ section.settings.search_placeholder }}"
+              class="w-full px-4 py-2 outline-none text-sm"
+            >
+            <button type="submit" class="bg-gray-400 p-2 text-white flex items-center justify-center">
+              <div class="w-5 h-5">
+                {% render 'icon-search' %}
+              </div>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} ② 下段：ナビゲーション（背景色：#EAE1D8） {% endcomment %}
+    <nav class="bg-[#EAE1D8] border-t border-b border-black/5">
+      <div class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center h-12">
+        {% comment %} ③ 中央：text * 5 のセンタリング {% endcomment %}
+        <div class="flex-grow flex justify-center space-x-12">
+          <span class="text-sm font-medium text-gray-800">text</span>
+          <span class="text-sm font-medium text-gray-800">text</span>
+          <span class="text-sm font-medium text-gray-800">text</span>
+          <span class="text-sm font-medium text-gray-800">text</span>
+          <span class="text-sm font-medium text-gray-800">text</span>
+        </div>
+
+        {% comment %} ④ 右：お買い物ガイドの右寄せ（ロゴの影響を受けないよう絶対配置で右端に） {% endcomment %}
+        <div class="absolute right-4 md:right-8">
+          <a href="#" class="text-sm font-medium text-gray-800 hover:text-[#C2A992]"> お買い物ガイド </a>
+        </div>
+      </div>
+    </nav>
   </div>
 
-  {% comment %} --- スマホ用：変更なし --- {% endcomment %}
+  {% comment %} --- スマホ用：元のデザインを維持 --- {% endcomment %}
   <div class="lg:hidden bg-[#FDFBF7]/90 backdrop-blur-md border-b border-[#C2A992]/20">
     <div class="flex items-center justify-between h-20 px-6">
-      <a href="/" class="flex items-center">
-        {% if section.settings.logo != blank %}
-          <img
-            src="{{ section.settings.logo | image_url: width: 500 }}"
-            alt="{{ section.settings.logo.alt }}"
-            style="width: {{ section.settings.logo_width }}px;"
-            class="h-auto"
-          >
-        {% else %}
-          <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider ml-1">Your day</span>
-        {% endif %}
-      </a>
-      <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="text-gray-600 p-2">
+      <div class="flex items-center">
+        <a href="/" class="flex items-center">
+          {% if section.settings.logo != blank %}
+            <img
+              src="{{ section.settings.logo | image_url: width: 500 }}"
+              alt="{{ section.settings.logo.alt | default: shop.name }}"
+              style="width: {{ section.settings.logo_width }}px;"
+              class="h-auto"
+            >
+          {% else %}
+            <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider ml-1">
+              {{ section.settings.logo_text | default: 'Your day' }}
+            </span>
+          {% endif %}
+        </a>
+      </div>
+      <button
+        @click="mobileMenuOpen = !mobileMenuOpen"
+        type="button"
+        class="text-gray-600 p-2"
+      >
         {% render 'icon-hambarger' %}
       </button>
     </div>
@@ -203,11 +152,13 @@
   {% comment %} モバイルメニュー {% endcomment %}
   <div x-show="mobileMenuOpen" x-cloak class="lg:hidden bg-[#FDFBF7] border-t border-[#C2A992]/10">
     <nav class="px-4 py-6 space-y-1">
-      <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
-      <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
-      <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
-      <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
-      <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
+      <div class="flex flex-col space-y-3">
+        <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
+        <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
+        <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
+        <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
+        <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
+      </div>
     </nav>
   </div>
 </header>
