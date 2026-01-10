@@ -55,21 +55,23 @@
         {% comment %} スクロール後の内容: ロゴ | 検索 | text × 5 | カート {% endcomment %}
         <div x-show="scrolled" x-transition class="flex items-center justify-between w-full">
           {% comment %} 左：ロゴ {% endcomment %}
-          <div class="flex-shrink-0">
-            <a href="/" class="flex items-center">
-              {% if section.settings.logo != blank %}
-                <img
-                  src="{{ section.settings.logo | image_url: width: 300 }}"
-                  alt="{{ section.settings.logo.alt | default: shop.name }}"
-                  style="width: {{ section.settings.logo_width | divided_by: 1.8 }}px;"
-                  class="h-auto"
-                >
-              {% else %}
-                <span class="text-base font-serif font-bold text-white tracking-wider">
-                  {{ section.settings.logo_text | default: 'Your day' }}
-                </span>
-              {% endif %}
-            </a>
+          <div class="flex items-center space-x-2">
+            <div class="flex-shrink-0">
+              <a href="/" class="flex items-center">
+                {% if section.settings.logo != blank %}
+                  <img
+                    src="{{ section.settings.logo | image_url: width: 300 }}"
+                    alt="{{ section.settings.logo.alt | default: shop.name }}"
+                    style="width: {{ section.settings.logo_width | divided_by: 1.8 }}px;"
+                    class="h-auto"
+                  >
+                {% else %}
+                  <span class="text-base font-serif font-bold text-white tracking-wider">
+                    {{ section.settings.logo_text | default: 'Your day' }}
+                  </span>
+                {% endif %}
+              </a>
+            </div>
           </div>
 
           {% comment %} 中央：検索 + ナビ {% endcomment %}
