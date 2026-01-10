@@ -9,8 +9,8 @@
 >
   {% comment %} --- PC用：3段構成 (lgサイズ以上で表示) --- {% endcomment %}
   <div class="hidden lg:block">
-    {% comment %} 上段：ユーティリティバー {% endcomment %}
-    <div class="bg-[{{ section.settings.top_bar_bg }}] text-sm py-2 border-b border-black/5">
+    {% comment %} ① 上段：ユーティリティバー（背景色：アクセントカラー） {% endcomment %}
+    <div class="bg-[#C2A992] text-sm py-2 border-b border-black/5">
       <div class="max-w-6xl mx-auto px-4 md:px-8 flex justify-between items-center">
         <div class="flex items-center space-x-4">
           <div class="relative">
@@ -40,8 +40,10 @@
             新規会員登録
           </a>
         </div>
+
+        {% comment %} 右側のカートアイコン {% endcomment %}
         <div class="flex items-center">
-          <a href="{{ routes.cart_url }}" class="relative text-gray-700">
+          <a href="{{ routes.cart_url }}" class="relative text-white hover:opacity-80 transition">
             <div class="w-8 h-8">
               {% render 'icon-cart' %}
             </div>
@@ -55,11 +57,11 @@
       </div>
     </div>
 
-    {% comment %} 中段：ロゴ & 検索バー {% endcomment %}
-    <div class="bg-[{{ section.settings.mid_bar_bg }}] py-4">
-      <div class="max-w-6xl mx-auto px-4 md:px-8 flex items-center gap-8">
-        {% comment %} ロゴエリア：背景に白ボックスを配置 {% endcomment %}
-        <div class="flex-shrink-0 bg-white px-4 py-2">
+    {% comment %} 中段：ロゴ & 検索バー（背景色：ホワイト） {% endcomment %}
+    <div class="bg-white py-4">
+      <div class="max-w-6xl mx-auto px-4 md:px-8 flex items-center justify-between">
+        {% comment %} ロゴエリア {% endcomment %}
+        <div class="flex-shrink-0 bg-[#FDFBF7] px-4 py-2">
           <a href="/" class="flex items-center">
             {% if section.settings.logo != blank %}
               <img
@@ -76,12 +78,12 @@
           </a>
         </div>
 
-        {% comment %} 検索窓 {% endcomment %}
-        <div class="w-full max-w-md">
+        {% comment %} 検索窓（中央に寄せるための調整） {% endcomment %}
+        <div class="flex-grow flex justify-center px-12">
           <form
             action="{{ routes.search_url }}"
             method="get"
-            class="relative flex items-center border border-gray-400 rounded overflow-hidden"
+            class="relative flex items-center border border-gray-400 rounded overflow-hidden w-full max-w-md"
           >
             <input
               type="text"
@@ -96,21 +98,38 @@
             </button>
           </form>
         </div>
+
+        {% comment %} 左右バランス用のダミー要素（ロゴと同じ幅を確保） {% endcomment %}
+        <div class="flex-shrink-0" style="width: calc({{ section.settings.logo_width }}px + 32px);"></div>
       </div>
     </div>
 
-    {% comment %} 下段：ナビゲーション {% endcomment %}
-    <nav class="bg-[{{ section.settings.bot_bar_bg }}] border-t border-b border-black/5">
-      <div class="max-w-6xl mx-auto px-4 md:px-8">
-        <ul class="flex items-center space-x-10 py-3">
-          {% for link in section.settings.main_linklist.links %}
-            <li>
-              <a href="{{ link.url }}" class="text-sm font-medium text-gray-700 hover:text-[#C2A992]">
-                {{ link.title }}
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
+    {% comment %} ② 下段：ナビゲーション（背景色：薄ベージュ） {% endcomment %}
+    <nav class="bg-[#EAE1D8] border-t border-b border-black/5">
+      <div class="max-w-6xl mx-auto px-4 md:px-8 flex items-center justify-between h-12">
+        {% comment %} 左側の空きスペース（センタリング用） {% endcomment %}
+        <div class="flex-1"></div>
+
+        {% comment %} ③ 中央：メインメニューのセンタリング {% endcomment %}
+        <div class="flex-1 flex justify-center">
+          <ul class="flex items-center space-x-8">
+            {% for link in section.settings.main_linklist.links %}
+              <li>
+                <a
+                  href="{{ link.url }}"
+                  class="text-sm font-medium text-gray-800 hover:text-[#C2A992] whitespace-nowrap"
+                >
+                  {{ link.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        {% comment %} ④ 右側：お買い物ガイドの右寄せ {% endcomment %}
+        <div class="flex-1 flex justify-end">
+          <a href="#" class="text-sm font-medium text-gray-800 hover:text-[#C2A992]"> お買い物ガイド </a>
+        </div>
       </div>
     </nav>
   </div>
@@ -155,80 +174,3 @@
     </nav>
   </div>
 </header>
-
-<style>
-  [x-cloak] {
-    display: none !important;
-  }
-</style>
-
-{% schema %}
-{
-  "name": "Header Custom",
-  "settings": [
-    {
-      "type": "header",
-      "content": "ロゴ設定"
-    },
-    {
-      "type": "image_picker",
-      "id": "logo",
-      "label": "ロゴ画像"
-    },
-    {
-      "type": "range",
-      "id": "logo_width",
-      "min": 50,
-      "max": 300,
-      "step": 5,
-      "unit": "px",
-      "label": "ロゴの横幅",
-      "default": 100
-    },
-    {
-      "type": "text",
-      "id": "logo_text",
-      "label": "ロゴテキスト（画像がない時）",
-      "default": "Your day"
-    },
-    {
-      "type": "header",
-      "content": "ナビゲーション"
-    },
-    {
-      "type": "link_list",
-      "id": "main_linklist",
-      "label": "表示するメニュー",
-      "default": "main-menu"
-    },
-    {
-      "type": "text",
-      "id": "search_placeholder",
-      "label": "検索窓のプレースホルダー",
-      "default": "商品番号・キーワード"
-    },
-    {
-      "type": "header",
-      "content": "カラー設定"
-    },
-    {
-      "type": "color",
-      "id": "top_bar_bg",
-      "label": "上段背景色",
-      "default": "#C2A992"
-    },
-    {
-      "type": "color",
-      "id": "mid_bar_bg",
-      "label": "中段背景色",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "bot_bar_bg",
-      "label": "下段背景色",
-      "default": "#EAE1D8"
-    }
-  ]
-}
-{% endschema %}
