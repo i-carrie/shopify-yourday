@@ -2,20 +2,28 @@
   x-data="
     {
       mobileMenuOpen: false,
-      myMenuOpen: false
+      myMenuOpen: false,
+      scrolled: false
     }
+  "
+  x-init="
+    window.addEventListener('scroll', () => {
+      scrolled = window.scrollY > 100
+    })
   "
   class="sticky top-0 z-50 w-full font-serif"
 >
   {% comment %} --- PC用：3段構成 (lgサイズ以上で表示) --- {% endcomment %}
   <div class="hidden lg:block" style="padding-top: 42px;">
-    {% comment %} ① 上段：ユーティリティバー（背景色：#C2A992） {% endcomment %}
+    {% comment %} ① 上段：固定バー - 内容が切り替わる {% endcomment %}
     <div
       style="position: fixed; top: 0; left: 0; right: 0; z-index: 100;"
-      class="bg-[#C2A992] text-sm py-2 border-b border-black/5"
+      class="bg-[#C2A992] text-sm border-b border-black/5 transition-all duration-300"
+      :class="scrolled ? 'bg-[#EAE1D8] py-1.5' : 'py-2'"
     >
       <div class="max-w-6xl mx-auto px-4 md:px-8 flex justify-between items-center">
-        <div class="flex items-center space-x-4">
+        {% comment %} スクロール前の内容 {% endcomment %}
+        <div x-show="!scrolled" x-transition class="flex items-center space-x-4">
           <div class="relative">
             <button
               @click="myMenuOpen = !myMenuOpen"
@@ -44,7 +52,72 @@
           </a>
         </div>
 
-        <div class="flex items-center">
+        {% comment %} スクロール後の内容: ロゴ | 検索 | text × 5 | カート {% endcomment %}
+        <div x-show="scrolled" x-transition class="flex items-center justify-between w-full">
+          {% comment %} 左：ロゴ {% endcomment %}
+          <div class="flex-shrink-0">
+            <a href="/" class="flex items-center">
+              {% if section.settings.logo != blank %}
+                <img
+                  src="{{ section.settings.logo | image_url: width: 300 }}"
+                  alt="{{ section.settings.logo.alt | default: shop.name }}"
+                  style="width: {{ section.settings.logo_width | divided_by: 1.8 }}px;"
+                  class="h-auto"
+                >
+              {% else %}
+                <span class="text-base font-serif font-bold text-[#C2A992] tracking-wider">
+                  {{ section.settings.logo_text | default: 'Your day' }}
+                </span>
+              {% endif %}
+            </a>
+          </div>
+
+          {% comment %} 中央：検索 + ナビ {% endcomment %}
+          <div class="flex items-center space-x-6 flex-grow justify-center">
+            <form
+              action="{{ routes.search_url }}"
+              method="get"
+              class="relative flex items-center border border-gray-400 rounded overflow-hidden w-full max-w-xs"
+            >
+              <input
+                type="text"
+                name="q"
+                placeholder="{{ section.settings.search_placeholder }}"
+                class="w-full px-3 py-1 outline-none text-xs bg-white"
+              >
+              <button type="submit" class="bg-gray-400 p-1.5 text-white flex items-center justify-center">
+                <div class="w-4 h-4">
+                  {% render 'icon-search' %}
+                </div>
+              </button>
+            </form>
+
+            <div class="flex space-x-8">
+              <span class="text-xs font-medium text-gray-800">text</span>
+              <span class="text-xs font-medium text-gray-800">text</span>
+              <span class="text-xs font-medium text-gray-800">text</span>
+              <span class="text-xs font-medium text-gray-800">text</span>
+              <span class="text-xs font-medium text-gray-800">text</span>
+            </div>
+          </div>
+
+          {% comment %} 右：カート {% endcomment %}
+          <div class="flex-shrink-0">
+            <a href="{{ routes.cart_url }}" class="relative text-gray-700 hover:opacity-80 transition">
+              <div class="w-6 h-6">
+                {% render 'icon-cart' %}
+              </div>
+              {% if cart.item_count > 0 %}
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {{ cart.item_count }}
+                </span>
+              {% endif %}
+            </a>
+          </div>
+        </div>
+
+        {% comment %} カート（スクロール前のみ） {% endcomment %}
+        <div x-show="!scrolled" x-transition class="flex items-center">
           <a href="{{ routes.cart_url }}" class="relative text-white hover:opacity-80 transition">
             <div class="w-8 h-8">
               {% render 'icon-cart' %}
@@ -59,8 +132,8 @@
       </div>
     </div>
 
-    {% comment %} 中段：ロゴ & 検索バー（背景色：ホワイト） {% endcomment %}
-    <div class="bg-white py-4">
+    {% comment %} 中段：ロゴ & 検索バー（背景色：ホワイト）スクロール時は非表示 {% endcomment %}
+    <div x-show="!scrolled" x-transition class="bg-white py-4">
       <div class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center min-h-[64px]">
         {% comment %} 左：ロゴエリア（絶対配置にせず、フレックスの先頭に置く） {% endcomment %}
         <div class="z-10 bg-[#FDFBF7] px-4 py-2 flex-shrink-0">
@@ -103,8 +176,8 @@
       </div>
     </div>
 
-    {% comment %} ② 下段：ナビゲーション（背景色：#EAE1D8） {% endcomment %}
-    <nav class="bg-[#EAE1D8] border-t border-b border-black/5">
+    {% comment %} ② 下段：ナビゲーション（背景色：#EAE1D8）スクロール時は非表示 {% endcomment %}
+    <nav x-show="!scrolled" x-transition class="bg-[#EAE1D8] border-t border-b border-black/5">
       <div class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center h-12">
         {% comment %} ③ 中央：text * 5 のセンタリング {% endcomment %}
         <div class="flex-grow flex justify-center space-x-12">
