@@ -2,23 +2,15 @@
   x-data="
     {
       mobileMenuOpen: false,
-      myMenuOpen: false,
-      scrolled: false
+      myMenuOpen: false
     }
-  "
-  x-init="
-    window.addEventListener('scroll', () => {
-      scrolled = window.scrollY > 100
-    })
   "
   class="sticky top-0 z-50 w-full font-serif"
 >
   {% comment %} --- PC用：3段構成 (lgサイズ以上で表示) --- {% endcomment %}
   <div class="hidden lg:block" style="padding-top: 42px;">
-    {% comment %} ① 上段：ユーティリティバー（背景色：#C2A992）スクロール時は非表示 {% endcomment %}
+    {% comment %} ① 上段：ユーティリティバー（背景色：#C2A992） {% endcomment %}
     <div
-      x-show="!scrolled"
-      x-transition
       style="position: fixed; top: 0; left: 0; right: 0; z-index: 100;"
       class="bg-[#C2A992] text-sm py-2 border-b border-black/5"
     >
@@ -67,8 +59,8 @@
       </div>
     </div>
 
-    {% comment %} 中段：ロゴ & 検索バー（背景色：ホワイト）スクロール時は非表示 {% endcomment %}
-    <div x-show="!scrolled" x-transition class="bg-white py-4">
+    {% comment %} 中段：ロゴ & 検索バー（背景色：ホワイト） {% endcomment %}
+    <div class="bg-white py-4">
       <div class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center min-h-[64px]">
         {% comment %} 左：ロゴエリア（絶対配置にせず、フレックスの先頭に置く） {% endcomment %}
         <div class="z-10 bg-[#FDFBF7] px-4 py-2 flex-shrink-0">
@@ -112,12 +104,8 @@
     </div>
 
     {% comment %} ② 下段：ナビゲーション（背景色：#EAE1D8） {% endcomment %}
-    <nav
-      style="position: fixed; top: 0; left: 0; right: 0; z-index: 100;"
-      class="bg-[#EAE1D8] border-t border-b border-black/5"
-    >
-      {% comment %} 通常時の表示 {% endcomment %}
-      <div x-show="!scrolled" x-transition class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center h-12">
+    <nav class="bg-[#EAE1D8] border-t border-b border-black/5">
+      <div class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center h-12">
         {% comment %} ③ 中央：text * 5 のセンタリング {% endcomment %}
         <div class="flex-grow flex justify-center space-x-12">
           <span class="text-sm font-medium text-gray-800">text</span>
@@ -130,70 +118,6 @@
         {% comment %} ④ 右：お買い物ガイドの右寄せ（ロゴの影響を受けないよう絶対配置で右端に） {% endcomment %}
         <div class="absolute right-4 md:right-8">
           <a href="#" class="text-sm font-medium text-gray-800 hover:text-[#C2A992]"> お買い物ガイド </a>
-        </div>
-      </div>
-
-      {% comment %} スクロール後のコンパクト表示 {% endcomment %}
-      <div x-show="scrolled" x-transition class="max-w-6xl mx-auto px-4 md:px-8 flex items-center h-12">
-        {% comment %} 左：ロゴ {% endcomment %}
-        <div class="flex-shrink-0">
-          <a href="/" class="flex items-center">
-            {% if section.settings.logo != blank %}
-              <img
-                src="{{ section.settings.logo | image_url: width: 300 }}"
-                alt="{{ section.settings.logo.alt | default: shop.name }}"
-                style="width: {{ section.settings.logo_width | divided_by: 1.5 }}px;"
-                class="h-auto"
-              >
-            {% else %}
-              <span class="text-lg font-serif font-bold text-[#C2A992] tracking-wider">
-                {{ section.settings.logo_text | default: 'Your day' }}
-              </span>
-            {% endif %}
-          </a>
-        </div>
-
-        {% comment %} 中央：検索バー + ナビゲーション {% endcomment %}
-        <div class="flex-grow flex items-center justify-center space-x-4 px-8">
-          <form
-            action="{{ routes.search_url }}"
-            method="get"
-            class="relative flex items-center border border-gray-400 rounded overflow-hidden w-full max-w-xs"
-          >
-            <input
-              type="text"
-              name="q"
-              placeholder="{{ section.settings.search_placeholder }}"
-              class="w-full px-3 py-1 outline-none text-xs bg-white"
-            >
-            <button type="submit" class="bg-gray-400 p-1.5 text-white flex items-center justify-center">
-              <div class="w-4 h-4">
-                {% render 'icon-search' %}
-              </div>
-            </button>
-          </form>
-
-          <div class="flex space-x-8">
-            <span class="text-xs font-medium text-gray-800">text</span>
-            <span class="text-xs font-medium text-gray-800">text</span>
-            <span class="text-xs font-medium text-gray-800">text</span>
-            <span class="text-xs font-medium text-gray-800">text</span>
-            <span class="text-xs font-medium text-gray-800">text</span>
-          </div>
-        </div>
-
-        {% comment %} 右：カートアイコン {% endcomment %}
-        <div class="flex-shrink-0">
-          <a href="{{ routes.cart_url }}" class="relative text-gray-700 hover:opacity-80 transition">
-            <div class="w-6 h-6">
-              {% render 'icon-cart' %}
-            </div>
-            {% if cart.item_count > 0 %}
-              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                {{ cart.item_count }}
-              </span>
-            {% endif %}
-          </a>
         </div>
       </div>
     </nav>
