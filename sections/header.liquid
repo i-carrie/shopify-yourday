@@ -108,11 +108,11 @@
           <div class="flex-shrink-0">
             <a href="{{ routes.cart_url }}" class="relative text-white hover:opacity-80 transition">
               <div class="w-6 h-6">
+                {% render 'icon-user-circle' %}
                 {% render 'icon-cart' %}
               </div>
               {% if cart.item_count > 0 %}
                 <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                  {% render 'icon-user-circle' %}
                   {{ cart.item_count }}
                 </span>
               {% endif %}
