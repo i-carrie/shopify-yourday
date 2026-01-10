@@ -9,7 +9,7 @@
 >
   {% comment %} --- PC用：3段構成 (lgサイズ以上で表示) --- {% endcomment %}
   <div class="hidden lg:block">
-    {% comment %} ① 上段：ユーティリティバー（背景色：アクセントカラー） {% endcomment %}
+    {% comment %} ① 上段：ユーティリティバー（背景色：#C2A992） {% endcomment %}
     <div class="bg-[#C2A992] text-sm py-2 border-b border-black/5">
       <div class="max-w-6xl mx-auto px-4 md:px-8 flex justify-between items-center">
         <div class="flex items-center space-x-4">
@@ -58,33 +58,31 @@
 
     {% comment %} 中段：ロゴ & 検索バー（背景色：ホワイト） {% endcomment %}
     <div class="bg-white py-4">
-      <div class="max-w-6xl mx-auto px-4 md:px-8 grid grid-cols-3 items-center">
-        {% comment %} 左：ロゴエリア（赤線に合わせる） {% endcomment %}
-        <div class="flex justify-start">
-          <div class="bg-[#FDFBF7] px-4 py-2">
-            <a href="/" class="flex items-center">
-              {% if section.settings.logo != blank %}
-                <img
-                  src="{{ section.settings.logo | image_url: width: 500 }}"
-                  alt="{{ section.settings.logo.alt | default: shop.name }}"
-                  style="width: {{ section.settings.logo_width }}px;"
-                  class="h-auto"
-                >
-              {% else %}
-                <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider ml-1">
-                  {{ section.settings.logo_text }}
-                </span>
-              {% endif %}
-            </a>
-          </div>
+      <div class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center min-h-[64px]">
+        {% comment %} 左：ロゴエリア（絶対配置にせず、フレックスの先頭に置く） {% endcomment %}
+        <div class="z-10 bg-[#FDFBF7] px-4 py-2 flex-shrink-0">
+          <a href="/" class="flex items-center">
+            {% if section.settings.logo != blank %}
+              <img
+                src="{{ section.settings.logo | image_url: width: 500 }}"
+                alt="{{ section.settings.logo.alt | default: shop.name }}"
+                style="width: {{ section.settings.logo_width }}px;"
+                class="h-auto"
+              >
+            {% else %}
+              <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider ml-1">
+                {{ section.settings.logo_text | default: 'Your day' }}
+              </span>
+            {% endif %}
+          </a>
         </div>
 
-        {% comment %} 中央：検索窓 {% endcomment %}
-        <div class="flex justify-center">
+        {% comment %} 中央：検索窓（コンテナに対して完全にセンターへ） {% endcomment %}
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none px-4">
           <form
             action="{{ routes.search_url }}"
             method="get"
-            class="relative flex items-center border border-gray-400 rounded overflow-hidden w-full max-w-md"
+            class="relative flex items-center border border-gray-400 rounded overflow-hidden w-full max-w-md pointer-events-auto"
           >
             <input
               type="text"
@@ -99,20 +97,14 @@
             </button>
           </form>
         </div>
-
-        {% comment %} 右：バランス用の空要素（グリッド維持のため） {% endcomment %}
-        <div></div>
       </div>
     </div>
 
-    {% comment %} ② 下段：ナビゲーション（背景色：薄ベージュ） {% endcomment %}
+    {% comment %} ② 下段：ナビゲーション（背景色：#EAE1D8） {% endcomment %}
     <nav class="bg-[#EAE1D8] border-t border-b border-black/5">
-      <div class="max-w-6xl mx-auto px-4 md:px-8 flex items-center h-12">
-        {% comment %} 左：スペース（ロゴの幅に合わせて調整可） {% endcomment %}
-        <div class="flex-1"></div>
-
+      <div class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center h-12">
         {% comment %} ③ 中央：text * 5 のセンタリング {% endcomment %}
-        <div class="flex-[2] flex justify-center space-x-12">
+        <div class="flex-grow flex justify-center space-x-12">
           <span class="text-sm font-medium text-gray-800">text</span>
           <span class="text-sm font-medium text-gray-800">text</span>
           <span class="text-sm font-medium text-gray-800">text</span>
@@ -120,8 +112,8 @@
           <span class="text-sm font-medium text-gray-800">text</span>
         </div>
 
-        {% comment %} ④ 右：お買い物ガイドの右寄せ {% endcomment %}
-        <div class="flex-1 flex justify-end">
+        {% comment %} ④ 右：お買い物ガイドの右寄せ（ロゴの影響を受けないよう絶対配置で右端に） {% endcomment %}
+        <div class="absolute right-4 md:right-8">
           <a href="#" class="text-sm font-medium text-gray-800 hover:text-[#C2A992]"> お買い物ガイド </a>
         </div>
       </div>
@@ -142,7 +134,7 @@
             >
           {% else %}
             <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider ml-1">
-              {{ section.settings.logo_text }}
+              {{ section.settings.logo_text | default: 'Your day' }}
             </span>
           {% endif %}
         </a>
