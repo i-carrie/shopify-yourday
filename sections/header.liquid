@@ -11,7 +11,7 @@
   <div class="hidden lg:block">
     {% comment %} 上段：ユーティリティバー {% endcomment %}
     <div class="bg-[{{ section.settings.top_bar_bg }}] text-sm py-2 border-b border-black/5">
-      <div class="max-w-7xl mx-auto px-8 flex justify-between items-center">
+      <div class="max-w-6xl mx-auto px-4 md:px-8 flex justify-between items-center">
         <div class="flex items-center space-x-4">
           <div class="relative">
             <button
@@ -57,8 +57,9 @@
 
     {% comment %} 中段：ロゴ & 検索バー {% endcomment %}
     <div class="bg-[{{ section.settings.mid_bar_bg }}] py-4">
-      <div class="max-w-7xl mx-auto px-8 flex items-center justify-between gap-4">
-        <div class="flex-shrink-0">
+      <div class="max-w-6xl mx-auto px-4 md:px-8 flex items-center gap-8">
+        {% comment %} ロゴエリア：背景に白ボックスを配置 {% endcomment %}
+        <div class="flex-shrink-0 bg-white px-4 py-2">
           <a href="/" class="flex items-center">
             {% if section.settings.logo != blank %}
               <img
@@ -68,12 +69,14 @@
                 class="h-auto"
               >
             {% else %}
-              <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider ml-1">
+              <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider">
                 {{ section.settings.logo_text }}
               </span>
             {% endif %}
           </a>
         </div>
+
+        {% comment %} 検索窓 {% endcomment %}
         <div class="w-full max-w-md">
           <form
             action="{{ routes.search_url }}"
@@ -86,22 +89,20 @@
               placeholder="{{ section.settings.search_placeholder }}"
               class="w-full px-4 py-2 outline-none text-sm"
             >
-            <button type="submit" class="bg-gray-400 p-2 text-white">
+            <button type="submit" class="bg-gray-400 p-2 text-white flex items-center justify-center">
               <div class="w-5 h-5">
                 {% render 'icon-search' %}
               </div>
             </button>
           </form>
         </div>
-        <div class="w-[{{ section.settings.logo_width }}px]"></div>
-        {% comment %} 左右バランス用ダミー {% endcomment %}
       </div>
     </div>
 
     {% comment %} 下段：ナビゲーション {% endcomment %}
     <nav class="bg-[{{ section.settings.bot_bar_bg }}] border-t border-b border-black/5">
-      <div class="max-w-7xl mx-auto">
-        <ul class="flex justify-center items-center space-x-10 py-3">
+      <div class="max-w-6xl mx-auto px-4 md:px-8">
+        <ul class="flex items-center space-x-10 py-3">
           {% for link in section.settings.main_linklist.links %}
             <li>
               <a href="{{ link.url }}" class="text-sm font-medium text-gray-700 hover:text-[#C2A992]">
@@ -114,7 +115,7 @@
     </nav>
   </div>
 
-  {% comment %} --- スマホ用：元のデザインを維持 (lgサイズ未満で表示) --- {% endcomment %}
+  {% comment %} --- スマホ用：元のデザインを維持 --- {% endcomment %}
   <div class="lg:hidden bg-[#FDFBF7]/90 backdrop-blur-md border-b border-[#C2A992]/20">
     <div class="flex items-center justify-between h-20 px-6">
       <div class="flex items-center">
