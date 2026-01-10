@@ -1,143 +1,145 @@
 <header
-  x-data="
-    {
-      mobileMenuOpen: false,
-      myMenuOpen: false
-    }
-  "
-  class="sticky top-0 z-50 w-full font-serif"
+  x-data="{ mobileMenuOpen: false }"
+  class="sticky top-0 z-50 w-full bg-[#FDFBF7]/90 backdrop-blur-md border-b border-[#C2A992]/20 font-serif"
 >
-  {% comment %} 1段目：ユーティリティバー（マイメニュー / 新規登録 / カート） {% endcomment %}
-  <div class="bg-[{{ section.settings.top_bar_bg }}] text-sm py-2 border-b border-black/5">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-      <div class="flex items-center space-x-4">
-        {% comment %} マイメニュー ドロップダウン {% endcomment %}
-        <div class="relative">
-          <button
-            @click="myMenuOpen = !myMenuOpen"
-            @click.away="myMenuOpen = false"
-            class="flex items-center bg-white px-3 py-1 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition"
-          >
-            <span>マイメニュー</span>
-            <span class="ml-1 w-4 h-4 text-gray-400">
-              {% render 'icon-chevron-down' %}
-            </span>
-          </button>
-          <div
-            x-show="myMenuOpen"
-            x-cloak
-            class="absolute left-0 mt-2 w-40 bg-white border border-gray-200 shadow-lg py-2 z-50"
-          >
-            <a href="/account" class="block px-4 py-2 hover:bg-gray-100">ログイン</a>
-            <a href="/account" class="block px-4 py-2 hover:bg-gray-100">注文履歴</a>
-          </div>
-        </div>
-        <a
-          href="/account/register"
-          class="bg-white px-3 py-1 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition"
-        >
-          新規会員登録
-        </a>
-      </div>
-
-      <div class="flex items-center">
-        <a href="{{ routes.cart_url }}" class="relative text-gray-700 hover:opacity-70 transition">
-          <div class="w-8 h-8">
-            {% render 'icon-cart' %}
-          </div>
-          {% if cart.item_count > 0 %}
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-              {{ cart.item_count }}
-            </span>
-          {% endif %}
-        </a>
-      </div>
-    </div>
-  </div>
-
-  {% comment %} 2段目：ロゴ & 検索バー {% endcomment %}
-  <div class="bg-[{{ section.settings.mid_bar_bg }}] py-4">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-      {% comment %} ロゴエリア {% endcomment %}
-      <div class="flex-shrink-0">
-        <a href="/" class="block">
+  <div class="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
+    {%- comment -%}
+      モバイルは flex、PC(lg) だけ grid 3カラムにして左右余白を「構造で」揃える
+    {%- endcomment -%}
+    <div class="flex items-center justify-between h-20 lg:grid lg:grid-cols-3 lg:items-center">
+      <!-- LEFT: LOGO -->
+      <div class="flex items-center lg:justify-start" style="height: 80px;">
+        <a href="/" class="flex items-center">
           {% if section.settings.logo != blank %}
+            {% assign logo_alt = section.settings.logo.alt | default: shop.name %}
             <img
               src="{{ section.settings.logo | image_url: width: 500 }}"
-              alt="{{ section.settings.logo.alt | default: shop.name }}"
-              style="width: {{ section.settings.logo_width }}px;"
-              class="h-auto"
+              alt="{{ logo_alt }}"
+              class="block"
+              style="width: {{ section.settings.logo_width }}px; height: auto; padding-top: 22px;"
             >
           {% else %}
-            <span class="text-3xl font-bold text-[#C2A992] tracking-widest italic">
+            <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider ml-1">
               {{ section.settings.logo_text }}
             </span>
           {% endif %}
         </a>
       </div>
 
-      {% comment %} 検索窓（中央配置） {% endcomment %}
-      <div class="w-full max-w-md">
-        <form
-          action="{{ routes.search_url }}"
-          method="get"
-          class="relative flex items-center border border-gray-400 rounded overflow-hidden focus-within:ring-1 focus-within:ring-[#C2A992]"
-        >
-          <input
-            type="text"
-            name="q"
-            placeholder="{{ section.settings.search_placeholder }}"
-            class="w-full px-4 py-2 outline-none text-sm"
-          >
-          <button type="submit" class="bg-gray-400 p-2 text-white hover:bg-gray-500 transition">
-            <div class="w-5 h-5">
-              {% render 'icon-search' %}
+      <!-- CENTER: NAV (PC only) -->
+      <nav class="hidden lg:flex lg:justify-center space-x-8">
+        {% for link in linklists['main-menu'].links %}
+          {% if link.links != blank %}
+            <div class="relative group" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+              <button class="flex items-center text-sm font-medium text-gray-600 group-hover:text-[#C2A992] transition-colors duration-300">
+                {{ link.title }}
+                <svg
+                  class="ml-1 w-4 h-4 transition-transform duration-300"
+                  :class="{ 'rotate-180': open }"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+              <div
+                x-show="open"
+                x-cloak
+                class="absolute left-0 mt-0 w-48 bg-[#FDFBF7] border border-[#C2A992]/10 shadow-xl py-2 z-50"
+              >
+                {% for childlink in link.links %}
+                  <a
+                    href="{{ childlink.url }}"
+                    class="block px-4 py-2 text-sm text-gray-600 hover:bg-[#C2A992]/5 hover:text-[#C2A992]"
+                  >
+                    {{ childlink.title }}
+                  </a>
+                {% endfor %}
+              </div>
             </div>
-          </button>
-        </form>
-      </div>
-
-      {% comment %} モバイル用ハンバーガー（中段に配置） {% endcomment %}
-      <button
-        @click="mobileMenuOpen = !mobileMenuOpen"
-        type="button"
-        class="lg:hidden absolute right-4 text-gray-600 p-2"
-      >
-        {% render 'icon-hambarger' %}
-      </button>
-    </div>
-  </div>
-
-  {% comment %} 3段目：ナビゲーションメニュー {% endcomment %}
-  <nav class="hidden lg:block bg-[{{ section.settings.bot_bar_bg }}] border-t border-b border-black/5">
-    <div class="max-w-7xl mx-auto px-4">
-      <ul class="flex justify-center items-center space-x-10 py-3">
-        {% for link in section.settings.main_linklist.links %}
-          <li>
+          {% else %}
             <a
               href="{{ link.url }}"
-              class="text-sm font-medium text-gray-700 hover:text-[#C2A992] transition duration-300"
+              class="text-sm font-medium text-gray-600 hover:text-[#C2A992] transition-colors duration-300"
             >
               {{ link.title }}
             </a>
-          </li>
+          {% endif %}
         {% endfor %}
-      </ul>
-    </div>
-  </nav>
+      </nav>
 
-  {% comment %} モバイルメニュー（既存ロジックを継承） {% endcomment %}
-  <div
-    x-show="mobileMenuOpen"
-    x-cloak
-    class="lg:hidden bg-white border-t border-gray-100 shadow-xl"
-  >
+      <!-- RIGHT: ICONS + ACCOUNT (PC), HAMBURGER (mobile) -->
+      <div class="flex items-center space-x-3 md:space-x-6 lg:justify-end">
+        <div class="hidden md:flex items-center space-x-5 text-sm font-medium text-gray-600">
+          <a href="{{ routes.search_url }}" class="hover:text-[#C2A992]">{% render 'icon-search' %}</a>
+          <a href="{{ routes.cart_url }}" class="hover:text-[#C2A992]">{% render 'icon-cart' %}</a>
+          {% if shop.customer_accounts_enabled %}
+            <a href="{{ routes.account_login_url }}" class="hover:text-[#C2A992]">Login</a>
+            <a href="{{ routes.account_register_url }}" class="hover:text-[#C2A992]">Register</a>
+          {% endif %}
+        </div>
+
+        <button
+          @click="mobileMenuOpen = !mobileMenuOpen"
+          type="button"
+          class="md:hidden text-gray-600 hover:text-[#C2A992] p-2"
+        >
+          {% render 'icon-hambarger' %}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE MENU -->
+  <div x-show="mobileMenuOpen" x-cloak class="md:hidden bg-[#FDFBF7] border-t border-[#C2A992]/10">
     <nav class="px-4 py-6 space-y-1">
-      {% for link in section.settings.main_linklist.links %}
-        <a href="{{ link.url }}" class="block py-3 text-lg text-gray-700 border-b border-gray-50 last:border-0">
-          {{ link.title }}
-        </a>
+      {% for link in linklists['main-menu'].links %}
+        {% if link.links != blank %}
+          <div x-data="{ expanded: false }">
+            <button
+              @click="expanded = !expanded"
+              class="flex items-center justify-between w-full py-3 text-lg text-gray-700"
+            >
+              {{ link.title }}
+              <svg
+                class="w-5 h-5 transition-transform"
+                :class="{ 'rotate-180': expanded }"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div x-show="expanded" class="pl-4 space-y-1 bg-gray-50/50 rounded-lg">
+              {% for childlink in link.links %}
+                <a
+                  href="{{ childlink.url }}"
+                  class="block py-3 text-base text-gray-600 border-b border-gray-100 last:border-0"
+                >
+                  {{ childlink.title }}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          <a href="{{ link.url }}" class="block py-3 text-lg text-gray-700 border-b border-[#C2A992]/5 last:border-0">
+            {{ link.title }}
+          </a>
+        {% endif %}
       {% endfor %}
+
+      <div class="pt-6 mt-4 border-t border-[#C2A992]/20 flex flex-col space-y-4">
+        <a href="{{ routes.cart_url }}" class="flex items-center text-gray-600">
+          {%- render 'icon-cart' -%}
+          <span class="ml-3">Cart</span>
+        </a>
+        <a href="{{ routes.search_url }}" class="flex items-center text-gray-600">
+          {%- render 'icon-search' -%}
+          <span class="ml-3">Search</span>
+        </a>
+      </div>
     </nav>
   </div>
 </header>
@@ -150,12 +152,8 @@
 
 {% schema %}
 {
-  "name": "Header Custom",
+  "name": "Header",
   "settings": [
-    {
-      "type": "header",
-      "content": "ロゴ設定"
-    },
     {
       "type": "image_picker",
       "id": "logo",
@@ -169,51 +167,13 @@
       "step": 5,
       "unit": "px",
       "label": "ロゴの横幅",
-      "default": 120
+      "default": 100
     },
     {
       "type": "text",
       "id": "logo_text",
       "label": "ロゴテキスト（画像がない時）",
       "default": "Your day"
-    },
-    {
-      "type": "header",
-      "content": "ナビゲーション"
-    },
-    {
-      "type": "link_list",
-      "id": "main_linklist",
-      "label": "表示するメニュー",
-      "default": "main-menu"
-    },
-    {
-      "type": "text",
-      "id": "search_placeholder",
-      "label": "検索窓のプレースホルダー",
-      "default": "商品番号・キーワード"
-    },
-    {
-      "type": "header",
-      "content": "カラー設定"
-    },
-    {
-      "type": "color",
-      "id": "top_bar_bg",
-      "label": "上段背景色",
-      "default": "#C2A992"
-    },
-    {
-      "type": "color",
-      "id": "mid_bar_bg",
-      "label": "中段背景色",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "bot_bar_bg",
-      "label": "下段背景色",
-      "default": "#EAE1D8"
     }
   ]
 }
