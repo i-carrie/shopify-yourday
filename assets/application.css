@@ -384,6 +384,9 @@
   .ml-1 {
     margin-left: calc(var(--spacing) * 1);
   }
+  .ml-6 {
+    margin-left: calc(var(--spacing) * 6);
+  }
   .line-clamp-2 {
     overflow: hidden;
     display: -webkit-box;
