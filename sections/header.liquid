@@ -41,7 +41,6 @@
           </a>
         </div>
 
-        {% comment %} 右側のカートアイコン {% endcomment %}
         <div class="flex items-center">
           <a href="{{ routes.cart_url }}" class="relative text-white hover:opacity-80 transition">
             <div class="w-8 h-8">
@@ -59,27 +58,29 @@
 
     {% comment %} 中段：ロゴ & 検索バー（背景色：ホワイト） {% endcomment %}
     <div class="bg-white py-4">
-      <div class="max-w-6xl mx-auto px-4 md:px-8 flex items-center justify-between">
-        {% comment %} ロゴエリア {% endcomment %}
-        <div class="flex-shrink-0 bg-[#FDFBF7] px-4 py-2">
-          <a href="/" class="flex items-center">
-            {% if section.settings.logo != blank %}
-              <img
-                src="{{ section.settings.logo | image_url: width: 500 }}"
-                alt="{{ section.settings.logo.alt | default: shop.name }}"
-                style="width: {{ section.settings.logo_width }}px;"
-                class="h-auto"
-              >
-            {% else %}
-              <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider">
-                {{ section.settings.logo_text }}
-              </span>
-            {% endif %}
-          </a>
+      <div class="max-w-6xl mx-auto px-4 md:px-8 grid grid-cols-3 items-center">
+        {% comment %} 左：ロゴエリア（赤線に合わせる） {% endcomment %}
+        <div class="flex justify-start">
+          <div class="bg-[#FDFBF7] px-4 py-2">
+            <a href="/" class="flex items-center">
+              {% if section.settings.logo != blank %}
+                <img
+                  src="{{ section.settings.logo | image_url: width: 500 }}"
+                  alt="{{ section.settings.logo.alt | default: shop.name }}"
+                  style="width: {{ section.settings.logo_width }}px;"
+                  class="h-auto"
+                >
+              {% else %}
+                <span class="text-2xl font-serif font-bold text-[#C2A992] tracking-wider ml-1">
+                  {{ section.settings.logo_text }}
+                </span>
+              {% endif %}
+            </a>
+          </div>
         </div>
 
-        {% comment %} 検索窓（中央に寄せるための調整） {% endcomment %}
-        <div class="flex-grow flex justify-center px-12">
+        {% comment %} 中央：検索窓 {% endcomment %}
+        <div class="flex justify-center">
           <form
             action="{{ routes.search_url }}"
             method="get"
@@ -99,34 +100,27 @@
           </form>
         </div>
 
-        {% comment %} 左右バランス用のダミー要素（ロゴと同じ幅を確保） {% endcomment %}
-        <div class="flex-shrink-0" style="width: calc({{ section.settings.logo_width }}px + 32px);"></div>
+        {% comment %} 右：バランス用の空要素（グリッド維持のため） {% endcomment %}
+        <div></div>
       </div>
     </div>
 
     {% comment %} ② 下段：ナビゲーション（背景色：薄ベージュ） {% endcomment %}
     <nav class="bg-[#EAE1D8] border-t border-b border-black/5">
-      <div class="max-w-6xl mx-auto px-4 md:px-8 flex items-center justify-between h-12">
-        {% comment %} 左側の空きスペース（センタリング用） {% endcomment %}
+      <div class="max-w-6xl mx-auto px-4 md:px-8 flex items-center h-12">
+        {% comment %} 左：スペース（ロゴの幅に合わせて調整可） {% endcomment %}
         <div class="flex-1"></div>
 
-        {% comment %} ③ 中央：メインメニューのセンタリング {% endcomment %}
-        <div class="flex-1 flex justify-center">
-          <ul class="flex items-center space-x-8">
-            {% for link in section.settings.main_linklist.links %}
-              <li>
-                <a
-                  href="{{ link.url }}"
-                  class="text-sm font-medium text-gray-800 hover:text-[#C2A992] whitespace-nowrap"
-                >
-                  {{ link.title }}
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
+        {% comment %} ③ 中央：text * 5 のセンタリング {% endcomment %}
+        <div class="flex-[2] flex justify-center space-x-12">
+          <span class="text-sm font-medium text-gray-800">text</span>
+          <span class="text-sm font-medium text-gray-800">text</span>
+          <span class="text-sm font-medium text-gray-800">text</span>
+          <span class="text-sm font-medium text-gray-800">text</span>
+          <span class="text-sm font-medium text-gray-800">text</span>
         </div>
 
-        {% comment %} ④ 右側：お買い物ガイドの右寄せ {% endcomment %}
+        {% comment %} ④ 右：お買い物ガイドの右寄せ {% endcomment %}
         <div class="flex-1 flex justify-end">
           <a href="#" class="text-sm font-medium text-gray-800 hover:text-[#C2A992]"> お買い物ガイド </a>
         </div>
@@ -163,14 +157,16 @@
     </div>
   </div>
 
-  {% comment %} モバイルメニューの中身 {% endcomment %}
+  {% comment %} モバイルメニュー {% endcomment %}
   <div x-show="mobileMenuOpen" x-cloak class="lg:hidden bg-[#FDFBF7] border-t border-[#C2A992]/10">
     <nav class="px-4 py-6 space-y-1">
-      {% for link in section.settings.main_linklist.links %}
-        <a href="{{ link.url }}" class="block py-3 text-lg text-gray-700 border-b border-[#C2A992]/5 last:border-0">
-          {{ link.title }}
-        </a>
-      {% endfor %}
+      <div class="flex flex-col space-y-3">
+        <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
+        <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
+        <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
+        <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
+        <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
+      </div>
     </nav>
   </div>
 </header>
