@@ -10,7 +10,10 @@
   {% comment %} --- PC用：3段構成 (lgサイズ以上で表示) --- {% endcomment %}
   <div class="hidden lg:block">
     {% comment %} ① 上段：ユーティリティバー（背景色：#C2A992） {% endcomment %}
-    <div style="position: sticky; top: 0; z-index: 100;" class="bg-[#C2A992] text-sm py-2 border-b border-black/5">
+    <div
+      style="position: fixed; top: 0; left: 0; right: 0; z-index: 100;"
+      class="bg-[#C2A992] text-sm py-2 border-b border-black/5"
+    >
       <div class="max-w-6xl mx-auto px-4 md:px-8 flex justify-between items-center">
         <div class="flex items-center space-x-4">
           <div class="relative">
