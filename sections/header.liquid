@@ -184,11 +184,26 @@
       <div class="max-w-6xl mx-auto px-4 md:px-8 relative flex items-center h-12">
         {% comment %} ③ 中央：text * 5 のセンタリング {% endcomment %}
         <div class="flex-grow flex justify-center space-x-12">
-          <span class="text-base font-medium text-gray-800">text</span>
-          <span class="text-base font-medium text-gray-800">text</span>
-          <span class="text-base font-medium text-gray-800">text</span>
-          <span class="text-base font-medium text-gray-800">text</span>
-          <span class="text-base font-medium text-gray-800">text</span>
+          {% comment %}
+            <span class="text-base font-medium text-gray-800">text</span>
+            <span class="text-base font-medium text-gray-800">text</span>
+            <span class="text-base font-medium text-gray-800">text</span>
+            <span class="text-base font-medium text-gray-800">text</span>
+            <span class="text-base font-medium text-gray-800">text</span>
+          {% endcomment %}
+          {% assign main_menu = linklists['main-menu'] %}
+          {% for link in main_menu.links %}
+            {% if link.title == 'Catalog' %}
+              {% for child_link in link.links %}
+                <a
+                  href="{{ child_link.url }}"
+                  class="text-base font-medium text-gray-800 hover:text-[#C2A992] transition"
+                >
+                  {{ child_link.title }}
+                </a>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
         </div>
 
         {% comment %} ④ 右：お買い物ガイドの右寄せ（ロゴの影響を受けないよう絶対配置で右端に） {% endcomment %}
