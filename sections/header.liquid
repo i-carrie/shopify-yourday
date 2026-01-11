@@ -193,8 +193,8 @@
           {% endcomment %}
           {% assign header_menu = linklists['header-menu'] %}
           {% for link in header_menu.links %}
-            {% comment %} 特定の親要素を除外 {% endcomment %}
-            {% unless link.title == 'すべての商品' or link.title == 'コレクション' or link.title == 'ブランド' %}
+            {% comment %} 「すべての商品」のみ除外 {% endcomment %}
+            {% unless link.title == 'すべての商品' %}
               {% if link.links.size > 0 %}
                 {% comment %} 子要素がある場合はドロップダウン {% endcomment %}
                 <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" class="relative">
