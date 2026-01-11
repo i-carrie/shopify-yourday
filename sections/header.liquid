@@ -193,9 +193,21 @@
           {% endcomment %}
           {% assign header_menu = linklists['header-menu'] %}
           {% for link in header_menu.links %}
-            <a href="{{ link.url }}" class="text-base font-medium text-gray-800 hover:text-[#C2A992] transition">
-              {{ link.title }}
-            </a>
+            {% comment %} 子要素がある場合は子要素を表示、ない場合は親を表示 {% endcomment %}
+            {% if link.links.size > 0 %}
+              {% for child_link in link.links %}
+                <a
+                  href="{{ child_link.url }}"
+                  class="text-base font-medium text-gray-800 hover:text-[#C2A992] transition"
+                >
+                  {{ child_link.title }}
+                </a>
+              {% endfor %}
+            {% else %}
+              <a href="{{ link.url }}" class="text-base font-medium text-gray-800 hover:text-[#C2A992] transition">
+                {{ link.title }}
+              </a>
+            {% endif %}
           {% endfor %}
         </div>
 
