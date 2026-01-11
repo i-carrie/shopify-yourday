@@ -95,11 +95,48 @@
               </form>
 
               <div class="flex space-x-8 ml-6">
-                <span class="text-base font-medium text-white">wwtext</span>
-                <span class="text-base font-medium text-white">text</span>
-                <span class="text-base font-medium text-white">text</span>
-                <span class="text-base font-medium text-white">text</span>
-                <span class="text-base font-medium text-white">text</span>
+                {% comment %}
+                  <span class="text-base font-medium text-white">wwtext</span>
+                  <span class="text-base font-medium text-white">text</span>
+                  <span class="text-base font-medium text-white">text</span>
+                  <span class="text-base font-medium text-white">text</span>
+                  <span class="text-base font-medium text-white">text</span>
+                {% endcomment %}
+                {% assign header_menu = linklists['header-menu'] %}
+                {% for link in header_menu.links %}
+                  {% unless link.title == 'すべての商品' %}
+                    {% if link.links.size > 0 %}
+                      <div
+                        x-data="{ open: false }"
+                        @mouseenter="open = true"
+                        @mouseleave="open = false"
+                        class="relative"
+                      >
+                        <button class="text-base font-medium text-white hover:text-gray-200 transition">
+                          {{ link.title }}
+                        </button>
+                        <div
+                          x-show="open"
+                          x-transition
+                          class="absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg py-2 min-w-[200px] z-50"
+                        >
+                          {% for child_link in link.links %}
+                            <a
+                              href="{{ child_link.url }}"
+                              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                              {{ child_link.title }}
+                            </a>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    {% else %}
+                      <a href="{{ link.url }}" class="text-base font-medium text-white hover:text-gray-200 transition">
+                        {{ link.title }}
+                      </a>
+                    {% endif %}
+                  {% endunless %}
+                {% endfor %}
               </div>
             </div>
           </div>
