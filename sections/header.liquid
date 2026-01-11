@@ -261,55 +261,6 @@
   </div>
 
   {% comment %} モバイルメニュー {% endcomment %}
-  {% comment %}
-    <div x-show="mobileMenuOpen" x-cloak class="lg:hidden bg-[#FDFBF7] border-t border-[#C2A992]/10">
-      <nav class="px-4 py-6 space-y-1">
-        <div class="flex flex-col space-y-3">
-          <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
-          <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
-          <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
-          <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
-          <span class="block py-2 text-lg text-gray-700 border-b border-[#C2A992]/5">text</span>
-        </div>
-      </nav>
-    </div>
-  {% endcomment %}
-
-  {% comment %}
-    <div x-show="mobileMenuOpen" x-cloak class="lg:hidden bg-white border-t border-[#C2A992]/10">
-      <nav class="px-4 py-6 space-y-1">
-        {% assign header_menu = linklists['header-menu'] %}
-        {% for link in header_menu.links %}
-          {% unless link.title == 'すべての商品' %}
-            {% if link.links.size > 0 %}
-              {% comment %} 子要素がある場合はアコーディオン {% endcomment %}
-              <div x-data="{ open: false }" class="border-b border-[#C2A992]/5">
-                <button @click="open = !open" class="w-full flex justify-between items-center py-3 text-lg text-gray-700">
-                  <span>{{ link.title }}</span>
-                  <span x-show="!open">▼</span>
-                  <span x-show="open">▲</span>
-                </button>
-                <div x-show="open" x-transition class="pl-4 pb-3 space-y-2">
-                  {% for child_link in link.links %}
-                    <a href="{{ child_link.url }}" class="block py-2 text-base text-gray-600 hover:text-[#C2A992]">
-                      {{ child_link.title }}
-                    </a>
-                  {% endfor %}
-                </div>
-              </div>
-            {% else %}
-              {% comment %} 子要素がない場合は通常のリンク {% endcomment %}
-              <a href="{{ link.url }}" class="block py-3 text-lg text-gray-700 border-b border-[#C2A992]/5">
-                {{ link.title }}
-              </a>
-            {% endif %}
-          {% endunless %}
-        {% endfor %}
-      </nav>
-    </div>
-  {% endcomment %}
-
-  {% comment %} モバイルメニュー {% endcomment %}
   <div x-show="mobileMenuOpen" x-cloak class="lg:hidden bg-white border-t border-[#C2A992]/10">
     <nav class="px-4 py-6 space-y-1">
       {% assign header_menu = linklists['header-menu'] %}
