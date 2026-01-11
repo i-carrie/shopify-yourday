@@ -191,18 +191,11 @@
             <span class="text-base font-medium text-gray-800">text</span>
             <span class="text-base font-medium text-gray-800">text</span>
           {% endcomment %}
-          {% assign main_menu = linklists['main-menu'] %}
-          {% for link in main_menu.links %}
-            {% if link.title == 'Catalog' %}
-              {% for child_link in link.links %}
-                <a
-                  href="{{ child_link.url }}"
-                  class="text-base font-medium text-gray-800 hover:text-[#C2A992] transition"
-                >
-                  {{ child_link.title }}
-                </a>
-              {% endfor %}
-            {% endif %}
+          {% assign header_menu = linklists['header-menu'] %}
+          {% for link in header_menu.links %}
+            <a href="{{ link.url }}" class="text-base font-medium text-gray-800 hover:text-[#C2A992] transition">
+              {{ link.title }}
+            </a>
           {% endfor %}
         </div>
 
