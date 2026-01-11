@@ -193,21 +193,33 @@
           {% endcomment %}
           {% assign header_menu = linklists['header-menu'] %}
           {% for link in header_menu.links %}
-            {% comment %} 子要素がある場合は子要素を表示、ない場合は親を表示 {% endcomment %}
-            {% if link.links.size > 0 %}
-              {% for child_link in link.links %}
-                <a
-                  href="{{ child_link.url }}"
-                  class="text-base font-medium text-gray-800 hover:text-[#C2A992] transition"
-                >
-                  {{ child_link.title }}
+            {% comment %} 特定の親要素を除外 {% endcomment %}
+            {% unless link.title == 'すべての商品' or link.title == 'コレクション' or link.title == 'ブランド' %}
+              {% if link.links.size > 0 %}
+                {% comment %} 子要素がある場合はドロップダウン {% endcomment %}
+                <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" class="relative">
+                  <button class="text-base font-medium text-gray-800 hover:text-[#C2A992] transition">
+                    {{ link.title }}
+                  </button>
+                  <div
+                    x-show="open"
+                    x-transition
+                    class="absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg py-2 min-w-[200px] z-50"
+                  >
+                    {% for child_link in link.links %}
+                      <a href="{{ child_link.url }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        {{ child_link.title }}
+                      </a>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% else %}
+                {% comment %} 子要素がない場合は通常のリンク {% endcomment %}
+                <a href="{{ link.url }}" class="text-base font-medium text-gray-800 hover:text-[#C2A992] transition">
+                  {{ link.title }}
                 </a>
-              {% endfor %}
-            {% else %}
-              <a href="{{ link.url }}" class="text-base font-medium text-gray-800 hover:text-[#C2A992] transition">
-                {{ link.title }}
-              </a>
-            {% endif %}
+              {% endif %}
+            {% endunless %}
           {% endfor %}
         </div>
 

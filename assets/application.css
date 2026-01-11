@@ -262,6 +262,9 @@
   .top-3 {
     top: calc(var(--spacing) * 3);
   }
+  .top-full {
+    top: 100%;
+  }
   .-right-1 {
     right: calc(var(--spacing) * -1);
   }
@@ -519,6 +522,9 @@
   }
   .max-w-md {
     max-width: var(--container-md);
+  }
+  .min-w-\[200px\] {
+    min-width: 200px;
   }
   .flex-1 {
     flex: 1;
