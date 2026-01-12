@@ -20,12 +20,26 @@
       {% if template.name == 'product' %}
         {% comment %} URLパラメータからコレクションハンドルを取得 {% endcomment %}
         {% assign collection_param = '' %}
-        {% assign url_parts = request.path | split: '?' %}
-        {% if url_parts.size > 1 %}
-          {% assign params = url_parts[1] | split: '&' %}
+        {% comment %} {% assign url_parts = request.path | split: '?' %} {% endcomment %}
+
+        {% comment %}
+          {% if url_parts.size > 1 %}
+            {% assign params = url_parts[1] | split: '&' %}
+            {% for param in params %}
+              {% if param contains 'collection=' %}
+                {% assign collection_param = param | remove: 'collection=' %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endcomment %}
+
+        {% if canonical_url contains '?' %}
+          {% assign url_parts = canonical_url | split: '?' %}
+          {% assign query_string = url_parts[1] %}
+          {% assign params = query_string | split: '&' %}
           {% for param in params %}
             {% if param contains 'collection=' %}
-              {% assign collection_param = param | remove: 'collection=' %}
+              {% assign collection_param = param | split: '=' | last %}
             {% endif %}
           {% endfor %}
         {% endif %}
