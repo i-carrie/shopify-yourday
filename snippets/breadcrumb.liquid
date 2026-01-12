@@ -18,18 +18,56 @@
 
       {% comment %} 商品ページ {% endcomment %}
       {% if template.name == 'product' %}
-        {% if product.collections.size > 0 %}
+        {% comment %} URLパラメータからコレクションハンドルを取得 {% endcomment %}
+        {% assign collection_param = '' %}
+        {% assign url_parts = request.path | split: '?' %}
+        {% if url_parts.size > 1 %}
+          {% assign params = url_parts[1] | split: '&' %}
+          {% for param in params %}
+            {% if param contains 'collection=' %}
+              {% assign collection_param = param | remove: 'collection=' %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        {% comment %} vendorsコレクションかどうかを判定 {% endcomment %}
+        {% assign is_vendors_collection = false %}
+        {% if collection_param == 'vendors' %}
+          {% assign is_vendors_collection = true %}
+        {% endif %}
+
+        {% comment %} ブランドページから来た場合は販売元名のみ表示 {% endcomment %}
+        {% if is_vendors_collection %}
           <li class="flex items-center gap-2">
             <span class="text-gray-400">&gt;</span>
-            <a href="{{ product.collections.first.url }}" class="hover:text-gray-900 transition-colors duration-150">
-              {{ product.collections.first.title }}
-            </a>
+            <span>{{ product.vendor }}</span>
+          </li>
+        {% else %}
+          {% comment %} 通常のコレクションページから来た場合 {% endcomment %}
+          {% if collection_param != '' %}
+            {% assign selected_collection = collections[collection_param] %}
+            {% if selected_collection %}
+              <li class="flex items-center gap-2">
+                <span class="text-gray-400">&gt;</span>
+                <a href="{{ selected_collection.url }}" class="hover:text-gray-900 transition-colors duration-150">
+                  {{ selected_collection.title }}
+                </a>
+              </li>
+            {% endif %}
+          {% elsif product.collections.size > 0 %}
+            <li class="flex items-center gap-2">
+              <span class="text-gray-400">&gt;</span>
+              <a href="{{ product.collections.first.url }}" class="hover:text-gray-900 transition-colors duration-150">
+                {{ product.collections.first.title }}
+              </a>
+            </li>
+          {% endif %}
+          {% comment %} 商品名を表示 {% endcomment %}
+          <li class="flex items-center gap-2">
+            <span class="text-gray-400">&gt;</span>
+            <span>{{ product.title }}</span>
           </li>
         {% endif %}
-        <li class="flex items-center gap-2">
-          <span class="text-gray-400">&gt;</span>
-          <span>{{ product.title }}</span>
-        </li>
       {% endif %}
 
       {% comment %} 検索ページ {% endcomment %}
