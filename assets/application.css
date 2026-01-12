@@ -784,6 +784,9 @@
   .bg-\[\#FDFBF7\]\/90 {
     background-color: color-mix(in oklab, #FDFBF7 90%, transparent);
   }
+  .bg-\[\#d7ebeb\] {
+    background-color: #d7ebeb;
+  }
   .bg-black {
     background-color: var(--color-black);
   }
@@ -1273,6 +1276,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--color-gray-200);
+      }
+    }
+  }
+  .hover\:text-gray-900 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-gray-900);
       }
     }
   }

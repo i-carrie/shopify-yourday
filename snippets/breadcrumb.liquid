@@ -1,0 +1,60 @@
+<nav class="breadcrumb-bar bg-[#d7ebeb] py-2" aria-label="breadcrumb">
+  <div class="max-w-6xl mx-auto px-4">
+    <ol class="flex items-center gap-2 text-sm text-gray-700">
+      {% comment %} ホーム {% endcomment %}
+      <li class="flex items-center">
+        <a href="/" class="flex items-center hover:text-gray-900 transition-colors duration-150">
+          {% render 'icon-home' %}
+        </a>
+      </li>
+
+      {% comment %} コレクションページ {% endcomment %}
+      {% if template.name == 'collection' %}
+        <li class="flex items-center gap-2">
+          <span class="text-gray-400">&gt;</span>
+          <span>{{ collection.title }}</span>
+        </li>
+      {% endif %}
+
+      {% comment %} 商品ページ {% endcomment %}
+      {% if template.name == 'product' %}
+        {% if product.collections.size > 0 %}
+          <li class="flex items-center gap-2">
+            <span class="text-gray-400">&gt;</span>
+            <a href="{{ product.collections.first.url }}" class="hover:text-gray-900 transition-colors duration-150">
+              {{ product.collections.first.title }}
+            </a>
+          </li>
+        {% endif %}
+        <li class="flex items-center gap-2">
+          <span class="text-gray-400">&gt;</span>
+          <span>{{ product.title }}</span>
+        </li>
+      {% endif %}
+
+      {% comment %} 検索ページ {% endcomment %}
+      {% if template.name == 'search' %}
+        <li class="flex items-center gap-2">
+          <span class="text-gray-400">&gt;</span>
+          <span>検索結果</span>
+        </li>
+      {% endif %}
+
+      {% comment %} カートページ {% endcomment %}
+      {% if template.name == 'cart' %}
+        <li class="flex items-center gap-2">
+          <span class="text-gray-400">&gt;</span>
+          <span>カート</span>
+        </li>
+      {% endif %}
+
+      {% comment %} その他のページ {% endcomment %}
+      {% if template.name == 'page' %}
+        <li class="flex items-center gap-2">
+          <span class="text-gray-400">&gt;</span>
+          <span>{{ page.title }}</span>
+        </li>
+      {% endif %}
+    </ol>
+  </div>
+</nav>
