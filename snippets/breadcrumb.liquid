@@ -1,3 +1,10 @@
+{% comment %}
+  パンくずリスト (Breadcrumb)
+  - ホームアイコンを表示
+  - カラー: #d7ebeb
+  - padding: ヘッダーより細め
+{% endcomment %}
+
 <nav class="breadcrumb-bar bg-[#d7ebeb] py-2" aria-label="breadcrumb">
   <div class="max-w-6xl mx-auto px-4">
     <ol class="flex items-center gap-2 text-sm text-gray-700">
@@ -13,6 +20,18 @@
         <li class="flex items-center gap-2">
           <span class="text-gray-400">&gt;</span>
           <span>{{ collection.title }}</span>
+        </li>
+      {% endif %}
+
+      {% comment %} 商品ページ {% endcomment %}
+      {% if template.name == 'product' %}
+        <li class="flex items-center gap-2" id="breadcrumb-collection" style="display: none;">
+          <span class="text-gray-400">&gt;</span>
+          <a href="#" class="hover:text-gray-900 transition-colors duration-150" id="breadcrumb-collection-link"></a>
+        </li>
+        <li class="flex items-center gap-2" id="breadcrumb-product">
+          <span class="text-gray-400">&gt;</span>
+          <span>{{ product.title }}</span>
         </li>
       {% endif %}
 
@@ -58,7 +77,7 @@
       breadcrumbLink.removeAttribute('href');
       breadcrumbCollection.style.display = 'flex';
       breadcrumbProduct.style.display = 'none';
-} else if (collectionHandle) {
+    } else if (collectionHandle) {
       // コレクションページから来た場合
       fetch(`/collections/${collectionHandle}.json`)
         .then(response => response.json())
@@ -66,11 +85,11 @@
           breadcrumbLink.textContent = data.collection.title;
           breadcrumbLink.href = `/collections/${collectionHandle}`;
           breadcrumbCollection.style.display = 'flex';
-          breadcrumbProduct.style.display = 'flex';  // ← この行を追加
+          breadcrumbProduct.style.display = 'flex';
         })
         .catch(() => {
           breadcrumbCollection.style.display = 'none';
-          breadcrumbProduct.style.display = 'none';  // ← この行も追加
+          breadcrumbProduct.style.display = 'none';
         });
     } else {
       // パラメータがない場合は最初のコレクション
@@ -78,10 +97,10 @@
         breadcrumbLink.textContent = '{{ product.collections.first.title }}';
         breadcrumbLink.href = '{{ product.collections.first.url }}';
         breadcrumbCollection.style.display = 'flex';
-        breadcrumbProduct.style.display = 'flex';  // ← この行を追加
+        breadcrumbProduct.style.display = 'flex';
       {% else %}
         breadcrumbCollection.style.display = 'none';
-        breadcrumbProduct.style.display = 'none';  // ← この行も追加
+        breadcrumbProduct.style.display = 'none';
       {% endif %}
     }
   })();
