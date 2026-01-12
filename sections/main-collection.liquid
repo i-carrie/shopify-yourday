@@ -30,27 +30,150 @@
         </div>
       {% endif %}
 
-      <!-- 商品グリッド -->
+      <!-- フィルターと商品グリッドのコンテナ -->
       {% if collection.products.size > 0 %}
-        <div
-          class="
-            grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8
-            {% if section.settings.products_per_row == 2 %}lg:grid-cols-2
-            {% elsif section.settings.products_per_row == 3 %}lg:grid-cols-3
-            {% elsif section.settings.products_per_row == 4 %}lg:grid-cols-4
-            {% elsif section.settings.products_per_row == 5 %}lg:grid-cols-5
-            {% endif %}
-          "
-        >
-          {% for product in collection.products %}
-            {% render 'product-card', product: product %}
-          {% endfor %}
-        </div>
+        <div x-data="{ filterOpen: false }" class="flex flex-col lg:flex-row gap-8">
+          <!-- フィルターサイドバー -->
+          <aside class="w-full lg:w-64 flex-shrink-0">
+            <!-- モバイル用トグルボタン -->
+            <button
+              @click="filterOpen = !filterOpen"
+              class="lg:hidden w-full flex items-center justify-between bg-white border border-gray-300 rounded px-4 py-3 mb-4 hover:bg-gray-50 transition"
+            >
+              <span class="font-medium text-gray-700">絞り込み</span>
+              <div class="w-5 h-5 transition-transform duration-200" :class="{ 'rotate-180': filterOpen }">
+                {% render 'icon-chevron-down' %}
+              </div>
+            </button>
 
-        <!-- ページネーション -->
-        {% if paginate.pages > 1 %}
-          {% render 'pagination', paginate: paginate %}
-        {% endif %}
+            <!-- フィルターコンテンツ -->
+            <div
+              x-show="filterOpen"
+              x-transition
+              class="lg:block space-y-6"
+              :class="{ 'hidden': !filterOpen }"
+            >
+              {% comment %} 商品タイプフィルター {% endcomment %}
+              {% if collection.filters.size > 0 %}
+                {% for filter in collection.filters %}
+                  {% case filter.type %}
+                    {% when 'list' %}
+                      <div class="border-b border-gray-200 pb-6">
+                        <h3 class="font-medium text-gray-900 mb-3">{{ filter.label }}</h3>
+                        <div class="space-y-2">
+                          {% for value in filter.values %}
+                            <label class="flex items-center cursor-pointer group">
+                              <input
+                                type="checkbox"
+                                name="{{ value.param_name }}"
+                                value="{{ value.value }}"
+                                {% if value.active %}
+                                  checked
+                                {% endif %}
+                                onchange="window.location.href = '{{ value.url_to_add }}'"
+                                class="w-4 h-4 text-[#C2A992] border-gray-300 rounded focus:ring-[#C2A992]"
+                              >
+                              <span class="ml-2 text-sm text-gray-700 group-hover:text-gray-900">
+                                {{ value.label }}
+                                <span class="text-gray-400">({{ value.count }})</span>
+                              </span>
+                            </label>
+                          {% endfor %}
+                        </div>
+                      </div>
+
+                    {% when 'price_range' %}
+                      <div class="border-b border-gray-200 pb-6">
+                        <h3 class="font-medium text-gray-900 mb-3">{{ filter.label }}</h3>
+                        <div class="space-y-3">
+                          <div class="flex items-center gap-2">
+                            <input
+                              type="number"
+                              name="{{ filter.min_value.param_name }}"
+                              id="Filter-{{ filter.label }}-GTE"
+                              {% if filter.min_value.value %}
+                                value="{{ filter.min_value.value | divided_by: 100 }}"
+                              {% endif %}
+                              placeholder="¥0"
+                              min="0"
+                              class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#C2A992]"
+                            >
+                            <span class="text-gray-500">-</span>
+                            <input
+                              type="number"
+                              name="{{ filter.max_value.param_name }}"
+                              id="Filter-{{ filter.label }}-LTE"
+                              {% if filter.max_value.value %}
+                                value="{{ filter.max_value.value | divided_by: 100 }}"
+                              {% endif %}
+                              placeholder="¥10000"
+                              min="0"
+                              class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#C2A992]"
+                            >
+                          </div>
+                          <button
+                            type="button"
+                            onclick="applyPriceFilter()"
+                            class="w-full bg-gray-800 text-white py-2 rounded hover:bg-gray-700 transition text-sm font-medium"
+                          >
+                            適用
+                          </button>
+                        </div>
+                      </div>
+                  {% endcase %}
+                {% endfor %}
+
+                {% comment %} アクティブフィルタークリア {% endcomment %}
+                {% if collection.filters %}
+                  {% assign active_filters = 0 %}
+                  {% for filter in collection.filters %}
+                    {% for value in filter.values %}
+                      {% if value.active %}
+                        {% assign active_filters = active_filters | plus: 1 %}
+                      {% endif %}
+                    {% endfor %}
+                  {% endfor %}
+
+                  {% if active_filters > 0 %}
+                    <div class="pt-4">
+                      <a
+                        href="{{ collection.url }}"
+                        class="text-sm text-[#C2A992] hover:text-[#A08870] underline"
+                      >
+                        すべてクリア
+                      </a>
+                    </div>
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+            </div>
+          </aside>
+
+          <!-- 商品グリッド -->
+          <div class="flex-1">
+            <div
+              class="
+                grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8
+                {% if section.settings.products_per_row == 2 %}lg:grid-cols-2
+                {% elsif section.settings.products_per_row == 3 %}lg:grid-cols-3
+                {% elsif section.settings.products_per_row == 4 %}lg:grid-cols-4
+                {% elsif section.settings.products_per_row == 5 %}lg:grid-cols-5
+                {% endif %}
+              "
+            >
+              {% for product in collection.products %}
+                {% render 'product-card', product: product, collection: collection %}
+              {% endfor %}
+            </div>
+
+            <!-- ページネーション -->
+            {% if paginate.pages > 1 %}
+              <div class="mt-8">
+                {% render 'pagination', paginate: paginate %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
       {% else %}
         <div class="text-center py-16">
           <p class="text-xl text-gray-500">このコレクションには商品がまだ登録されていません</p>
@@ -65,6 +188,32 @@
     {% endpaginate %}
   </div>
 </div>
+
+<script>
+  function applyPriceFilter() {
+    const minInput = document.querySelector('[id^="Filter-"][id$="-GTE"]');
+    const maxInput = document.querySelector('[id^="Filter-"][id$="-LTE"]');
+
+    const minValue = minInput.value ? parseInt(minInput.value) * 100 : '';
+    const maxValue = maxInput.value ? parseInt(maxInput.value) * 100 : '';
+
+    const url = new URL(window.location.href);
+
+    if (minValue) {
+      url.searchParams.set(minInput.name, minValue);
+    } else {
+      url.searchParams.delete(minInput.name);
+    }
+
+    if (maxValue) {
+      url.searchParams.set(maxInput.name, maxValue);
+    } else {
+      url.searchParams.delete(maxInput.name);
+    }
+
+    window.location.href = url.toString();
+  }
+</script>
 
 {% schema %}
 {
