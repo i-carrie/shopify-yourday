@@ -1,63 +1,56 @@
-<div class="py-8">
-  <div class="max-w-6xl mx-auto px-4 md:px-8">
-    <!-- パンくずナビ -->
-    <nav class="mb-8 text-center">
-      <a
-        href="{{ routes.collections_url }}"
-        class="text-sm text-gray-600 hover:text-[#C2A992] transition-colors inline-flex items-center gap-2"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-        </svg>
-        コレクション一覧に戻る
-      </a>
-    </nav>
+{% comment %}
+  PDPと完全に同じクラス構成に戻し、
+  Schemaの「tag」設定を削除して二重枠を防いだ正解コード
+{% endcomment %}
+<section class="max-w-6xl mx-auto px-4 py-8 md:px-8 lg:py-12">
+  <nav class="mb-8 text-center">
+    <a
+      href="{{ routes.collections_url }}"
+      class="text-sm text-gray-600 hover:text-[#C2A992] transition-colors inline-flex items-center gap-2"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      コレクション一覧に戻る
+    </a>
+  </nav>
 
-    {% paginate collection.products by section.settings.number_of_products_per_page %}
-      <!-- コレクションタイトル -->
-      <h1 class="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">
-        {% if section.settings.custom_title != blank %}
-          {{ section.settings.custom_title }}
-        {% else %}
-          {{ collection.title }}
-        {% endif %}
-      </h1>
+  {% paginate collection.products by section.settings.number_of_products_per_page %}
+    <h1 class="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">
+      {{ section.settings.custom_title | default: collection.title }}
+    </h1>
 
-      <!-- コレクション説明 -->
-      {% if collection.description != blank %}
-        <div class="max-w-3xl mx-auto mb-12 text-center text-gray-600">
-          {{ collection.description }}
+    {% if collection.description != blank %}
+      <div class="max-w-3xl mx-auto mb-12 text-center text-gray-600">
+        {{ collection.description }}
+      </div>
+    {% endif %}
+
+    {% if collection.products.size > 0 %}
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+        {% for product in collection.products %}
+          {% render 'product-card', product: product, collection: collection %}
+        {% endfor %}
+      </div>
+
+      {% if paginate.pages > 1 %}
+        <div class="mt-12 flex justify-center">
+          {% render 'pagination', paginate: paginate %}
         </div>
       {% endif %}
-
-      <!-- 商品グリッド -->
-      {% if collection.products.size > 0 %}
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {% for product in collection.products %}
-            {% render 'product-card', product: product, collection: collection %}
-          {% endfor %}
-        </div>
-
-        <!-- ページネーション -->
-        {% if paginate.pages > 1 %}
-          <div class="mt-8">
-            {% render 'pagination', paginate: paginate %}
-          </div>
-        {% endif %}
-      {% else %}
-        <div class="text-center py-16">
-          <p class="text-xl text-gray-500">このコレクションには商品がまだ登録されていません</p>
-          <a
-            href="{{ routes.collections_url }}"
-            class="mt-6 inline-block px-6 py-3 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
-          >
-            他のコレクションを見る
-          </a>
-        </div>
-      {% endif %}
-    {% endpaginate %}
-  </div>
-{% comment %} </div> {% endcomment %}
+    {% else %}
+      <div class="text-center py-16">
+        <p class="text-xl text-gray-500">このコレクションには商品がまだ登録されていません</p>
+        <a
+          href="{{ routes.collections_url }}"
+          class="mt-6 inline-block px-8 py-3 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition"
+        >
+          他のコレクションを見る
+        </a>
+      </div>
+    {% endif %}
+  {% endpaginate %}
+</section>
 
 {% schema %}
 {
