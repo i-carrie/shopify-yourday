@@ -1,6 +1,7 @@
 {% comment %}
   Parameters:
   - product: Product object
+  - collection: Collection object (optional)
 {% endcomment %}
 
 <div class="py-6 px-3">
@@ -43,7 +44,7 @@
       {% endif %}
 
       <a
-        href="{{ product.url }}"
+        href="{{ product.url }}{% if collection %}?collection={{ collection.handle }}{% endif %}"
         class="text-gray-700 uppercase font-medium hover:text-[#C2A992] transition-colors mb-2"
       >
         {{ product.title }}
