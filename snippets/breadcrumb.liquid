@@ -16,24 +16,6 @@
         </li>
       {% endif %}
 
-      {% comment %} 商品ページ {% endcomment %}
-      {% comment %} {% if template.name == 'product' %} {% endcomment %}
-      {% comment %} URLパラメータからコレクションハンドルを取得 {% endcomment %}
-      {% comment %}
-        {% assign collection_param = '' %}
-        {% assign url_parts = request.path | split: '?' %}
-        {% if canonical_url contains '?' %}
-          {% assign url_parts = canonical_url | split: '?' %}
-          {% assign query_string = url_parts[1] %}
-          {% assign params = query_string | split: '&' %}
-          {% for param in params %}
-            {% if param contains 'collection=' %}
-              {% assign collection_param = param | split: '=' | last %}
-            {% endif %}
-          {% endfor %}
-        {% endif %}
-      {% endcomment %}
-
       {% if template.name == 'product' %}
         <li class="flex items-center gap-2" id="breadcrumb-collection" style="display: none;">
           <span class="text-gray-400">&gt;</span>
@@ -126,7 +108,7 @@
       breadcrumbLink.removeAttribute('href');
       breadcrumbCollection.style.display = 'flex';
       breadcrumbProduct.style.display = 'none';
-    } else if (collectionHandle) {
+} else if (collectionHandle) {
       // コレクションページから来た場合
       fetch(`/collections/${collectionHandle}.json`)
         .then(response => response.json())
@@ -134,9 +116,11 @@
           breadcrumbLink.textContent = data.collection.title;
           breadcrumbLink.href = `/collections/${collectionHandle}`;
           breadcrumbCollection.style.display = 'flex';
+          breadcrumbProduct.style.display = 'flex';  // ← この行を追加
         })
         .catch(() => {
           breadcrumbCollection.style.display = 'none';
+          breadcrumbProduct.style.display = 'none';  // ← この行も追加
         });
     } else {
       // パラメータがない場合は最初のコレクション
@@ -144,8 +128,10 @@
         breadcrumbLink.textContent = '{{ product.collections.first.title }}';
         breadcrumbLink.href = '{{ product.collections.first.url }}';
         breadcrumbCollection.style.display = 'flex';
+        breadcrumbProduct.style.display = 'flex';  // ← この行を追加
       {% else %}
         breadcrumbCollection.style.display = 'none';
+        breadcrumbProduct.style.display = 'none';  // ← この行も追加
       {% endif %}
     }
   })();
