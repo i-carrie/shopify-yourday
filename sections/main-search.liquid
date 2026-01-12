@@ -1,0 +1,91 @@
+<div class="px-4 py-8">
+  <div class="max-w-7xl mx-auto">
+    {% paginate search.results by section.settings.number_of_products_per_page %}
+      <!-- 検索結果タイトル -->
+      <h1 class="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">
+        {% if search.performed %}
+          "{{ search.terms }}" の検索結果
+        {% else %}
+          検索
+        {% endif %}
+      </h1>
+
+      <!-- 検索結果の件数表示 -->
+      {% if search.performed %}
+        <div class="text-center mb-8 text-gray-600">
+          {% if search.results_count > 0 %}
+            {{ search.results_count }}件の商品が見つかりました
+          {% else %}
+            {{ search.terms }}の検索結果：0件
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- 商品グリッド -->
+      {% if search.results_count > 0 %}
+        <div
+          class="
+            grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8
+            {% if section.settings.products_per_row == 2 %}lg:grid-cols-2
+            {% elsif section.settings.products_per_row == 3 %}lg:grid-cols-3
+            {% elsif section.settings.products_per_row == 4 %}lg:grid-cols-4
+            {% elsif section.settings.products_per_row == 5 %}lg:grid-cols-5
+            {% endif %}
+          "
+        >
+          {% for item in search.results %}
+            {% if item.object_type == 'product' %}
+              {% render 'product-card', product: item %}
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- ページネーション -->
+        {% if paginate.pages > 1 %}
+          {% render 'pagination', paginate: paginate %}
+        {% endif %}
+      {% elsif search.performed %}
+        <div class="text-center py-16">
+          <p class="text-xl text-gray-500 mb-4">「{{ search.terms }}」に一致する商品が見つかりませんでした</p>
+          <p class="text-gray-500 mb-8">別のキーワードで検索してみてください</p>
+          <a
+            href="{{ routes.all_products_collection_url }}"
+            class="inline-block px-6 py-3 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
+          >
+            すべての商品を見る
+          </a>
+        </div>
+      {% else %}
+        <div class="text-center py-16">
+          <p class="text-xl text-gray-500">検索キーワードを入力してください</p>
+        </div>
+      {% endif %}
+    {% endpaginate %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Main Search",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_row",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "1行あたりの商品数（デスクトップ）",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "number_of_products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "label": "1ページあたりの商品数",
+      "default": 8
+    }
+  ]
+}
+{% endschema %}
