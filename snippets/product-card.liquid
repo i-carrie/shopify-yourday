@@ -8,7 +8,7 @@
   <div class="border border-gray-200 bg-white shadow-lg rounded-lg overflow-hidden group hover:shadow-xl transition-shadow duration-300">
     <a href="{{ product.url }}{% if collection %}?collection={{ collection.handle }}{% endif %}" class="block">
       <!-- 商品画像 -->
-      <div class="h-80 overflow-hidden relative">
+      <div class="aspect-square overflow-hidden relative">
         {% if product.featured_image %}
           <img
             class="w-full h-full object-cover transition duration-1000 ease-in-out group-hover:scale-105 transform"
