@@ -17,22 +17,11 @@
       {% endif %}
 
       {% comment %} 商品ページ {% endcomment %}
-      {% if template.name == 'product' %}
-        {% comment %} URLパラメータからコレクションハンドルを取得 {% endcomment %}
+      {% comment %} {% if template.name == 'product' %} {% endcomment %}
+      {% comment %} URLパラメータからコレクションハンドルを取得 {% endcomment %}
+      {% comment %}
         {% assign collection_param = '' %}
-        {% comment %} {% assign url_parts = request.path | split: '?' %} {% endcomment %}
-
-        {% comment %}
-          {% if url_parts.size > 1 %}
-            {% assign params = url_parts[1] | split: '&' %}
-            {% for param in params %}
-              {% if param contains 'collection=' %}
-                {% assign collection_param = param | remove: 'collection=' %}
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-        {% endcomment %}
-
+        {% assign url_parts = request.path | split: '?' %}
         {% if canonical_url contains '?' %}
           {% assign url_parts = canonical_url | split: '?' %}
           {% assign query_string = url_parts[1] %}
@@ -43,14 +32,17 @@
             {% endif %}
           {% endfor %}
         {% endif %}
+      {% endcomment %}
 
-        {% comment %} デバッグ用 - あとで削除 {% endcomment %}
-        <div style="background: yellow; padding: 10px;">
-          DEBUG: canonical_url = {{ canonical_url -}}
-          <br>
-          DEBUG: collection_param = {{ collection_param -}}
-          <br>
-        </div>
+      {% if template.name == 'product' %}
+        <li class="flex items-center gap-2" id="breadcrumb-collection" style="display: none;">
+          <span class="text-gray-400">&gt;</span>
+          <a href="#" class="hover:text-gray-900 transition-colors duration-150" id="breadcrumb-collection-link"></a>
+        </li>
+        <li class="flex items-center gap-2" id="breadcrumb-product">
+          <span class="text-gray-400">&gt;</span>
+          <span>{{ product.title }}</span>
+        </li>
 
         {% comment %} vendorsコレクションかどうかを判定 {% endcomment %}
         {% assign is_vendors_collection = false %}
@@ -118,3 +110,44 @@
     </ol>
   </div>
 </nav>
+
+{% if template.name == 'product' %}
+  <script>
+  (function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const collectionHandle = urlParams.get('collection');
+    const breadcrumbCollection = document.getElementById('breadcrumb-collection');
+    const breadcrumbProduct = document.getElementById('breadcrumb-product');
+    const breadcrumbLink = document.getElementById('breadcrumb-collection-link');
+
+    if (collectionHandle === 'vendors') {
+      // ブランドページから来た場合は販売元名のみ
+      breadcrumbLink.textContent = '{{ product.vendor }}';
+      breadcrumbLink.removeAttribute('href');
+      breadcrumbCollection.style.display = 'flex';
+      breadcrumbProduct.style.display = 'none';
+    } else if (collectionHandle) {
+      // コレクションページから来た場合
+      fetch(`/collections/${collectionHandle}.json`)
+        .then(response => response.json())
+        .then(data => {
+          breadcrumbLink.textContent = data.collection.title;
+          breadcrumbLink.href = `/collections/${collectionHandle}`;
+          breadcrumbCollection.style.display = 'flex';
+        })
+        .catch(() => {
+          breadcrumbCollection.style.display = 'none';
+        });
+    } else {
+      // パラメータがない場合は最初のコレクション
+      {% if product.collections.size > 0 %}
+        breadcrumbLink.textContent = '{{ product.collections.first.title }}';
+        breadcrumbLink.href = '{{ product.collections.first.url }}';
+        breadcrumbCollection.style.display = 'flex';
+      {% else %}
+        breadcrumbCollection.style.display = 'none';
+      {% endif %}
+    }
+  })();
+  </script>
+{% endif %}
