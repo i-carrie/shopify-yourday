@@ -16,58 +16,6 @@
         </li>
       {% endif %}
 
-      {% if template.name == 'product' %}
-        <li class="flex items-center gap-2" id="breadcrumb-collection" style="display: none;">
-          <span class="text-gray-400">&gt;</span>
-          <a href="#" class="hover:text-gray-900 transition-colors duration-150" id="breadcrumb-collection-link"></a>
-        </li>
-        <li class="flex items-center gap-2" id="breadcrumb-product">
-          <span class="text-gray-400">&gt;</span>
-          <span>{{ product.title }}</span>
-        </li>
-
-        {% comment %} vendorsコレクションかどうかを判定 {% endcomment %}
-        {% comment %}
-          {% assign is_vendors_collection = false %}
-          {% if collection_param == 'vendors' %}
-            {% assign is_vendors_collection = true %}
-          {% endif %}
-        {% endcomment %}
-
-        {% comment %} ブランドページから来た場合は販売元名のみ表示 {% endcomment %}
-        {% if is_vendors_collection %}
-          <li class="flex items-center gap-2">
-            <span class="text-gray-400">&gt;</span>
-            <span>{{ product.vendor }}</span>
-          </li>
-        {% else %}
-          {% comment %} 通常のコレクションページから来た場合 {% endcomment %}
-          {% if collection_param != '' %}
-            {% assign selected_collection = collections[collection_param] %}
-            {% if selected_collection %}
-              <li class="flex items-center gap-2">
-                <span class="text-gray-400">&gt;</span>
-                <a href="{{ selected_collection.url }}" class="hover:text-gray-900 transition-colors duration-150">
-                  {{ selected_collection.title }}
-                </a>
-              </li>
-            {% endif %}
-          {% elsif product.collections.size > 0 %}
-            <li class="flex items-center gap-2">
-              <span class="text-gray-400">&gt;</span>
-              <a href="{{ product.collections.first.url }}" class="hover:text-gray-900 transition-colors duration-150">
-                {{ product.collections.first.title }}
-              </a>
-            </li>
-          {% endif %}
-          {% comment %} 商品名を表示 {% endcomment %}
-          <li class="flex items-center gap-2">
-            <span class="text-gray-400">&gt;</span>
-            <span>{{ product.title }}</span>
-          </li>
-        {% endif %}
-      {% endif %}
-
       {% comment %} 検索ページ {% endcomment %}
       {% if template.name == 'search' %}
         <li class="flex items-center gap-2">
