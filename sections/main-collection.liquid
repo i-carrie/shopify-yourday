@@ -1,63 +1,67 @@
-<div class="py-8">
-  <div class="max-w-6xl mx-auto px-4 md:px-8">
-    <!-- パンくずナビ -->
-    <nav class="mb-8 text-center">
-      <a
-        href="{{ routes.collections_url }}"
-        class="text-sm text-gray-600 hover:text-[#C2A992] transition-colors inline-flex items-center gap-2"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-        </svg>
-        コレクション一覧に戻る
-      </a>
-    </nav>
+{% comment %}
+  PLP（コレクションページ）のメインセクション
+  左右幅を他のページ（max-w-6xl）と完全に同期させているよ
+{% endcomment %}
 
-    {% paginate collection.products by section.settings.number_of_products_per_page %}
-      <!-- コレクションタイトル -->
-      <h1 class="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">
-        {% if section.settings.custom_title != blank %}
-          {{ section.settings.custom_title }}
-        {% else %}
-          {{ collection.title }}
-        {% endif %}
-      </h1>
+<section class="max-w-6xl mx-auto px-4 py-8 md:px-8 lg:py-12">
+  {% comment %} コレクション一覧に戻るリンク：PDPの余白感と合わせているよ {% endcomment %}
+  <nav class="mb-8 text-center">
+    <a
+      href="{{ routes.collections_url }}"
+      class="text-sm text-gray-600 hover:text-[#C2A992] transition-colors inline-flex items-center gap-2"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      コレクション一覧に戻る
+    </a>
+  </nav>
 
-      <!-- コレクション説明 -->
-      {% if collection.description != blank %}
-        <div class="max-w-3xl mx-auto mb-12 text-center text-gray-600">
-          {{ collection.description }}
-        </div>
-      {% endif %}
-
-      <!-- 商品グリッド -->
-      {% if collection.products.size > 0 %}
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {% for product in collection.products %}
-            {% render 'product-card', product: product, collection: collection %}
-          {% endfor %}
-        </div>
-
-        <!-- ページネーション -->
-        {% if paginate.pages > 1 %}
-          <div class="mt-8">
-            {% render 'pagination', paginate: paginate %}
-          </div>
-        {% endif %}
+  {% paginate collection.products by section.settings.number_of_products_per_page %}
+    {% comment %} タイトルエリア {% endcomment %}
+    <h1 class="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">
+      {% if section.settings.custom_title != blank %}
+        {{ section.settings.custom_title }}
       {% else %}
-        <div class="text-center py-16">
-          <p class="text-xl text-gray-500">このコレクションには商品がまだ登録されていません</p>
-          <a
-            href="{{ routes.collections_url }}"
-            class="mt-6 inline-block px-6 py-3 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
-          >
-            他のコレクションを見る
-          </a>
+        {{ collection.title }}
+      {% endif %}
+    </h1>
+
+    {% comment %} コレクション説明 {% endcomment %}
+    {% if collection.description != blank %}
+      <div class="max-w-3xl mx-auto mb-12 text-center text-gray-600">
+        {{ collection.description }}
+      </div>
+    {% endif %}
+
+    {% comment %} 商品グリッド本体：ここが PLP の核となる部分だよ {% endcomment %}
+    {% if collection.products.size > 0 %}
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        {% for product in collection.products %}
+          {% render 'product-card', product: product, collection: collection %}
+        {% endfor %}
+      </div>
+
+      {% comment %} ページネーション {% endcomment %}
+      {% if paginate.pages > 1 %}
+        <div class="mt-12 flex justify-center">
+          {% render 'pagination', paginate: paginate %}
         </div>
       {% endif %}
-    {% endpaginate %}
-  </div>
-{% comment %} </div> {% endcomment %}
+    {% else %}
+      {% comment %} 商品がない場合の表示 {% endcomment %}
+      <div class="text-center py-16">
+        <p class="text-xl text-gray-500">このコレクションには商品がまだ登録されていません</p>
+        <a
+          href="{{ routes.collections_url }}"
+          class="mt-6 inline-block px-8 py-3 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-colors"
+        >
+          他のコレクションを見る
+        </a>
+      </div>
+    {% endif %}
+  {% endpaginate %}
+</section>
 
 {% schema %}
 {
