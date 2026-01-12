@@ -44,6 +44,14 @@
           {% endfor %}
         {% endif %}
 
+        {% comment %} デバッグ用 - あとで削除 {% endcomment %}
+        <div style="background: yellow; padding: 10px;">
+          DEBUG: canonical_url = {{ canonical_url -}}
+          <br>
+          DEBUG: collection_param = {{ collection_param -}}
+          <br>
+        </div>
+
         {% comment %} vendorsコレクションかどうかを判定 {% endcomment %}
         {% assign is_vendors_collection = false %}
         {% if collection_param == 'vendors' %}
