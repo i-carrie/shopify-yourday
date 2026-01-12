@@ -1,5 +1,5 @@
-<div class="py-8">
-  <div class="max-w-6xl mx-auto px-4 md:px-8">
+<div class="px-4 py-8">
+  <div class="max-w-7xl mx-auto">
     <!-- パンくずナビ -->
     <nav class="mb-8 text-center">
       <a
@@ -32,17 +32,24 @@
 
       <!-- 商品グリッド -->
       {% if collection.products.size > 0 %}
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div
+          class="
+            grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8
+            {% if section.settings.products_per_row == 2 %}lg:grid-cols-2
+            {% elsif section.settings.products_per_row == 3 %}lg:grid-cols-3
+            {% elsif section.settings.products_per_row == 4 %}lg:grid-cols-4
+            {% elsif section.settings.products_per_row == 5 %}lg:grid-cols-5
+            {% endif %}
+          "
+        >
           {% for product in collection.products %}
-            {% render 'product-card', product: product, collection: collection %}
+            {% render 'product-card', product: product %}
           {% endfor %}
         </div>
 
         <!-- ページネーション -->
         {% if paginate.pages > 1 %}
-          <div class="mt-8">
-            {% render 'pagination', paginate: paginate %}
-          </div>
+          {% render 'pagination', paginate: paginate %}
         {% endif %}
       {% else %}
         <div class="text-center py-16">
@@ -57,7 +64,7 @@
       {% endif %}
     {% endpaginate %}
   </div>
-{% comment %} </div> {% endcomment %}
+</div>
 
 {% schema %}
 {
@@ -71,12 +78,21 @@
     },
     {
       "type": "range",
+      "id": "products_per_row",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "1行あたりの商品数（デスクトップ）",
+      "default": 4
+    },
+    {
+      "type": "range",
       "id": "number_of_products_per_page",
       "min": 8,
       "max": 48,
       "step": 4,
       "label": "1ページあたりの商品数",
-      "default": 12
+      "default": 8
     }
   ]
 }
