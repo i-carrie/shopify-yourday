@@ -27,10 +27,12 @@
         </li>
 
         {% comment %} vendorsコレクションかどうかを判定 {% endcomment %}
-        {% assign is_vendors_collection = false %}
-        {% if collection_param == 'vendors' %}
-          {% assign is_vendors_collection = true %}
-        {% endif %}
+        {% comment %}
+          {% assign is_vendors_collection = false %}
+          {% if collection_param == 'vendors' %}
+            {% assign is_vendors_collection = true %}
+          {% endif %}
+        {% endcomment %}
 
         {% comment %} ブランドページから来た場合は販売元名のみ表示 {% endcomment %}
         {% if is_vendors_collection %}
