@@ -542,7 +542,7 @@
         {% form 'product', product %}
           <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
           <div class="flex gap-3 h-[50px] mt-4">
-            <div class="flex-1 bg-pink-400">ボタン1</div>
+            <div class="flex-1 bg-pink-400"><button type="submit" name="add"></div>
             <div class="flex-1 bg-gray-400">ボタン2</div>
           </div>
         {% endform %}
