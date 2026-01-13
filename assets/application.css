@@ -1630,6 +1630,36 @@
       padding-block: calc(var(--spacing) * 12);
     }
   }
+  .\[\&_\.shopify-payment-button\]\:h-full {
+    & .shopify-payment-button {
+      height: 100%;
+    }
+  }
+  .\[\&_\.shopify-payment-button__button\]\:m-0 {
+    & .shopify-payment-button  button {
+      margin: calc(var(--spacing) * 0);
+    }
+  }
+  .\[\&_\.shopify-payment-button__button\]\:h-full {
+    & .shopify-payment-button  button {
+      height: 100%;
+    }
+  }
+  .\[\&_\.shopify-payment-button__button\]\:min-h-0 {
+    & .shopify-payment-button  button {
+      min-height: calc(var(--spacing) * 0);
+    }
+  }
+  .\[\&_\.shopify-payment-button__button\]\:rounded-none {
+    & .shopify-payment-button  button {
+      border-radius: 0;
+    }
+  }
+  .\[\&_\.shopify-payment-button_div\]\:h-full {
+    & .shopify-payment-button div {
+      height: 100%;
+    }
+  }
   .\[\&\>div\]\:h-full {
     &>div {
       height: 100%;
