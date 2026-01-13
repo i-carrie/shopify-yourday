@@ -534,6 +534,11 @@
           </div>
         </div>
 
+        <div class="flex gap-3 h-[50px] mt-4">
+          <div class="flex-1 bg-black"></div>
+          <div class="flex-1 bg-gray-400"></div>
+        </div>
+
         {% comment %}
           <div class="mt-6">
             <button
@@ -546,7 +551,7 @@
         {% endcomment %}
 
         <div class="mt-6">
-          {%- form 'product', product -%}
+          {% form 'product', product %}
             <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
 
             <div class="grid grid-cols-2 gap-3 h-[50px] [&_*]:h-full [&_button]:min-h-0 [&_button]:m-0 [&_button]:rounded-none [&_button]:border-0 [&_button]:p-0">
@@ -559,7 +564,7 @@
               </button>
               {{ form | payment_button }}
             </div>
-          {%- endform -%}
+          {% endform %}
         </div>
       </div>
 
