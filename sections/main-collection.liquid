@@ -10,6 +10,15 @@
   >
 </nav>
 
+<!-- コレクションタイトル -->
+<h1 class="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">
+  {% if section.settings.custom_title != blank %}
+    {{ section.settings.custom_title }}
+  {% else %}
+    {{ collection.title }}
+  {% endif %}
+</h1>
+
 <section class="max-w-6xl mx-auto px-4 py-12 md:px-8">
   <div class="text-center mb-8">
     <h2 class="text-lg md:text-xl font-serif text-gray-800 tracking-wide">カテゴリー</h2>
