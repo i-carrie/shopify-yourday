@@ -534,13 +534,37 @@
           </div>
         </div>
 
+        {% comment %}
+          <div class="mt-6">
+            <button
+              id="AddToCart"
+              class="w-full bg-black text-white py-4 font-bold text-sm hover:bg-gray-800 transition uppercase tracking-widest"
+            >
+              ADD TO CART
+            </button>
+          </div>
+        {% endcomment %}
+
         <div class="mt-6">
-          <button
-            id="AddToCart"
-            class="w-full bg-black text-white py-4 font-bold text-sm hover:bg-gray-800 transition uppercase tracking-widest"
-          >
-            ADD TO CART
-          </button>
+          {% form 'product', product %}
+            {% comment %} どのバリアントを買うか指定するための隠し入力（とりあえず最初のものを指定） {% endcomment %}
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+            <div class="flex flex-col gap-3">
+              {% comment %} 1. カートに入れるボタン {% endcomment %}
+              <button
+                id="AddToCart"
+                type="submit"
+                name="add"
+                class="w-full bg-black text-white py-4 font-bold text-sm hover:bg-gray-800 transition uppercase tracking-widest"
+              >
+                ADD TO CART
+              </button>
+
+              {% comment %} 2. いますぐ購入ボタン（Shopifyが自動生成） {% endcomment %}
+              {{ form | payment_button }}
+            </div>
+          {% endform %}
         </div>
       </div>
 
