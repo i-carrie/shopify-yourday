@@ -541,8 +541,16 @@
 
         {% form 'product', product %}
           <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-          <div class="flex gap-3 h-[40px] mt-4">
-            <div class="flex-1 bg-pink-400"><button type="submit" name="add">add</button></div>
+          <div class="flex gap-3 h-[45px] mt-4">
+            <div class="flex-1 bg-pink-400">
+              <button
+                type="submit"
+                name="add"
+                class="bg-black text-white font-bold text-[10px] md:text-sm uppercase tracking-widest flex items-center justify-center hover:bg-gray-800 transition"
+              >
+                add
+              </button>
+            </div>
             <div class="flex-1 bg-gray-400">{{ form | payment_button }}</div>
           </div>
         {% endform %}
