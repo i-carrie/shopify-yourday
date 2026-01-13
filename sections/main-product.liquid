@@ -545,31 +545,35 @@
           </div>
         {% endcomment %}
 
-<div class="mt-6">
-  {% form 'product', product %}
-    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-    
-    {% comment %} flex-row で横並びにし、gap-3 でボタン間に隙間を作る {% endcomment %}
-    <div class="flex flex-row gap-3 items-stretch">
-      
-      {% comment %} 1. カートに入れるボタン（flex-1 で幅を均等に） {% endcomment %}
-      <button
-        id="AddToCart"
-        type="submit"
-        name="add"
-        class="flex-1 bg-black text-white py-4 font-bold text-[10px] md:text-sm hover:bg-gray-800 transition uppercase tracking-widest"
-      >
-        ADD TO CART
-      </button>
+        <div class="mt-6">
+          {% form 'product', product %}
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
 
-      {% comment %} 2. いますぐ購入ボタン（親要素に flex-1 をつけて幅を均等に） {% endcomment %}
-      <div class="flex-1">
-        {{ form | payment_button }}
+            <div class="flex flex-row gap-3 items-stretch">
+              {% comment %}
+                「カートに入れる」ボタン
+                h-[50px] で高さを固定。py-4 などの余白指定は外してOK！
+              {% endcomment %}
+              <button
+                id="AddToCart"
+                type="submit"
+                name="add"
+                class="flex-1 bg-black text-white h-[50px] font-bold text-[10px] md:text-sm hover:bg-gray-800 transition uppercase tracking-widest"
+              >
+                ADD TO CART
+              </button>
+
+              {% comment %}
+                「いますぐ購入」ボタンの親要素
+                同じく h-[50px] を指定し、中のボタンが親いっぱいに広がるように設定。
+              {% endcomment %}
+              <div class="flex-1 h-[50px] [&>div]:h-full">
+                {{ form | payment_button }}
+              </div>
+            </div>
+          {% endform %}
+        </div>
       </div>
-
-    </div>
-  {% endform %}
-</div>
 
       <div class="border-t border-gray-200 mt-2">
         <details class="group">
