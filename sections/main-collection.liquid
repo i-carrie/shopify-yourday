@@ -40,12 +40,7 @@
     <div class="flex flex-col items-center">
       <a href="/collections/bath" class="w-full group">
         <div class="aspect-[4/5] bg-gray-100 rounded-2xl overflow-hidden relative">
-          <img
-            src="//yourday-dev-p.myshopify.com/cdn/shop/collections/bath.png?v=1767608082&amp;width=600"
-            alt="お風呂でケア"
-            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-          >
+          {{ 'collection-1' | placeholder_svg_tag: 'w-full h-full bg-gray-200' }}
 
           <div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-300"></div>
 
