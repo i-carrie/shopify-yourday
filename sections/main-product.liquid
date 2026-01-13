@@ -538,23 +538,7 @@
           <div class="flex-1 bg-black"></div>
           <div class="flex-1 bg-gray-400"></div>
         </div>
-        {% form 'product', product %}
-          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-          <div class="flex gap-3 h-[50px] mt-6">
-            <div class="flex-1 bg-black">
-              <button
-                type="submit"
-                name="add"
-                class="w-full h-full text-white font-bold text-[10px] md:text-sm uppercase tracking-widest flex items-center justify-center border-0 m-0 p-0"
-              >
-                ADD TO CART
-              </button>
-            </div>
-            <div class="flex-1 [&_.shopify-payment-button]:h-full [&_.shopify-payment-button_div]:h-full [&_.shopify-payment-button__button]:h-full [&_.shopify-payment-button__button]:min-h-0 [&_.shopify-payment-button__button]:m-0 [&_.shopify-payment-button__button]:rounded-none [&_.shopify-payment-button__button]:border-0">
-              {{ form | payment_button }}
-            </div>
-          </div>
-        {% endform %}
+
         {% comment %}
           <div class="mt-6">
             <button
