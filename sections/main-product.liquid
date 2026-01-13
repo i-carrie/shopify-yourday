@@ -545,28 +545,31 @@
           </div>
         {% endcomment %}
 
-        <div class="mt-6">
-          {% form 'product', product %}
-            {% comment %} どのバリアントを買うか指定するための隠し入力（とりあえず最初のものを指定） {% endcomment %}
-            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+<div class="mt-6">
+  {% form 'product', product %}
+    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+    
+    {% comment %} flex-row で横並びにし、gap-3 でボタン間に隙間を作る {% endcomment %}
+    <div class="flex flex-row gap-3 items-stretch">
+      
+      {% comment %} 1. カートに入れるボタン（flex-1 で幅を均等に） {% endcomment %}
+      <button
+        id="AddToCart"
+        type="submit"
+        name="add"
+        class="flex-1 bg-black text-white py-4 font-bold text-[10px] md:text-sm hover:bg-gray-800 transition uppercase tracking-widest"
+      >
+        ADD TO CART
+      </button>
 
-            <div class="flex flex-col gap-3">
-              {% comment %} 1. カートに入れるボタン {% endcomment %}
-              <button
-                id="AddToCart"
-                type="submit"
-                name="add"
-                class="w-full bg-black text-white py-4 font-bold text-sm hover:bg-gray-800 transition uppercase tracking-widest"
-              >
-                ADD TO CART
-              </button>
-
-              {% comment %} 2. いますぐ購入ボタン（Shopifyが自動生成） {% endcomment %}
-              {{ form | payment_button }}
-            </div>
-          {% endform %}
-        </div>
+      {% comment %} 2. いますぐ購入ボタン（親要素に flex-1 をつけて幅を均等に） {% endcomment %}
+      <div class="flex-1">
+        {{ form | payment_button }}
       </div>
+
+    </div>
+  {% endform %}
+</div>
 
       <div class="border-t border-gray-200 mt-2">
         <details class="group">
