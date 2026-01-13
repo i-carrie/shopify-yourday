@@ -549,26 +549,25 @@
           {% form 'product', product %}
             <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
 
-            {% comment %} grid-cols-2 で 1:1 にし、items-stretch で高さを揃えるベースを作る {% endcomment %}
-            <div class="grid grid-cols-2 gap-3 items-stretch">
+            <div class="flex flex-row gap-3 items-stretch">
               {% comment %}
-                ADD TO CART ボタン
-                h-full をつけることで、隣のボタンに合わせて伸び縮みするようにする
+                「カートに入れる」ボタン
+                h-[50px] で高さを固定。py-4 などの余白指定は外してOK！
               {% endcomment %}
               <button
                 id="AddToCart"
                 type="submit"
                 name="add"
-                class="bg-black text-white py-4 font-bold text-[10px] md:text-sm hover:bg-gray-800 transition uppercase tracking-widest h-full"
+                class="flex-1 bg-black text-white h-[50px] font-bold text-[10px] md:text-sm hover:bg-gray-800 transition uppercase tracking-widest"
               >
                 ADD TO CART
               </button>
 
               {% comment %}
-                いますぐ購入ボタンの親
-                CSSで制御しやすいように独自クラス（pdp-buy-now）を付与
+                「いますぐ購入」ボタンの親要素
+                同じく h-[50px] を指定し、中のボタンが親いっぱいに広がるように設定。
               {% endcomment %}
-              <div class="pdp-buy-now">
+              <div class="flex-1 h-[50px] [&>div]:h-full">
                 {{ form | payment_button }}
               </div>
             </div>
