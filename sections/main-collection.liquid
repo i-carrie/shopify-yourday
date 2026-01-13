@@ -29,7 +29,15 @@
 {% paginate collection.products by section.settings.number_of_products_per_page %}
   {% if collection.products.size > 0 %}
     <section class="max-w-6xl mx-auto px-4 py-12 md:px-8">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+      <div
+        class="
+          grid grid-cols-2 gap-4 md:gap-8
+          {% if section.settings.products_per_row == 2 %}md:grid-cols-2
+          {% elsif section.settings.products_per_row == 3 %}md:grid-cols-3
+          {% elsif section.settings.products_per_row == 4 %}md:grid-cols-4
+          {% endif %}
+        "
+      >
         {% for product in collection.products %}
           <div class="flex flex-col items-center">
             {% render 'product-card', product: product, collection: collection %}
@@ -69,12 +77,21 @@
     },
     {
       "type": "range",
+      "id": "products_per_row",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "1行あたりの商品数（デスクトップ）",
+      "default": 4
+    },
+    {
+      "type": "range",
       "id": "number_of_products_per_page",
       "min": 8,
-      "max": 48,
+      "max": 16,
       "step": 4,
       "label": "1ページあたりの商品数",
-      "default": 12
+      "default": 8
     }
   ]
 }
