@@ -102,6 +102,29 @@
   </div>
 </section>
 
+{% schema %}
+{
+  "name": "Main Collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "custom_title",
+      "label": "タイトル",
+      "info": "例: 商品、おすすめ商品など"
+    },
+    {
+      "type": "range",
+      "id": "number_of_products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "label": "1ページあたりの商品数",
+      "default": 12
+    }
+  ]
+}
+{% endschema %}
+
 {% comment %}
   <div class="py-8">
     <div class="max-w-6xl mx-auto px-4 md:px-8">
