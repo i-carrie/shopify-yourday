@@ -64,42 +64,27 @@
       </div>
     {% endfor %}
 
-    {% comment %} セット商品の表示 {% endcomment %}
-    {% if product.metafields.custom.set_product != blank %}
+    {% assign related_set = product.metafields.custom.related_set.value %}
+    {% if related_set != blank %}
+      {% assign set_variant = related_set.first_available_variant %}
       <div
         class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-gray-100 js-variant-row"
-        data-variant-id="set"
+        data-variant-id="{{ set_variant.id }}"
       >
         <div class="col-span-6 flex flex-col pr-2">
-          <span class="text-sm font-bold text-gray-800 leading-snug break-words">
-            {{ product.metafields.custom.set_product.title }}
-          </span>
-          {% if product.metafields.custom.set_product.description != blank %}
-            <span class="text-[11px] text-gray-600 mt-1">
-              {{ product.metafields.custom.set_product.description }}
-            </span>
-          {% endif %}
+          <span class="text-sm font-bold text-gray-900 leading-snug">{{ related_set.title }}</span>
+          <p class="text-[12px] text-gray-500 mt-1">{{ related_set.metafields.custom.product_subtitle }}</p>
         </div>
         <div class="col-span-3 text-right">
-          {% if product.metafields.custom.set_product.compare_at_price %}
-            <div class="flex flex-col items-end gap-1">
-              <span class="text-sm text-red-600 font-medium line-through">
-                {{ product.metafields.custom.set_product.compare_at_price | money }}
-              </span>
-              <span class="text-sm text-gray-700">
-                {{ product.metafields.custom.set_product.price | money }}
-              </span>
-            </div>
-          {% else %}
-            <span class="text-sm text-gray-700">
-              {{ product.metafields.custom.set_product.price | money }}
-            </span>
-          {% endif %}
+          <div class="flex flex-col">
+            <span class="text-[14px] text-pink-700 line-through">{{ related_set.compare_at_price | money }}</span>
+            <span class="text-sm text-gray-600">{{ related_set.price | money }}</span>
+          </div>
         </div>
         <div class="col-span-3 flex justify-center">
           <div style="position: relative; width: 64px;">
             <select
-              name="updates[set]"
+              name="updates[{{ set_variant.id }}]"
               class="js-matrix-quantity"
               style="width: 100%; padding: 6px 20px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
             >
