@@ -748,6 +748,61 @@
   })();
 </script>
 
+<script>
+  // ========================================
+  // Ajax Cart 機能
+  // ========================================
+  document.addEventListener('DOMContentLoaded', function () {
+    const productForm = document.getElementById('product-form-{{ section.id }}');
+    const addToCartButton = document.getElementById('add-to-cart-button');
+
+    if (productForm && addToCartButton) {
+      const originalText = addToCartButton.textContent;
+
+      productForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        // ボタンを無効化
+        addToCartButton.disabled = true;
+        addToCartButton.textContent = '追加中...';
+
+        try {
+          const formData = new FormData(productForm);
+
+          const cartData = {
+            id: formData.get('id'),
+            quantity: parseInt(formData.get('quantity') || 1),
+            properties: {},
+          };
+
+          // ギフトオプションを追加（もしあれば）
+          const giftWrapping = formData.get('properties[ギフトラッピング]');
+          if (giftWrapping) {
+            cartData.properties['ギフトラッピング'] = giftWrapping;
+          }
+
+          const giftMessage = formData.get('properties[ギフトメッセージ]');
+          if (giftMessage && giftMessage.trim()) {
+            cartData.properties['ギフトメッセージ'] = giftMessage.trim();
+          }
+
+          // カートに追加
+          await window.cartAPI.addToCart(cartData);
+
+          // 成功メッセージ
+          window.cartAPI.showToast('カートに追加しました', 'success');
+        } catch (error) {
+          console.error('Error:', error);
+          window.cartAPI.showToast(error.message || 'カートへの追加に失敗しました', 'error');
+        } finally {
+          addToCartButton.disabled = false;
+          addToCartButton.textContent = originalText;
+        }
+      });
+    }
+  });
+</script>
+
 {% schema %}
 {
   "name": "メイン商品",
