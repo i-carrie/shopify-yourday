@@ -1,5 +1,5 @@
 {% comment %}
-  Product Cart Section
+  Product Cart Section - Fixed Version
   カート関連機能（バリアント選択、ギフトオプション、カートボタン）
 
   Parameters:
@@ -8,8 +8,15 @@
 {% endcomment %}
 
 {% assign has_multiple_variants = false %}
+{% assign has_set_product = false %}
+
 {% if product.variants.size > 1 %}
   {% assign has_multiple_variants = true %}
+{% endif %}
+
+{% assign related_set = product.metafields.custom.related_set.value %}
+{% if related_set != blank %}
+  {% assign has_set_product = true %}
 {% endif %}
 
 {% comment %} マトリックス・バリエーションセレクター {% endcomment %}
@@ -50,6 +57,7 @@
             <select
               name="updates[{{ variant.id }}]"
               class="js-matrix-quantity"
+              data-variant-id="{{ variant.id }}"
               style="width: 100%; padding: 6px 20px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
             >
               {% for i in (0..10) %}
@@ -64,8 +72,7 @@
       </div>
     {% endfor %}
 
-    {% assign related_set = product.metafields.custom.related_set.value %}
-    {% if related_set != blank %}
+    {% if has_set_product %}
       {% assign set_variant = related_set.first_available_variant %}
       <div
         class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-gray-100 js-variant-row"
@@ -77,7 +84,9 @@
         </div>
         <div class="col-span-3 text-right">
           <div class="flex flex-col">
-            <span class="text-[14px] text-pink-700 line-through">{{ related_set.compare_at_price | money }}</span>
+            {% if related_set.compare_at_price > related_set.price %}
+              <span class="text-[14px] text-pink-700 line-through">{{ related_set.compare_at_price | money }}</span>
+            {% endif %}
             <span class="text-sm text-gray-600">{{ related_set.price | money }}</span>
           </div>
         </div>
@@ -86,6 +95,7 @@
             <select
               name="updates[{{ set_variant.id }}]"
               class="js-matrix-quantity"
+              data-variant-id="{{ set_variant.id }}"
               style="width: 100%; padding: 6px 20px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
             >
               {% for i in (0..10) %}
@@ -116,6 +126,7 @@
     <label class="flex items-start gap-3 cursor-pointer group">
       <input
         type="checkbox"
+        id="gift-wrapping-checkbox-{{ section_id }}"
         name="properties[ギフトラッピング]"
         value="希望する"
         class="mt-1 w-4 h-4 text-stone-800 border-stone-300 rounded focus:ring-stone-500"
@@ -132,9 +143,9 @@
     <label class="flex items-start gap-3 cursor-pointer group mb-2">
       <input
         type="checkbox"
-        id="gift-message-toggle"
+        id="gift-message-toggle-{{ section_id }}"
         class="mt-1 w-4 h-4 text-stone-800 border-stone-300 rounded focus:ring-stone-500"
-        onchange="document.getElementById('gift-message-input').classList.toggle('hidden')"
+        onchange="document.getElementById('gift-message-input-{{ section_id }}').classList.toggle('hidden')"
       >
       <div class="flex-1">
         <span class="text-sm text-stone-700 group-hover:text-stone-900"> メッセージカードを追加 </span>
@@ -142,8 +153,9 @@
       </div>
     </label>
 
-    <div id="gift-message-input" class="hidden">
+    <div id="gift-message-input-{{ section_id }}" class="hidden">
       <textarea
+        id="gift-message-textarea-{{ section_id }}"
         name="properties[ギフトメッセージ]"
         rows="3"
         maxlength="100"
@@ -157,34 +169,153 @@
 
 {% comment %} カートボタン {% endcomment %}
 <div class="mt-6">
-  {% if has_multiple_variants %}
-    {% comment %} バリアントありの場合：カートに追加ボタンのみ {% endcomment %}
-    {% form 'product', product, id: 'product-form-{{ section_id }}' %}
+  {% if has_multiple_variants or has_set_product %}
+    {% comment %} バリアントありまたはセット商品がある場合：カートに追加ボタンのみ {% endcomment %}
+    <form id="product-form-{{ section_id }}" class="product-form">
       <button
         type="submit"
-        name="add"
-        id="add-to-cart-button"
-        class="w-full h-[45px] bg-black text-white font-bold text-[14px] md:text-sm uppercase tracking-widest flex items-center justify-center hover:bg-gray-800 transition"
+        id="add-to-cart-button-{{ section_id }}"
+        class="w-full h-[45px] bg-black text-white font-bold text-[14px] md:text-sm uppercase tracking-widest flex items-center justify-center hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         カートに追加する
       </button>
-    {% endform %}
+    </form>
   {% else %}
-    {% comment %} バリアントなしの場合：カートに追加 + 今すぐ購入 {% endcomment %}
-    {% form 'product', product, id: 'product-form-{{ section_id }}' %}
-      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-
-      <div class="grid grid-cols-2 gap-3 h-[45px] [&_*]:h-full [&_button]:min-h-0 [&_button]:m-0 [&_button]:p-0 [&_button]:rounded-none [&_button]:border-0 [&_button]:p-0">
+    {% comment %} バリアントなしかつセット商品なしの場合：カートに追加 + 今すぐ購入 {% endcomment %}
+    <div class="grid grid-cols-2 gap-3">
+      <form id="product-form-{{ section_id }}" class="product-form">
         <button
           type="submit"
-          name="add"
-          id="add-to-cart-button"
-          class="bg-black text-white font-bold text-[14px] md:text-sm uppercase tracking-widest flex items-center justify-center hover:bg-gray-800 transition"
+          id="add-to-cart-button-{{ section_id }}"
+          class="w-full h-[45px] bg-black text-white font-bold text-[14px] md:text-sm uppercase tracking-widest flex items-center justify-center hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           カートに追加する
         </button>
-        {{ form | payment_button }}
-      </div>
-    {% endform %}
+      </form>
+
+      {% comment %} 今すぐ購入ボタン - Shopifyのネイティブ機能を使用 {% endcomment %}
+      {% form 'product', product, id: 'buy-now-form-{{ section_id }}' %}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        <div class="h-[45px] [&_*]:h-full [&_button]:min-h-0 [&_button]:m-0 [&_button]:p-0 [&_button]:rounded-none [&_button]:border-0">
+          {{ form | payment_button }}
+        </div>
+      {% endform %}
+    </div>
   {% endif %}
 </div>
+
+<script>
+  (function () {
+    const formId = 'product-form-{{ section_id }}';
+    const buttonId = 'add-to-cart-button-{{ section_id }}';
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById(formId);
+      const button = document.getElementById(buttonId);
+
+      if (!form || !button) return;
+
+      const originalButtonText = button.textContent;
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        // 選択された商品を収集
+        const itemsToAdd = [];
+        const quantitySelects = form.querySelectorAll('.js-matrix-quantity');
+
+        quantitySelects.forEach((select) => {
+          const quantity = parseInt(select.value);
+          const variantId = select.getAttribute('data-variant-id');
+
+          if (quantity > 0 && variantId) {
+            itemsToAdd.push({
+              id: variantId,
+              quantity: quantity,
+            });
+          }
+        });
+
+        // 何も選択されていない場合
+        if (itemsToAdd.length === 0) {
+          if (window.cartAPI) {
+            window.cartAPI.showToast('数量を選択してください', 'error');
+          } else {
+            alert('数量を選択してください');
+          }
+          return;
+        }
+
+        // ボタンを無効化
+        button.disabled = true;
+        button.textContent = '追加中...';
+
+        try {
+          // ギフトオプションを取得
+          const giftWrappingCheckbox = document.getElementById('gift-wrapping-checkbox-{{ section_id }}');
+          const giftMessageTextarea = document.getElementById('gift-message-textarea-{{ section_id }}');
+          const giftMessageToggle = document.getElementById('gift-message-toggle-{{ section_id }}');
+
+          const giftWrapping = giftWrappingCheckbox && giftWrappingCheckbox.checked ? '希望する' : null;
+          const giftMessage =
+            giftMessageToggle && giftMessageToggle.checked && giftMessageTextarea
+              ? giftMessageTextarea.value.trim()
+              : null;
+
+          // 各アイテムをカートに追加
+          for (const item of itemsToAdd) {
+            const cartData = {
+              id: item.id,
+              quantity: item.quantity,
+              properties: {},
+            };
+
+            // ギフトオプションを追加
+            if (giftWrapping) {
+              cartData.properties['ギフトラッピング'] = giftWrapping;
+            }
+
+            if (giftMessage) {
+              cartData.properties['ギフトメッセージ'] = giftMessage;
+            }
+
+            if (window.cartAPI) {
+              await window.cartAPI.addToCart(cartData);
+            } else {
+              // Fallback: cartAPI がない場合は標準のCart API を使用
+              const response = await fetch('/cart/add.js', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ items: [cartData] }),
+              });
+
+              if (!response.ok) {
+                throw new Error('カートへの追加に失敗しました');
+              }
+            }
+          }
+
+          // 成功メッセージ
+          if (window.cartAPI) {
+            window.cartAPI.showToast('カートに追加しました', 'success');
+          } else {
+            alert('カートに追加しました');
+          }
+        } catch (error) {
+          console.error('Add to cart error:', error);
+          if (window.cartAPI) {
+            window.cartAPI.showToast(error.message || 'カートへの追加に失敗しました', 'error');
+          } else {
+            alert(error.message || 'カートへの追加に失敗しました');
+          }
+        } finally {
+          // ボタンを元に戻す
+          button.disabled = false;
+          button.textContent = originalButtonText;
+        }
+      });
+    });
+  })();
+</script>
