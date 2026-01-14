@@ -22,23 +22,28 @@ class CartAPI {
     }
   }
 
-  /**
+/**
    * カートに商品を追加
    * @param {Object} data - { id: variantId, quantity: 1, properties: {} }
    */
   async addToCart(data) {
     try {
+      // items形式に変換
+      const requestData = {
+        items: [data]
+      };
+      
       const response = await fetch('/cart/add.js', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(requestData)
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.description || 'カートへの追加に失敗しました');
+        throw new Error(error.description || error.message || 'カートへの追加に失敗しました');
       }
 
       const result = await response.json();
