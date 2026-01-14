@@ -1,5 +1,5 @@
 {% comment %}
-  Product Cart Section - Fixed Version
+  Product Cart Section - Fixed Version V2
   カート関連機能（バリアント選択、ギフトオプション、カートボタン）
 
   Parameters:
@@ -19,30 +19,189 @@
   {% assign has_set_product = true %}
 {% endif %}
 
-{% comment %} マトリックス・バリエーションセレクター {% endcomment %}
-<div class="matrix-variant-selector pt-1 mt-1">
-  <div class="grid grid-cols-12 gap-2 pb-2 border-b border-gray-200 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-    <div class="col-span-6">
-      {% if product.has_only_default_variant %}商品名{% else %}{{ product.options.first }}{% endif %}
-    </div>
-    <div class="col-span-3 text-right">価格</div>
-    <div class="col-span-3 text-center">個数</div>
-  </div>
+{% comment %} フォームの開始 {% endcomment %}
+{% if has_multiple_variants or has_set_product %}
+  {% comment %} バリアントありまたはセット商品がある場合：カートに追加ボタンのみ {% endcomment %}
+  <form id="product-form-{{ section_id }}" class="product-form">
+    {% comment %} マトリックス・バリエーションセレクター {% endcomment %}
+    <div class="matrix-variant-selector pt-1 mt-1">
+      <div class="grid grid-cols-12 gap-2 pb-2 border-b border-gray-200 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+        <div class="col-span-6">
+          {% if product.has_only_default_variant %}商品名{% else %}{{ product.options.first }}{% endif %}
+        </div>
+        <div class="col-span-3 text-right">価格</div>
+        <div class="col-span-3 text-center">個数</div>
+      </div>
 
-  <div class="space-y-0">
-    {% for variant in product.variants %}
+      <div class="space-y-0">
+        {% for variant in product.variants %}
+          <div
+            class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-gray-100 js-variant-row"
+            data-variant-id="{{ variant.id }}"
+          >
+            <div class="col-span-6 flex flex-col pr-2">
+              <span class="text-sm font-bold text-gray-800 leading-snug break-words">
+                {% if product.has_only_default_variant %}
+                  {{ product.title }}
+                {% else %}
+                  {{ variant.title }}
+                {% endif %}
+              </span>
+              {% if variant.inventory_quantity <= 5 and variant.inventory_quantity > 0 %}
+                <span class="text-[10px] text-red-500 font-bold mt-1"
+                  >残りわずか（{{ variant.inventory_quantity }}個）</span
+                >
+              {% endif %}
+            </div>
+            <div class="col-span-3 text-right">
+              <span class="text-sm text-gray-700">{{ variant.price | money }}</span>
+            </div>
+            <div class="col-span-3 flex justify-center">
+              <div style="position: relative; width: 64px;">
+                <select
+                  name="updates[{{ variant.id }}]"
+                  class="js-matrix-quantity"
+                  data-variant-id="{{ variant.id }}"
+                  style="width: 100%; padding: 6px 20px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
+                >
+                  {% for i in (0..10) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                  {% endfor %}
+                </select>
+                <div style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 8px;">
+                  ▼
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+
+        {% if has_set_product %}
+          {% assign set_variant = related_set.first_available_variant %}
+          <div
+            class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-gray-100 js-variant-row"
+            data-variant-id="{{ set_variant.id }}"
+          >
+            <div class="col-span-6 flex flex-col pr-2">
+              <span class="text-sm font-bold text-gray-900 leading-snug">{{ related_set.title }}</span>
+              <p class="text-[12px] text-gray-500 mt-1">{{ related_set.metafields.custom.product_subtitle }}</p>
+            </div>
+            <div class="col-span-3 text-right">
+              <div class="flex flex-col">
+                {% if related_set.compare_at_price > related_set.price %}
+                  <span class="text-[14px] text-pink-700 line-through">{{ related_set.compare_at_price | money }}</span>
+                {% endif %}
+                <span class="text-sm text-gray-600">{{ related_set.price | money }}</span>
+              </div>
+            </div>
+            <div class="col-span-3 flex justify-center">
+              <div style="position: relative; width: 64px;">
+                <select
+                  name="updates[{{ set_variant.id }}]"
+                  class="js-matrix-quantity"
+                  data-variant-id="{{ set_variant.id }}"
+                  style="width: 100%; padding: 6px 20px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
+                >
+                  {% for i in (0..10) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                  {% endfor %}
+                </select>
+                <div style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 8px;">
+                  ▼
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% comment %} ギフトオプション {% endcomment %}
+    <div class="mt-6 bg-pink-50 border border-pink-200 rounded-lg p-6">
+      <h3 class="text-base font-medium text-stone-800 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+        </svg>
+        ギフトオプション
+      </h3>
+
+      {% comment %} ギフトラッピング {% endcomment %}
+      <div class="mb-4">
+        <label class="flex items-start gap-3 cursor-pointer group">
+          <input
+            type="checkbox"
+            id="gift-wrapping-checkbox-{{ section_id }}"
+            name="properties[ギフトラッピング]"
+            value="希望する"
+            class="mt-1 w-4 h-4 text-stone-800 border-stone-300 rounded focus:ring-stone-500"
+          >
+          <div class="flex-1">
+            <span class="text-sm text-stone-700 group-hover:text-stone-900"> ギフトラッピングを希望する </span>
+            <span class="block text-xs text-stone-500 mt-0.5"> + ¥300 </span>
+          </div>
+        </label>
+      </div>
+
+      {% comment %} メッセージカード {% endcomment %}
+      <div>
+        <label class="flex items-start gap-3 cursor-pointer group mb-2">
+          <input
+            type="checkbox"
+            id="gift-message-toggle-{{ section_id }}"
+            class="mt-1 w-4 h-4 text-stone-800 border-stone-300 rounded focus:ring-stone-500"
+            onchange="document.getElementById('gift-message-input-{{ section_id }}').classList.toggle('hidden')"
+          >
+          <div class="flex-1">
+            <span class="text-sm text-stone-700 group-hover:text-stone-900"> メッセージカードを追加 </span>
+            <span class="block text-xs text-stone-500 mt-0.5"> 無料 </span>
+          </div>
+        </label>
+
+        <div id="gift-message-input-{{ section_id }}" class="hidden">
+          <textarea
+            id="gift-message-textarea-{{ section_id }}"
+            name="properties[ギフトメッセージ]"
+            rows="3"
+            maxlength="100"
+            placeholder="メッセージを入力してください (100文字以内)"
+            class="w-full px-3 py-2 text-sm border border-stone-300 rounded focus:outline-none focus:ring-2 focus:ring-stone-500"
+          ></textarea>
+          <p class="text-xs text-stone-500 mt-1">※ メッセージは100文字以内でご入力ください</p>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} カートボタン {% endcomment %}
+    <div class="mt-6">
+      <button
+        type="submit"
+        id="add-to-cart-button-{{ section_id }}"
+        class="w-full h-[45px] bg-black text-white font-bold text-[14px] md:text-sm uppercase tracking-widest flex items-center justify-center hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        カートに追加する
+      </button>
+    </div>
+  </form>
+
+{% else %}
+  {% comment %} バリアントなしかつセット商品なしの場合：カートに追加 + 今すぐ購入 {% endcomment %}
+
+  {% comment %} マトリックス・バリエーションセレクター {% endcomment %}
+  <div class="matrix-variant-selector pt-1 mt-1">
+    <div class="grid grid-cols-12 gap-2 pb-2 border-b border-gray-200 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+      <div class="col-span-6">商品名</div>
+      <div class="col-span-3 text-right">価格</div>
+      <div class="col-span-3 text-center">個数</div>
+    </div>
+
+    <div class="space-y-0">
+      {% assign variant = product.selected_or_first_available_variant %}
       <div
         class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-gray-100 js-variant-row"
         data-variant-id="{{ variant.id }}"
       >
         <div class="col-span-6 flex flex-col pr-2">
-          <span class="text-sm font-bold text-gray-800 leading-snug break-words">
-            {% if product.has_only_default_variant %}
-              {{ product.title }}
-            {% else %}
-              {{ variant.title }}
-            {% endif %}
-          </span>
+          <span class="text-sm font-bold text-gray-800 leading-snug break-words">{{ product.title }}</span>
           {% if variant.inventory_quantity <= 5 and variant.inventory_quantity > 0 %}
             <span class="text-[10px] text-red-500 font-bold mt-1"
               >残りわずか（{{ variant.inventory_quantity }}個）</span
@@ -55,13 +214,20 @@
         <div class="col-span-3 flex justify-center">
           <div style="position: relative; width: 64px;">
             <select
-              name="updates[{{ variant.id }}]"
+              id="single-product-quantity-{{ section_id }}"
               class="js-matrix-quantity"
               data-variant-id="{{ variant.id }}"
               style="width: 100%; padding: 6px 20px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
             >
               {% for i in (0..10) %}
-                <option value="{{ i }}">{{ i }}</option>
+                <option
+                  value="{{ i }}"
+                  {% if i == 1 %}
+                    selected
+                  {% endif %}
+                >
+                  {{ i }}
+                </option>
               {% endfor %}
             </select>
             <div style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 8px;">
@@ -70,107 +236,62 @@
           </div>
         </div>
       </div>
-    {% endfor %}
-
-    {% if has_set_product %}
-      {% assign set_variant = related_set.first_available_variant %}
-      <div
-        class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-gray-100 js-variant-row"
-        data-variant-id="{{ set_variant.id }}"
-      >
-        <div class="col-span-6 flex flex-col pr-2">
-          <span class="text-sm font-bold text-gray-900 leading-snug">{{ related_set.title }}</span>
-          <p class="text-[12px] text-gray-500 mt-1">{{ related_set.metafields.custom.product_subtitle }}</p>
-        </div>
-        <div class="col-span-3 text-right">
-          <div class="flex flex-col">
-            {% if related_set.compare_at_price > related_set.price %}
-              <span class="text-[14px] text-pink-700 line-through">{{ related_set.compare_at_price | money }}</span>
-            {% endif %}
-            <span class="text-sm text-gray-600">{{ related_set.price | money }}</span>
-          </div>
-        </div>
-        <div class="col-span-3 flex justify-center">
-          <div style="position: relative; width: 64px;">
-            <select
-              name="updates[{{ set_variant.id }}]"
-              class="js-matrix-quantity"
-              data-variant-id="{{ set_variant.id }}"
-              style="width: 100%; padding: 6px 20px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
-            >
-              {% for i in (0..10) %}
-                <option value="{{ i }}">{{ i }}</option>
-              {% endfor %}
-            </select>
-            <div style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 8px;">
-              ▼
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endif %}
-  </div>
-</div>
-
-{% comment %} ギフトオプション {% endcomment %}
-<div class="mt-6 bg-pink-50 border border-pink-200 rounded-lg p-6">
-  <h3 class="text-base font-medium text-stone-800 mb-4 flex items-center gap-2">
-    <svg class="w-5 h-5 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
-      <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
-    </svg>
-    ギフトオプション
-  </h3>
-
-  {% comment %} ギフトラッピング {% endcomment %}
-  <div class="mb-4">
-    <label class="flex items-start gap-3 cursor-pointer group">
-      <input
-        type="checkbox"
-        id="gift-wrapping-checkbox-{{ section_id }}"
-        name="properties[ギフトラッピング]"
-        value="希望する"
-        class="mt-1 w-4 h-4 text-stone-800 border-stone-300 rounded focus:ring-stone-500"
-      >
-      <div class="flex-1">
-        <span class="text-sm text-stone-700 group-hover:text-stone-900"> ギフトラッピングを希望する </span>
-        <span class="block text-xs text-stone-500 mt-0.5"> + ¥300 </span>
-      </div>
-    </label>
-  </div>
-
-  {% comment %} メッセージカード {% endcomment %}
-  <div>
-    <label class="flex items-start gap-3 cursor-pointer group mb-2">
-      <input
-        type="checkbox"
-        id="gift-message-toggle-{{ section_id }}"
-        class="mt-1 w-4 h-4 text-stone-800 border-stone-300 rounded focus:ring-stone-500"
-        onchange="document.getElementById('gift-message-input-{{ section_id }}').classList.toggle('hidden')"
-      >
-      <div class="flex-1">
-        <span class="text-sm text-stone-700 group-hover:text-stone-900"> メッセージカードを追加 </span>
-        <span class="block text-xs text-stone-500 mt-0.5"> 無料 </span>
-      </div>
-    </label>
-
-    <div id="gift-message-input-{{ section_id }}" class="hidden">
-      <textarea
-        id="gift-message-textarea-{{ section_id }}"
-        name="properties[ギフトメッセージ]"
-        rows="3"
-        maxlength="100"
-        placeholder="メッセージを入力してください (100文字以内)"
-        class="w-full px-3 py-2 text-sm border border-stone-300 rounded focus:outline-none focus:ring-2 focus:ring-stone-500"
-      ></textarea>
-      <p class="text-xs text-stone-500 mt-1">※ メッセージは100文字以内でご入力ください</p>
     </div>
   </div>
-</div>
 
-{% comment %} カートボタン {% endcomment %}
-<div class="mt-6">
-  {% if has_multiple_variants or has_set_product %}
-    {% comment %} バリアントありまたはセット商品がある場合：カートに追加ボタンのみ {% endcomment %}
+  {% comment %} ギフトオプション {% endcomment %}
+  <div class="mt-6 bg-pink-50 border border-pink-200 rounded-lg p-6">
+    <h3 class="text-base font-medium text-stone-800 mb-4 flex items-center gap-2">
+      <svg class="w-5 h-5 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+      </svg>
+      ギフトオプション
+    </h3>
+
+    <div class="mb-4">
+      <label class="flex items-start gap-3 cursor-pointer group">
+        <input
+          type="checkbox"
+          id="gift-wrapping-checkbox-single-{{ section_id }}"
+          class="mt-1 w-4 h-4 text-stone-800 border-stone-300 rounded focus:ring-stone-500"
+        >
+        <div class="flex-1">
+          <span class="text-sm text-stone-700 group-hover:text-stone-900"> ギフトラッピングを希望する </span>
+          <span class="block text-xs text-stone-500 mt-0.5"> + ¥300 </span>
+        </div>
+      </label>
+    </div>
+
+    <div>
+      <label class="flex items-start gap-3 cursor-pointer group mb-2">
+        <input
+          type="checkbox"
+          id="gift-message-toggle-single-{{ section_id }}"
+          class="mt-1 w-4 h-4 text-stone-800 border-stone-300 rounded focus:ring-stone-500"
+          onchange="document.getElementById('gift-message-input-single-{{ section_id }}').classList.toggle('hidden')"
+        >
+        <div class="flex-1">
+          <span class="text-sm text-stone-700 group-hover:text-stone-900"> メッセージカードを追加 </span>
+          <span class="block text-xs text-stone-500 mt-0.5"> 無料 </span>
+        </div>
+      </label>
+
+      <div id="gift-message-input-single-{{ section_id }}" class="hidden">
+        <textarea
+          id="gift-message-textarea-single-{{ section_id }}"
+          rows="3"
+          maxlength="100"
+          placeholder="メッセージを入力してください (100文字以内)"
+          class="w-full px-3 py-2 text-sm border border-stone-300 rounded focus:outline-none focus:ring-2 focus:ring-stone-500"
+        ></textarea>
+        <p class="text-xs text-stone-500 mt-1">※ メッセージは100文字以内でご入力ください</p>
+      </div>
+    </div>
+  </div>
+
+  {% comment %} カートボタン（2列） {% endcomment %}
+  <div class="mt-6 grid grid-cols-2 gap-3">
+    {% comment %} カートに追加ボタン {% endcomment %}
     <form id="product-form-{{ section_id }}" class="product-form">
       <button
         type="submit"
@@ -180,29 +301,16 @@
         カートに追加する
       </button>
     </form>
-  {% else %}
-    {% comment %} バリアントなしかつセット商品なしの場合：カートに追加 + 今すぐ購入 {% endcomment %}
-    <div class="grid grid-cols-2 gap-3">
-      <form id="product-form-{{ section_id }}" class="product-form">
-        <button
-          type="submit"
-          id="add-to-cart-button-{{ section_id }}"
-          class="w-full h-[45px] bg-black text-white font-bold text-[14px] md:text-sm uppercase tracking-widest flex items-center justify-center hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          カートに追加する
-        </button>
-      </form>
 
-      {% comment %} 今すぐ購入ボタン - Shopifyのネイティブ機能を使用 {% endcomment %}
-      {% form 'product', product, id: 'buy-now-form-{{ section_id }}' %}
-        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-        <div class="h-[45px] [&_*]:h-full [&_button]:min-h-0 [&_button]:m-0 [&_button]:p-0 [&_button]:rounded-none [&_button]:border-0">
-          {{ form | payment_button }}
-        </div>
-      {% endform %}
-    </div>
-  {% endif %}
-</div>
+    {% comment %} 今すぐ購入ボタン - Shopifyのネイティブ機能を使用 {% endcomment %}
+    {% form 'product', product, id: 'buy-now-form-{{ section_id }}' %}
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+      <div class="h-[45px] [&_*]:h-full [&_button]:min-h-0 [&_button]:m-0 [&_button]:p-0 [&_button]:rounded-none [&_button]:border-0">
+        {{ form | payment_button }}
+      </div>
+    {% endform %}
+  </div>
+{% endif %}
 
 <script>
   (function () {
@@ -222,7 +330,7 @@
 
         // 選択された商品を収集
         const itemsToAdd = [];
-        const quantitySelects = form.querySelectorAll('.js-matrix-quantity');
+        const quantitySelects = document.querySelectorAll('.js-matrix-quantity');
 
         quantitySelects.forEach((select) => {
           const quantity = parseInt(select.value);
@@ -251,15 +359,28 @@
         button.textContent = '追加中...';
 
         try {
-          // ギフトオプションを取得
+          // ギフトオプションを取得（複数商品の場合）
           const giftWrappingCheckbox = document.getElementById('gift-wrapping-checkbox-{{ section_id }}');
           const giftMessageTextarea = document.getElementById('gift-message-textarea-{{ section_id }}');
           const giftMessageToggle = document.getElementById('gift-message-toggle-{{ section_id }}');
 
-          const giftWrapping = giftWrappingCheckbox && giftWrappingCheckbox.checked ? '希望する' : null;
+          // ギフトオプションを取得（単品の場合）
+          const giftWrappingCheckboxSingle = document.getElementById('gift-wrapping-checkbox-single-{{ section_id }}');
+          const giftMessageTextareaSingle = document.getElementById('gift-message-textarea-single-{{ section_id }}');
+          const giftMessageToggleSingle = document.getElementById('gift-message-toggle-single-{{ section_id }}');
+
+          const giftWrapping =
+            (giftWrappingCheckbox && giftWrappingCheckbox.checked) ||
+            (giftWrappingCheckboxSingle && giftWrappingCheckboxSingle.checked)
+              ? '希望する'
+              : null;
+
           const giftMessage =
-            giftMessageToggle && giftMessageToggle.checked && giftMessageTextarea
-              ? giftMessageTextarea.value.trim()
+            (giftMessageToggle && giftMessageToggle.checked && giftMessageTextarea) ||
+            (giftMessageToggleSingle && giftMessageToggleSingle.checked && giftMessageTextareaSingle)
+              ? giftMessageTextarea
+                ? giftMessageTextarea.value.trim()
+                : giftMessageTextareaSingle.value.trim()
               : null;
 
           // 各アイテムをカートに追加
