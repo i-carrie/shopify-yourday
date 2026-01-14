@@ -544,7 +544,7 @@
         <div class="mt-6">
           {% comment %} {% form 'product', product %} {% endcomment %}
           {% form 'product', product, id: 'product-form-{{ section.id }}' %}
-            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+            {% comment %} <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}"> {% endcomment %}
 
             <div class="grid grid-cols-2 gap-3 h-[45px] [&_*]:h-full [&_button]:min-h-0 [&_button]:m-0 [&_button]:rounded-none [&_button]:border-0 [&_button]:p-0">
               {% comment %}
@@ -760,22 +760,24 @@
       productForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        // すべてのバリアント数量を取得
+        // すべての updates フィールドを取得
         const formData = new FormData(productForm);
-        const quantities = formData.getAll('quantity');
-        const variantIds = formData.getAll('id');
-
-        // 数量が1以上のバリアントを抽出
         const itemsToAdd = [];
-        quantities.forEach((qty, index) => {
-          const quantity = parseInt(qty);
-          if (quantity > 0) {
-            itemsToAdd.push({
-              id: variantIds[index],
-              quantity: quantity,
-            });
+
+        // updates[variant_id] 形式のフィールドを抽出
+        for (let [key, value] of formData.entries()) {
+          if (key.startsWith('updates[')) {
+            const variantId = key.match(/updates\[(\d+)\]/)[1];
+            const quantity = parseInt(value);
+
+            if (quantity > 0) {
+              itemsToAdd.push({
+                id: variantId,
+                quantity: quantity,
+              });
+            }
           }
-        });
+        }
 
         // 何も選択されていない場合
         if (itemsToAdd.length === 0) {
