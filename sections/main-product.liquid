@@ -542,16 +542,27 @@
         </div>
 
         <div class="mt-6">
-          {% form 'product', product %}
+          {% comment %} {% form 'product', product %} {% endcomment %}
+          {% form 'product', product, id: 'product-form-{{ section.id }}' %}
             <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
 
             <div class="grid grid-cols-2 gap-3 h-[45px] [&_*]:h-full [&_button]:min-h-0 [&_button]:m-0 [&_button]:rounded-none [&_button]:border-0 [&_button]:p-0">
+              {% comment %}
+                <button
+                  type="submit"
+                  name="add"
+                  class="bg-black text-white font-bold text-[14px] md:text-sm uppercase tracking-widest flex items-center justify-center hover:bg-gray-800 transition"
+                >
+                  カートに追加する
+                </button>
+              {% endcomment %}
               <button
                 type="submit"
                 name="add"
+                id="add-to-cart-button"
                 class="bg-black text-white font-bold text-[14px] md:text-sm uppercase tracking-widest flex items-center justify-center hover:bg-gray-800 transition"
               >
-                カートに追加する
+                <span class="button-text">カートに追加する</span>
               </button>
               {{ form | payment_button }}
             </div>
