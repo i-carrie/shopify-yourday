@@ -543,9 +543,17 @@
 
         <div class="mt-6">
           {% comment %} {% form 'product', product %} {% endcomment %}
-          {% form 'product', product, id: 'product-form-{{ section.id }}' %}
-            {% comment %} <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}"> {% endcomment %}
+          {% comment %} {% form 'product', product, id: 'product-form-{{ section.id }}' %} {% endcomment %}
 
+          {% comment %} <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}"> {% endcomment %}
+          <form
+            method="post"
+            action="/cart/add"
+            id="product-form-{{ section.id }}"
+            accept-charset="UTF-8"
+            enctype="multipart/form-data"
+            class="shopify-product-form"
+          >
             <div class="grid grid-cols-2 gap-3 h-[45px] [&_*]:h-full [&_button]:min-h-0 [&_button]:m-0 [&_button]:rounded-none [&_button]:border-0 [&_button]:p-0">
               {% comment %}
                 <button
@@ -566,7 +574,8 @@
               </button>
               {{ form | payment_button }}
             </div>
-          {% endform %}
+            {% comment %} {% endform %} {% endcomment %}
+          </form>
         </div>
       </div>
 
