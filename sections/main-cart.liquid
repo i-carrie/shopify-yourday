@@ -1,0 +1,408 @@
+{% comment %}
+  Main Cart Section
+  カート専用ページのメインセクション
+{% endcomment %}
+
+<div class="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
+  {% if cart.item_count > 0 %}
+    {%- comment -%} カートに商品がある場合 {%- endcomment -%}
+
+    <h1 class="text-2xl md:text-3xl font-light text-stone-800 mb-6 md:mb-8">
+      {{ section.settings.cart_title }}
+      <span class="text-stone-500">({{ cart.item_count }}点)</span>
+    </h1>
+
+    <form action="{{ routes.cart_url }}" method="post" id="cart-form">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {%- comment -%} 左側: カート商品リスト {%- endcomment -%}
+        <div class="lg:col-span-2">
+          <div class="space-y-4">
+            {% for item in cart.items %}
+              <div class="bg-white border border-stone-200 rounded-lg p-4 md:p-6" data-cart-item="{{ item.key }}">
+                <div class="flex gap-4">
+                  {%- comment -%} 商品画像 {%- endcomment -%}
+                  <div class="flex-shrink-0 w-24 h-24 md:w-32 md:h-32">
+                    {% if item.image %}
+                      <img
+                        src="{{ item.image | image_url: width: 200 }}"
+                        alt="{{ item.product.title }}"
+                        class="w-full h-full object-cover rounded"
+                        loading="lazy"
+                      >
+                    {% else %}
+                      <div class="w-full h-full bg-stone-100 rounded flex items-center justify-center">
+                        <span class="text-stone-400 text-sm">No image</span>
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  {%- comment -%} 商品情報 {%- endcomment -%}
+                  <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="flex-1 pr-4">
+                        <h3 class="text-base md:text-lg font-medium text-stone-800 mb-1">
+                          <a href="{{ item.url }}" class="hover:text-stone-600">
+                            {{ item.product.title }}
+                          </a>
+                        </h3>
+
+                        {%- comment -%} バリアント情報 {%- endcomment -%}
+                        {% unless item.variant.title == 'Default Title' %}
+                          <p class="text-sm text-stone-600">
+                            {{ item.variant.title }}
+                          </p>
+                        {% endunless %}
+
+                        {%- comment -%} ギフトラッピング {%- endcomment -%}
+                        {% if item.properties['ギフトラッピング'] %}
+                          <p class="text-sm text-stone-600 mt-1">🎁 ギフトラッピング</p>
+                        {% endif %}
+
+                        {%- comment -%} ギフトメッセージ {%- endcomment -%}
+                        {% if item.properties['ギフトメッセージ'] %}
+                          <p class="text-sm text-stone-600 mt-1">
+                            💌 メッセージ: {{ item.properties['ギフトメッセージ'] }}
+                          </p>
+                        {% endif %}
+                      </div>
+
+                      {%- comment -%} 価格（PC） {%- endcomment -%}
+                      <div class="hidden md:block text-right">
+                        <p class="text-lg font-medium text-stone-800">
+                          {{ item.final_line_price | money }}
+                        </p>
+                        {% if item.original_line_price > item.final_line_price %}
+                          <p class="text-sm text-stone-500 line-through">
+                            {{ item.original_line_price | money }}
+                          </p>
+                        {% endif %}
+                      </div>
+                    </div>
+
+                    {%- comment -%} 数量変更と削除 {%- endcomment -%}
+                    <div class="flex items-center justify-between mt-4">
+                      <div class="flex items-center gap-3">
+                        {%- comment -%} 数量変更 {%- endcomment -%}
+                        <div class="flex items-center border border-stone-300 rounded">
+                          <button
+                            type="button"
+                            class="px-3 py-2 hover:bg-stone-50 transition-colors"
+                            onclick="updateQuantity('{{ item.key }}', {{ item.quantity | minus: 1 }})"
+                            {% if item.quantity <= 1 %}
+                              disabled
+                            {% endif %}
+                          >
+                            <span class="text-stone-600">−</span>
+                          </button>
+
+                          <input
+                            type="number"
+                            name="updates[]"
+                            id="updates_{{ item.key }}"
+                            value="{{ item.quantity }}"
+                            min="0"
+                            class="w-12 text-center border-x border-stone-300 py-2 focus:outline-none"
+                            data-cart-item-key="{{ item.key }}"
+                            onchange="updateQuantity('{{ item.key }}', this.value)"
+                          >
+
+                          <button
+                            type="button"
+                            class="px-3 py-2 hover:bg-stone-50 transition-colors"
+                            onclick="updateQuantity('{{ item.key }}', {{ item.quantity | plus: 1 }})"
+                          >
+                            <span class="text-stone-600">+</span>
+                          </button>
+                        </div>
+
+                        {%- comment -%} 削除ボタン {%- endcomment -%}
+                        <button
+                          type="button"
+                          class="text-sm text-stone-500 hover:text-red-600 transition-colors"
+                          onclick="updateQuantity('{{ item.key }}', 0)"
+                        >
+                          削除
+                        </button>
+                      </div>
+
+                      {%- comment -%} 価格（モバイル） {%- endcomment -%}
+                      <div class="md:hidden text-right">
+                        <p class="text-base font-medium text-stone-800">
+                          {{ item.final_line_price | money }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {%- comment -%} 右側: サマリーとギフトオプション {%- endcomment -%}
+        <div class="lg:col-span-1">
+          <div class="bg-stone-50 border border-stone-200 rounded-lg p-6 sticky top-24">
+            {%- comment -%} ギフトオプション {%- endcomment -%}
+            <div class="mb-6 pb-6 border-b border-stone-200">
+              <h3 class="text-base font-medium text-stone-800 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+                </svg>
+                {{ section.settings.gift_title }}
+              </h3>
+
+              {%- comment -%} ギフトラッピング {%- endcomment -%}
+              <div class="mb-4">
+                <label class="flex items-start gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    name="attributes[ギフトラッピング]"
+                    value="希望する"
+                    class="mt-1 w-4 h-4 text-stone-800 border-stone-300 rounded focus:ring-stone-500"
+                    {% if cart.attributes['ギフトラッピング'] %}
+                      checked
+                    {% endif %}
+                    onchange="this.form.submit()"
+                  >
+                  <div class="flex-1">
+                    <span class="text-sm text-stone-700 group-hover:text-stone-900">
+                      {{ section.settings.gift_wrapping_label }}
+                    </span>
+                    <span class="block text-xs text-stone-500 mt-0.5">
+                      {{ section.settings.gift_wrapping_note }}
+                    </span>
+                  </div>
+                </label>
+              </div>
+
+              {%- comment -%} メッセージカード {%- endcomment -%}
+              <div>
+                <label class="flex items-start gap-3 cursor-pointer group mb-2">
+                  <input
+                    type="checkbox"
+                    id="gift-message-toggle"
+                    class="mt-1 w-4 h-4 text-stone-800 border-stone-300 rounded focus:ring-stone-500"
+                    {% if cart.attributes['ギフトメッセージ'] %}
+                      checked
+                    {% endif %}
+                    onchange="toggleGiftMessage()"
+                  >
+                  <div class="flex-1">
+                    <span class="text-sm text-stone-700 group-hover:text-stone-900">
+                      {{ section.settings.gift_message_label }}
+                    </span>
+                    <span class="block text-xs text-stone-500 mt-0.5">
+                      {{ section.settings.gift_message_note }}
+                    </span>
+                  </div>
+                </label>
+
+                <div
+                  id="gift-message-input"
+                  class="{% unless cart.attributes['ギフトメッセージ'] %}hidden{% endunless %}"
+                >
+                  <textarea
+                    name="attributes[ギフトメッセージ]"
+                    rows="3"
+                    maxlength="100"
+                    placeholder="{{ section.settings.gift_placeholder }}"
+                    class="w-full px-3 py-2 text-sm border border-stone-300 rounded focus:outline-none focus:ring-2 focus:ring-stone-500"
+                    onchange="this.form.submit()"
+                  >{{ cart.attributes['ギフトメッセージ'] }}</textarea>
+                </div>
+              </div>
+            </div>
+
+            {%- comment -%} 金額サマリー {%- endcomment -%}
+            <div class="space-y-3 mb-6">
+              <div class="flex justify-between text-sm">
+                <span class="text-stone-600">{{ section.settings.subtotal_label }}</span>
+                <span class="text-stone-800 font-medium">{{ cart.total_price | money }}</span>
+              </div>
+
+              <div class="flex justify-between text-sm">
+                <span class="text-stone-600">{{ section.settings.shipping_label }}</span>
+                <span class="text-stone-500 text-xs">{{ section.settings.shipping_note }}</span>
+              </div>
+
+              <div class="pt-3 border-t border-stone-300">
+                <div class="flex justify-between text-lg font-medium">
+                  <span class="text-stone-800">{{ section.settings.total_label }}</span>
+                  <span class="text-stone-800">{{ cart.total_price | money }}</span>
+                </div>
+              </div>
+            </div>
+
+            {%- comment -%} チェックアウトボタン {%- endcomment -%}
+            <button
+              type="submit"
+              name="checkout"
+              class="w-full bg-stone-800 text-white py-3 px-6 rounded hover:bg-stone-700 transition-colors font-medium"
+            >
+              {{ section.settings.checkout_button_text }}
+            </button>
+
+            <p class="text-xs text-stone-500 text-center mt-3">税込価格で表示されています</p>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  {% else %}
+    {%- comment -%} カートが空の場合 {%- endcomment -%}
+    <div class="text-center py-16 md:py-24">
+      <svg class="w-20 h-20 mx-auto text-stone-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+      </svg>
+
+      <h2 class="text-2xl font-light text-stone-800 mb-3">
+        {{ section.settings.empty_cart_message }}
+      </h2>
+
+      <a
+        href="{{ routes.all_products_collection_url }}"
+        class="inline-block mt-6 px-8 py-3 bg-stone-800 text-white rounded hover:bg-stone-700 transition-colors"
+      >
+        {{ section.settings.continue_shopping_text }}
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+{%- comment -%} JavaScript for Cart Updates {%- endcomment -%}
+<script>
+  function updateQuantity(key, quantity) {
+    const formData = new FormData();
+    formData.append('updates[' + key + ']', quantity);
+
+    fetch('/cart/update.js', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        alert('カートの更新に失敗しました');
+      });
+  }
+
+  function toggleGiftMessage() {
+    const checkbox = document.getElementById('gift-message-toggle');
+    const input = document.getElementById('gift-message-input');
+
+    if (checkbox.checked) {
+      input.classList.remove('hidden');
+    } else {
+      input.classList.add('hidden');
+      // メッセージをクリア
+      const textarea = input.querySelector('textarea');
+      if (textarea) {
+        textarea.value = '';
+        document.getElementById('cart-form').submit();
+      }
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Cart",
+  "settings": [
+    {
+      "type": "text",
+      "id": "cart_title",
+      "label": "カートタイトル",
+      "default": "カート"
+    },
+    {
+      "type": "text",
+      "id": "empty_cart_message",
+      "label": "空カートメッセージ",
+      "default": "カートに商品がありません。"
+    },
+    {
+      "type": "text",
+      "id": "continue_shopping_text",
+      "label": "ショッピング継続ボタンテキスト",
+      "default": "ショッピングを続ける"
+    },
+    {
+      "type": "text",
+      "id": "checkout_button_text",
+      "label": "チェックアウトボタンテキスト",
+      "default": "購入手続きへ"
+    },
+    {
+      "type": "header",
+      "content": "ギフトオプション"
+    },
+    {
+      "type": "text",
+      "id": "gift_title",
+      "label": "ギフトオプションタイトル",
+      "default": "ギフトオプション"
+    },
+    {
+      "type": "text",
+      "id": "gift_wrapping_label",
+      "label": "ギフトラッピングラベル",
+      "default": "ギフトラッピングを希望する"
+    },
+    {
+      "type": "text",
+      "id": "gift_wrapping_note",
+      "label": "ギフトラッピング注記",
+      "default": "+ ¥300"
+    },
+    {
+      "type": "text",
+      "id": "gift_message_label",
+      "label": "メッセージカードラベル",
+      "default": "メッセージカードを追加"
+    },
+    {
+      "type": "text",
+      "id": "gift_message_note",
+      "label": "メッセージカード注記",
+      "default": "無料"
+    },
+    {
+      "type": "text",
+      "id": "gift_placeholder",
+      "label": "メッセージプレースホルダー",
+      "default": "メッセージを入力してください (100文字以内)"
+    },
+    {
+      "type": "header",
+      "content": "サマリー"
+    },
+    {
+      "type": "text",
+      "id": "subtotal_label",
+      "label": "小計ラベル",
+      "default": "小計"
+    },
+    {
+      "type": "text",
+      "id": "shipping_label",
+      "label": "配送料ラベル",
+      "default": "配送料"
+    },
+    {
+      "type": "text",
+      "id": "shipping_note",
+      "label": "配送料注記",
+      "default": "購入手続き時に計算されます"
+    },
+    {
+      "type": "text",
+      "id": "total_label",
+      "label": "合計ラベル",
+      "default": "合計"
+    }
+  ]
+}
+{% endschema %}
