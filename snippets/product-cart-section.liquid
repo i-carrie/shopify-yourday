@@ -63,6 +63,57 @@
         </div>
       </div>
     {% endfor %}
+
+    {% comment %} セット商品の表示 {% endcomment %}
+    {% if product.metafields.custom.set_product != blank %}
+      <div
+        class="grid grid-cols-12 gap-2 py-4 items-center border-b-2 border-gray-100 js-variant-row"
+        data-variant-id="set"
+      >
+        <div class="col-span-6 flex flex-col pr-2">
+          <span class="text-sm font-bold text-gray-800 leading-snug break-words">
+            {{ product.metafields.custom.set_product.title }}
+          </span>
+          {% if product.metafields.custom.set_product.description != blank %}
+            <span class="text-[11px] text-gray-600 mt-1">
+              {{ product.metafields.custom.set_product.description }}
+            </span>
+          {% endif %}
+        </div>
+        <div class="col-span-3 text-right">
+          {% if product.metafields.custom.set_product.compare_at_price %}
+            <div class="flex flex-col items-end gap-1">
+              <span class="text-sm text-red-600 font-medium line-through">
+                {{ product.metafields.custom.set_product.compare_at_price | money }}
+              </span>
+              <span class="text-sm text-gray-700">
+                {{ product.metafields.custom.set_product.price | money }}
+              </span>
+            </div>
+          {% else %}
+            <span class="text-sm text-gray-700">
+              {{ product.metafields.custom.set_product.price | money }}
+            </span>
+          {% endif %}
+        </div>
+        <div class="col-span-3 flex justify-center">
+          <div style="position: relative; width: 64px;">
+            <select
+              name="updates[set]"
+              class="js-matrix-quantity"
+              style="width: 100%; padding: 6px 20px 6px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer; appearance: none; -webkit-appearance: none; text-align-last: center;"
+            >
+              {% for i in (0..10) %}
+                <option value="{{ i }}">{{ i }}</option>
+              {% endfor %}
+            </select>
+            <div style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; font-size: 8px;">
+              ▼
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
   </div>
 </div>
 
