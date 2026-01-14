@@ -538,13 +538,6 @@
           </div>
         </div>
 
-        {% comment %}
-          <div class="flex gap-3 h-[50px] mt-4">
-            <div class="flex-1 bg-black"></div>
-            <div class="flex-1 bg-gray-400"></div>
-          </div>
-        {% endcomment %}
-
         <div class="mt-6">
           {% form 'product', product %}
             <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
@@ -555,7 +548,7 @@
                 name="add"
                 class="bg-black text-white font-bold text-[10px] md:text-sm uppercase tracking-widest flex items-center justify-center hover:bg-gray-800 transition"
               >
-                ADD TO CART
+                カートに追加する
               </button>
               {{ form | payment_button }}
             </div>
