@@ -748,10 +748,8 @@
   })();
 </script>
 
+// ======================================== // Ajax Cart 機能 // ========================================
 <script>
-  // ========================================
-  // Ajax Cart 機能
-  // ========================================
   document.addEventListener('DOMContentLoaded', function () {
     const productForm = document.getElementById('product-form-{{ section.id }}');
     const addToCartButton = document.getElementById('add-to-cart-button');
@@ -762,32 +760,57 @@
       productForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
+        // すべてのバリアント数量を取得
+        const formData = new FormData(productForm);
+        const quantities = formData.getAll('quantity');
+        const variantIds = formData.getAll('id');
+
+        // 数量が1以上のバリアントを抽出
+        const itemsToAdd = [];
+        quantities.forEach((qty, index) => {
+          const quantity = parseInt(qty);
+          if (quantity > 0) {
+            itemsToAdd.push({
+              id: variantIds[index],
+              quantity: quantity,
+            });
+          }
+        });
+
+        // 何も選択されていない場合
+        if (itemsToAdd.length === 0) {
+          window.cartAPI.showToast('数量を選択してください', 'error');
+          return;
+        }
+
         // ボタンを無効化
         addToCartButton.disabled = true;
         addToCartButton.textContent = '追加中...';
 
         try {
-          const formData = new FormData(productForm);
-
-          const cartData = {
-            id: formData.get('id'),
-            quantity: parseInt(formData.get('quantity') || 1),
-            properties: {},
-          };
-
-          // ギフトオプションを追加（もしあれば）
+          // ギフトオプションを取得
           const giftWrapping = formData.get('properties[ギフトラッピング]');
-          if (giftWrapping) {
-            cartData.properties['ギフトラッピング'] = giftWrapping;
-          }
-
           const giftMessage = formData.get('properties[ギフトメッセージ]');
-          if (giftMessage && giftMessage.trim()) {
-            cartData.properties['ギフトメッセージ'] = giftMessage.trim();
-          }
 
-          // カートに追加
-          await window.cartAPI.addToCart(cartData);
+          // 各アイテムをカートに追加
+          for (const item of itemsToAdd) {
+            const cartData = {
+              id: item.id,
+              quantity: item.quantity,
+              properties: {},
+            };
+
+            // ギフトオプションを追加
+            if (giftWrapping) {
+              cartData.properties['ギフトラッピング'] = giftWrapping;
+            }
+
+            if (giftMessage && giftMessage.trim()) {
+              cartData.properties['ギフトメッセージ'] = giftMessage.trim();
+            }
+
+            await window.cartAPI.addToCart(cartData);
+          }
 
           // 成功メッセージ
           window.cartAPI.showToast('カートに追加しました', 'success');
