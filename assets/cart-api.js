@@ -137,16 +137,29 @@ class CartAPI {
    * ヘッダーのカート数を更新
    */
   updateCartCount() {
-    const cartCountElement = document.getElementById('cart-count');
-    if (cartCountElement && this.cart) {
+    if (this.cart) {
       const itemCount = this.cart.item_count;
-      cartCountElement.textContent = itemCount;
       
-      // カート数が0の場合は非表示
-      if (itemCount > 0) {
-        cartCountElement.classList.remove('hidden');
-      } else {
-        cartCountElement.classList.add('hidden');
+      // スクロール前のカート数
+      const cartCountElement = document.getElementById('cart-count');
+      if (cartCountElement) {
+        cartCountElement.textContent = itemCount;
+        if (itemCount > 0) {
+          cartCountElement.classList.remove('hidden');
+        } else {
+          cartCountElement.classList.add('hidden');
+        }
+      }
+      
+      // スクロール後のカート数
+      const cartCountScrolled = document.getElementById('cart-count-scrolled');
+      if (cartCountScrolled) {
+        cartCountScrolled.textContent = itemCount;
+        if (itemCount > 0) {
+          cartCountScrolled.classList.remove('hidden');
+        } else {
+          cartCountScrolled.classList.add('hidden');
+        }
       }
     }
   }
