@@ -181,16 +181,22 @@
             {% endcomment %}
             <div class="space-y-3 mb-6">
               {% for item in cart.items %}
-                {% comment %} 文字列の組み立てロジック {% endcomment %}
+                {% comment %}
+                  表示用のテキスト作成
+                  item.product.has_only_default_variant が false（バリエーションあり）のときだけ、バリエーション名を表示するよ
+                {% endcomment %}
                 {% capture sidebar_item_title %}
-      {{ item.product.title }}: {{ item.variant.title | slice: 0, 7 }}{% if item.variant.title.size > 7 %}...{% endif %}
+      {{ item.product.title }}
+      {% unless item.product.has_only_default_variant %}
+        : {{ item.variant.title | slice: 0, 7 }}{% if item.variant.title.size > 7 %}...{% endif %}
+      {% endunless %}
       {% if item.quantity > 1 %} x {{ item.quantity }}{% endif %}
     {% endcapture %}
 
                 {% comment %} レイアウト：items-end で価格を一番下の行に揃える {% endcomment %}
                 <div class="flex justify-between items-end gap-4">
                   <div class="flex-1 min-w-0">
-                    {% comment %} max-w-[12em] で全角12文字での折り返しを指定 {% endcomment %}
+                    {% comment %} max-w-[12em] で全角12文字相当での折り返しを指定 {% endcomment %}
                     <p class="text-sm text-stone-700 leading-snug break-all max-w-[12em]">
                       {{ sidebar_item_title }}
                     </p>
