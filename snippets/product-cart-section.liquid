@@ -395,27 +395,47 @@
 
           // ギフトラッピングがチェックされている場合、ギフトラッピング商品を追加
           if (isGiftWrappingChecked && giftWrappingVariantId) {
-            const giftWrappingData = {
-              id: giftWrappingVariantId,
-              quantity: 1,
-              properties: {},
-            };
-
-            if (giftMessage) {
-              giftWrappingData.properties['ギフトメッセージ'] = giftMessage;
-            }
-
-            if (window.cartAPI) {
-              await window.cartAPI.addToCart(giftWrappingData);
-            } else {
-              const response = await fetch('/cart/add.js', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items: [giftWrappingData] }),
-              });
-              if (!response.ok) {
-                throw new Error('ギフトラッピングの追加に失敗しました');
+            try {
+              // まず現在のカートを取得して、ギフトラッピングが既にあるか確認
+              let cart;
+              if (window.cartAPI) {
+                cart = await window.cartAPI.getCart();
+              } else {
+                const cartResponse = await fetch('/cart.js');
+                cart = await cartResponse.json();
               }
+
+              // ギフトラッピング商品が既にカートにあるかチェック
+              const giftWrappingInCart = cart.items.find((item) => item.id == giftWrappingVariantId);
+
+              if (!giftWrappingInCart) {
+                // カートにない場合のみ追加
+                const giftWrappingData = {
+                  id: giftWrappingVariantId,
+                  quantity: 1,
+                  properties: {},
+                };
+
+                if (giftMessage) {
+                  giftWrappingData.properties['ギフトメッセージ'] = giftMessage;
+                }
+
+                if (window.cartAPI) {
+                  await window.cartAPI.addToCart(giftWrappingData);
+                } else {
+                  const response = await fetch('/cart/add.js', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: [giftWrappingData] }),
+                  });
+                  if (!response.ok) {
+                    throw new Error('ギフトラッピングの追加に失敗しました');
+                  }
+                }
+              }
+            } catch (giftError) {
+              console.warn('Gift wrapping add warning:', giftError);
+              // ギフトラッピングの追加に失敗しても、メイン商品の追加は続行
             }
           }
 
