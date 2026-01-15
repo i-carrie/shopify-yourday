@@ -183,12 +183,12 @@
             <div class="space-y-3 mb-6">
               {% for item in cart.items %}
                 {% capture sidebar_item_title %}
-      {{ item.product.title }}
-      {% unless item.product.has_only_default_variant %}
-        : {{ item.variant.title | slice: 0, 7 }}{% if item.variant.title.size > 7 %}...{% endif %}
-      {% endunless %}
-      {% if item.quantity > 1 %} x {{ item.quantity }}{% endif %}
-    {% endcapture %}
+                  {{ item.product.title }}
+              {% unless item.product.has_only_default_variant %}
+                : {{ item.variant.title | slice: 0, 7 }}{% if item.variant.title.size > 7 %}...{% endif %}
+              {% endunless %}
+              {% if item.quantity > 1 %} x {{ item.quantity }}{% endif %}
+              {% endcapture %}
 
                 {% comment %} レイアウト：items-end で価格を一番下の行に揃える {% endcomment %}
                 <div class="flex justify-between items-end gap-4">
