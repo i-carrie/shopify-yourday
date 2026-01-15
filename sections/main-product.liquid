@@ -396,7 +396,15 @@
             </p>
           </div>
         {% endif %}
-        <p class="text-xl text-gray-800 font-bold mt-4">{{ product.price | money }}</p>
+
+        {% comment %} <p class="text-xl text-gray-800 font-bold mt-4">{{ product.price | money }}</p> {% endcomment %}
+        <p class="text-xl text-gray-800 font-bold mt-4">
+          {% if product.price_varies %}
+            {{ product.price_min | money }}〜
+          {% else %}
+            {{ product.price | money }}
+          {% endif %}
+        </p>
       </div>
 
       {% render 'product-cart-section', product: product, section_id: section.id %}
