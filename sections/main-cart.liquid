@@ -221,6 +221,8 @@
               {{ section.settings.checkout_button_text }}
             </button>
 
+            <p class="text-xs text-stone-500 text-center mt-3">税込価格で表示されています</p>
+
             {% comment %} お買い物を続けるボタン（新規追加） {% endcomment %}
             <a
               href="{{ routes.all_products_collection_url }}"
@@ -228,8 +230,6 @@
             >
               {{ section.settings.continue_shopping_text }}
             </a>
-
-            <p class="text-xs text-stone-500 text-center mt-3">税込価格で表示されています</p>
           </div>
         </div>
       </div>
