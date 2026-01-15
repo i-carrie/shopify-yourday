@@ -143,7 +143,12 @@ class CartAPI {
    */
   updateCartCount() {
     if (this.cart) {
-      const itemCount = this.cart.item_count;
+const itemCount = this.cart.items.reduce((count, item) => {
+  if (item.product_title === 'ギフトラッピング') {
+    return count;
+  }
+  return count + item.quantity;
+}, 0);
       
       // スクロール前のカート数
       const cartCountElement = document.getElementById('cart-count');
