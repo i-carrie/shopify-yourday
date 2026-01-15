@@ -221,6 +221,14 @@
               {{ section.settings.checkout_button_text }}
             </button>
 
+            {% comment %} お買い物を続けるボタン（新規追加） {% endcomment %}
+            <a
+              href="{{ routes.all_products_collection_url }}"
+              class="w-full inline-block text-center bg-white border border-stone-300 text-stone-600 py-3 px-6 rounded hover:bg-stone-50 transition-colors font-medium mt-3"
+            >
+              {{ section.settings.continue_shopping_text }}
+            </a>
+
             <p class="text-xs text-stone-500 text-center mt-3">税込価格で表示されています</p>
           </div>
         </div>
