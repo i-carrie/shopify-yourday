@@ -158,28 +158,6 @@
               <span class="text-center">価格</span>
             </div>
 
-            {%- comment -%} 商品内訳リスト {%- endcomment -%}
-            {% comment %}
-              <div class="space-y-3 mb-6">
-              {% for item in cart.items %}
-                <div class="flex justify-between items-start gap-4">
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm text-stone-700 leading-snug">
-                      {{ item.product.title }}
-                      {% if item.quantity > 1 %}
-                        <span class="text-stone-400 font-medium ml-1">x {{ item.quantity }}</span>
-                      {% endif %}
-                    </p>
-                  </div>
-                  <div class="flex-shrink-0 text-right">
-                    <p class="text-sm font-medium text-stone-800">
-                      {{ item.final_line_price | money }}
-                    </p>
-                  </div>
-                </div>
-              {% endfor %}
-            {% endcomment %}
-
             <div class="space-y-3 mb-6">
               {% for item in cart.items %}
                 {% capture sidebar_item_title %}
