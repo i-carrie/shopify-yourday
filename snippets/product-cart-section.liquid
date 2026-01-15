@@ -468,11 +468,36 @@
 
           // 成功メッセージ
           if (window.cartAPI) {
-            await window.cartAPI.getCart(); // 追加
-            window.cartAPI.updateCartCount(); // 追加
+            await window.cartAPI.getCart(); // カート情報を最新に更新
+            window.cartAPI.updateCartCount(); // カート数を更新
             window.cartAPI.showToast('カートに追加しました', 'success');
           } else {
             alert('カートに追加しました');
+            // cartAPIがない場合は手動でカート情報を取得して更新
+            const cartResponse = await fetch('/cart.js');
+            const cart = await cartResponse.json();
+            const itemCount = cart.items.reduce((count, item) => {
+              if (item.product_title === 'ギフトラッピング') {
+                return count;
+              }
+              return count + item.quantity;
+            }, 0);
+
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) {
+              cartCountElement.textContent = itemCount;
+              if (itemCount > 0) {
+                cartCountElement.classList.remove('hidden');
+              }
+            }
+
+            const cartCountScrolled = document.getElementById('cart-count-scrolled');
+            if (cartCountScrolled) {
+              cartCountScrolled.textContent = itemCount;
+              if (itemCount > 0) {
+                cartCountScrolled.classList.remove('hidden');
+              }
+            }
           }
         } catch (error) {
           console.error('Add to cart error:', error);
