@@ -563,6 +563,9 @@
   .max-w-7xl {
     max-width: var(--container-7xl);
   }
+  .max-w-\[12em\] {
+    max-width: 12em;
+  }
   .max-w-full {
     max-width: 100%;
   }
@@ -1130,6 +1133,9 @@
   }
   .break-words {
     overflow-wrap: break-word;
+  }
+  .break-all {
+    word-break: break-all;
   }
   .whitespace-pre-wrap {
     white-space: pre-wrap;
