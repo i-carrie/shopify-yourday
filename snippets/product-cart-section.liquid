@@ -490,29 +490,4 @@
       });
     });
   })();
-
-  // 「今すぐ購入」ボタンの制御ロジック
-  const buyNowForm = document.getElementById('buy-now-form-{{ section_id }}');
-  if (buyNowForm) {
-    // capture: true を使って、Shopify内部の処理が走る前にクリックを捕まえる
-    buyNowForm.addEventListener(
-      'click',
-      (e) => {
-        // チェックボックスの状態を取得
-        const wrapping = document.getElementById('gift-wrapping-checkbox-single-{{ section_id }}');
-        const message = document.getElementById('gift-message-toggle-single-{{ section_id }}');
-
-        if (wrapping?.checked || message?.checked) {
-          // ギフトが選択されていれば、イベントを完全に停止させる
-          e.preventDefault();
-          e.stopPropagation();
-          e.stopImmediatePropagation();
-
-          // エラー通知
-          window.cartAPI?.showToast('ギフトオプションを選択の場合、今すぐ購入ボタンをご利用できません。', 'error');
-        }
-      },
-      { capture: true }
-    );
-  }
 </script>
