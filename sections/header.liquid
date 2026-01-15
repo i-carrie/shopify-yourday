@@ -102,14 +102,6 @@
               </form>
 
               <div class="flex space-x-8 ml-6">
-                {% comment %}
-                  <span class="text-base font-medium text-white">wwtext</span>
-                  <span class="text-base font-medium text-white">text</span>
-                  <span class="text-base font-medium text-white">text</span>
-                  <span class="text-base font-medium text-white">text</span>
-                  <span class="text-base font-medium text-white">text</span>
-                {% endcomment %}
-
                 {% assign header_menu = linklists['header-menu'] %}
                 {% for link in header_menu.links %}
                   {% unless link.title == 'すべての商品' %}
@@ -155,22 +147,22 @@
               <div class="w-6 h-6">
                 {% render 'icon-cart' %}
               </div>
-              {% if cart.item_count > 0 %}
-                {% comment %}
+              {% comment %}
+                {% if cart.item_count > 0 %}
                   <span
                     id="cart-count"
                     class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart.item_count == 0 %}hidden{% endif %}"
                   >
                     {{ cart.item_count }}
                   </span>
-                {% endcomment %}
-                <span
-                  id="cart-count"
-                  class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart_count == 0 %}hidden{% endif %}"
-                >
-                  {{ cart_count }}
-                </span>
-              {% endif %}
+                {% endif %}
+              {% endcomment %}
+              <span
+                id="cart-count"
+                class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart_count == 0 %}hidden{% endif %}"
+              >
+                {{ cart_count }}
+              </span>
             </a>
           </div>
         </div>
@@ -181,16 +173,16 @@
             <div class="w-8 h-8">
               {% render 'icon-cart' %}
             </div>
-            {% if cart.item_count > 0 %}
-              {% comment %}
+            {% comment %}
+              {% if cart.item_count > 0 %}
                 <span
                   id="cart-count-scrolled"
                   class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart.item_count == 0 %}hidden{% endif %}"
                 >
                   {{ cart.item_count }}
                 </span>
-              {% endcomment %}
-            {% endif %}
+              {% endif %}
+            {% endcomment %}
             <span
               id="cart-count-scrolled"
               class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart_count == 0 %}hidden{% endif %}"
