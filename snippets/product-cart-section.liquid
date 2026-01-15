@@ -1,5 +1,5 @@
 {% comment %}
-  Product Cart Section - Fixed Version V2
+  Product Cart Section - Final Version with Gift Wrapping
   カート関連機能（バリアント選択、ギフトオプション、カートボタン）
 
   Parameters:
@@ -19,10 +19,17 @@
   {% assign has_set_product = true %}
 {% endif %}
 
+{% comment %} ギフトラッピング商品を取得 {% endcomment %}
+{% assign gift_wrapping_product = all_products['gift-wrapping'] %}
+
 {% comment %} フォームの開始 {% endcomment %}
 {% if has_multiple_variants or has_set_product %}
   {% comment %} バリアントありまたはセット商品がある場合：カートに追加ボタンのみ {% endcomment %}
-  <form id="product-form-{{ section_id }}" class="product-form">
+  <form
+    id="product-form-{{ section_id }}"
+    class="product-form"
+    data-gift-variant-id="{{ gift_wrapping_product.selected_or_first_available_variant.id }}"
+  >
     {% comment %} マトリックス・バリエーションセレクター {% endcomment %}
     <div class="matrix-variant-selector pt-1 mt-1">
       <div class="grid grid-cols-12 gap-2 pb-2 border-b border-gray-200 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
@@ -137,7 +144,7 @@
           >
           <div class="flex-1">
             <span class="text-sm text-stone-700 group-hover:text-stone-900"> ギフトラッピングを希望する </span>
-            <span class="block text-xs text-stone-500 mt-0.5"> + ¥300 </span>
+            <span class="block text-xs text-stone-500 mt-0.5"> + {{ gift_wrapping_product.price | money }} </span>
           </div>
         </label>
       </div>
@@ -257,7 +264,7 @@
         >
         <div class="flex-1">
           <span class="text-sm text-stone-700 group-hover:text-stone-900"> ギフトラッピングを希望する </span>
-          <span class="block text-xs text-stone-500 mt-0.5"> + ¥300 </span>
+          <span class="block text-xs text-stone-500 mt-0.5"> + {{ gift_wrapping_product.price | money }} </span>
         </div>
       </label>
     </div>
@@ -292,7 +299,11 @@
   {% comment %} カートボタン（2列） {% endcomment %}
   <div class="mt-6 grid grid-cols-2 gap-3">
     {% comment %} カートに追加ボタン {% endcomment %}
-    <form id="product-form-{{ section_id }}" class="product-form">
+    <form
+      id="product-form-{{ section_id }}"
+      class="product-form"
+      data-gift-variant-id="{{ gift_wrapping_product.selected_or_first_available_variant.id }}"
+    >
       <button
         type="submit"
         id="add-to-cart-button-{{ section_id }}"
@@ -324,6 +335,7 @@
       if (!form || !button) return;
 
       const originalButtonText = button.textContent;
+      const giftWrappingVariantId = form.getAttribute('data-gift-variant-id');
 
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -369,11 +381,9 @@
           const giftMessageTextareaSingle = document.getElementById('gift-message-textarea-single-{{ section_id }}');
           const giftMessageToggleSingle = document.getElementById('gift-message-toggle-single-{{ section_id }}');
 
-          const giftWrapping =
+          const isGiftWrappingChecked =
             (giftWrappingCheckbox && giftWrappingCheckbox.checked) ||
-            (giftWrappingCheckboxSingle && giftWrappingCheckboxSingle.checked)
-              ? '希望する'
-              : null;
+            (giftWrappingCheckboxSingle && giftWrappingCheckboxSingle.checked);
 
           const giftMessage =
             (giftMessageToggle && giftMessageToggle.checked && giftMessageTextarea) ||
@@ -383,7 +393,33 @@
                 : giftMessageTextareaSingle.value.trim()
               : null;
 
-          // 各アイテムをカートに追加
+          // ギフトラッピングがチェックされている場合、ギフトラッピング商品を追加
+          if (isGiftWrappingChecked && giftWrappingVariantId) {
+            const giftWrappingData = {
+              id: giftWrappingVariantId,
+              quantity: 1,
+              properties: {},
+            };
+
+            if (giftMessage) {
+              giftWrappingData.properties['ギフトメッセージ'] = giftMessage;
+            }
+
+            if (window.cartAPI) {
+              await window.cartAPI.addToCart(giftWrappingData);
+            } else {
+              const response = await fetch('/cart/add.js', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: [giftWrappingData] }),
+              });
+              if (!response.ok) {
+                throw new Error('ギフトラッピングの追加に失敗しました');
+              }
+            }
+          }
+
+          // 各商品アイテムをカートに追加
           for (const item of itemsToAdd) {
             const cartData = {
               id: item.id,
@@ -391,11 +427,7 @@
               properties: {},
             };
 
-            // ギフトオプションを追加
-            if (giftWrapping) {
-              cartData.properties['ギフトラッピング'] = giftWrapping;
-            }
-
+            // メッセージがある場合は商品にも追加
             if (giftMessage) {
               cartData.properties['ギフトメッセージ'] = giftMessage;
             }
@@ -403,15 +435,11 @@
             if (window.cartAPI) {
               await window.cartAPI.addToCart(cartData);
             } else {
-              // Fallback: cartAPI がない場合は標準のCart API を使用
               const response = await fetch('/cart/add.js', {
                 method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ items: [cartData] }),
               });
-
               if (!response.ok) {
                 throw new Error('カートへの追加に失敗しました');
               }
