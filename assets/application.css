@@ -989,6 +989,9 @@
   .pt-3 {
     padding-top: calc(var(--spacing) * 3);
   }
+  .pt-5 {
+    padding-top: calc(var(--spacing) * 5);
+  }
   .pr-2 {
     padding-right: calc(var(--spacing) * 2);
   }
