@@ -190,13 +190,13 @@
                   {{ cart.item_count }}
                 </span>
               {% endcomment %}
-              <span
-                id="cart-count-scrolled"
-                class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart_count == 0 %}hidden{% endif %}"
-              >
-                {{ cart_count }}
-              </span>
             {% endif %}
+            <span
+              id="cart-count-scrolled"
+              class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart_count == 0 %}hidden{% endif %}"
+            >
+              {{ cart_count }}
+            </span>
           </a>
         </div>
       </div>
