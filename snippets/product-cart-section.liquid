@@ -319,8 +319,19 @@
     {% comment %} 今すぐ購入ボタン - Shopifyのネイティブ機能を使用 {% endcomment %}
     {% form 'product', product, id: 'buy-now-form-{{ section_id }}' %}
       <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-      <div class="h-[45px] [&_*]:h-full [&_button]:min-h-0 [&_button]:m-0 [&_button]:p-0 [&_button]:rounded-none [&_button]:border-0">
+
+      {%- comment -%} JSで制御するために ID: buy-now-wrapper-... を追加し、ガード用の div を挿入 {%- endcomment -%}
+      <div
+        id="buy-now-wrapper-{{ section_id }}"
+        class="relative h-[45px] transition-all duration-300 [&_*]:h-full [&_button]:min-h-0 [&_button]:m-0 [&_button]:p-0 [&_button]:rounded-none [&_button]:border-0"
+      >
         {{ form | payment_button }}
+
+        {%- comment -%} 物理的にクリックを阻止する透明なガード {%- endcomment -%}
+        <div
+          id="buy-now-guard-{{ section_id }}"
+          class="absolute inset-0 z-10 cursor-not-allowed hidden"
+        ></div>
       </div>
     {% endform %}
   </div>
