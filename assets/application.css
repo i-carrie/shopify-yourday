@@ -836,6 +836,9 @@
   .border-gray-400 {
     border-color: var(--color-gray-400);
   }
+  .border-pink-100 {
+    border-color: var(--color-pink-100);
+  }
   .border-pink-200 {
     border-color: var(--color-pink-200);
   }
