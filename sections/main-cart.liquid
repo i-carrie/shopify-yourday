@@ -180,12 +180,8 @@
               {% endfor %}
             {% endcomment %}
 
-            <div class="space-y-3 mb-6">
+            <div class="space-y-3 mb-6 px-2">
               {% for item in cart.items %}
-                {% comment %}
-                  表示用のテキスト作成
-                  item.product.has_only_default_variant が false のときだけ、バリエーション名を表示
-                {% endcomment %}
                 {% capture sidebar_item_title %}
       {{ item.product.title }}
       {% unless item.product.has_only_default_variant %}
@@ -194,10 +190,12 @@
       {% if item.quantity > 1 %} x {{ item.quantity }}{% endif %}
     {% endcapture %}
 
-                {% comment %} レイアウト：items-end で価格を一番下の行に揃える {% endcomment %}
                 <div class="flex justify-between items-end gap-4">
                   <div class="flex-1 min-w-0">
-                    {% comment %} max-w-[12em] から [14em] に広げて、英字名が入りやすくしたよ {% endcomment %}
+                    {% comment %}
+                      外側を px-2 狭くしたので、14em だと少し窮屈かもしれない。
+                      もしはみ出すようなら、ここを 13em くらいに調整してもいいかも！
+                    {% endcomment %}
                     <p class="text-sm text-stone-700 leading-snug break-all max-w-[14em]">
                       {{ sidebar_item_title }}
                     </p>
