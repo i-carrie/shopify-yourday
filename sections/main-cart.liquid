@@ -179,11 +179,12 @@
                 </div>
               {% endfor %}
             {% endcomment %}
+
             <div class="space-y-3 mb-6">
               {% for item in cart.items %}
                 {% comment %}
                   表示用のテキスト作成
-                  item.product.has_only_default_variant が false（バリエーションあり）のときだけ、バリエーション名を表示するよ
+                  item.product.has_only_default_variant が false のときだけ、バリエーション名を表示
                 {% endcomment %}
                 {% capture sidebar_item_title %}
       {{ item.product.title }}
@@ -196,8 +197,8 @@
                 {% comment %} レイアウト：items-end で価格を一番下の行に揃える {% endcomment %}
                 <div class="flex justify-between items-end gap-4">
                   <div class="flex-1 min-w-0">
-                    {% comment %} max-w-[12em] で全角12文字相当での折り返しを指定 {% endcomment %}
-                    <p class="text-sm text-stone-700 leading-snug break-all max-w-[12em]">
+                    {% comment %} max-w-[12em] から [14em] に広げて、英字名が入りやすくしたよ {% endcomment %}
+                    <p class="text-sm text-stone-700 leading-snug break-all max-w-[14em]">
                       {{ sidebar_item_title }}
                     </p>
                   </div>
