@@ -282,7 +282,7 @@
           <span class="block text-xs text-stone-500 mt-0.5"> 無料 </span>
         </div>
       </label>
-      <div class="text-xs text-red-500 mt-4 font-bold pt-2">
+      <div class="text-xs text-red-500 mt-4 font-bold pt-2 pb-3">
         ※ ギフトオプションを選択の場合、「今すぐ購入」ボタンのご利用はできません。
       </div>
 
@@ -490,31 +490,4 @@
       });
     });
   })();
-
-  // 「今すぐ購入」ボタンの制御ロジック
-  const buyNowForm = document.getElementById('buy-now-form-{{ section_id }}');
-  if (buyNowForm) {
-    buyNowForm.addEventListener('submit', function (e) {
-      // ギフトオプションのチェックボックスを取得
-      const wrapping =
-        document.getElementById('gift-wrapping-checkbox-{{ section_id }}') ||
-        document.getElementById('gift-wrapping-checkbox-single-{{ section_id }}');
-      const message =
-        document.getElementById('gift-message-toggle-{{ section_id }}') ||
-        document.getElementById('gift-message-toggle-single-{{ section_id }}');
-
-      // いずれかにチェックが入っているか確認 [cite: 80, 83, 95, 96]
-      if ((wrapping && wrapping.checked) || (message && message.checked)) {
-        e.preventDefault(); // 送信を中止
-        e.stopPropagation();
-
-        // エラーをトースト通知で表示
-        if (window.cartAPI) {
-          window.cartAPI.showToast('ギフトオプションを選択の場合、今すぐ購入ボタンをご利用できません。', 'error');
-        } else {
-          alert('ギフトオプションを選択の場合、今すぐ購入ボタンをご利用できません。');
-        }
-      }
-    });
-  }
 </script>
