@@ -1,3 +1,10 @@
+{% assign cart_count = 0 %}
+{% for item in cart.items %}
+  {% unless item.product.title == 'ギフトラッピング' %}
+    {% assign cart_count = cart_count | plus: item.quantity %}
+  {% endunless %}
+{% endfor %}
+
 <header
   x-data="
     {
@@ -150,15 +157,18 @@
               </div>
               {% if cart.item_count > 0 %}
                 {% comment %}
-                  <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  <span
+                    id="cart-count"
+                    class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart.item_count == 0 %}hidden{% endif %}"
+                  >
                     {{ cart.item_count }}
                   </span>
                 {% endcomment %}
                 <span
                   id="cart-count"
-                  class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart.item_count == 0 %}hidden{% endif %}"
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart_count == 0 %}hidden{% endif %}"
                 >
-                  {{ cart.item_count }}
+                  {{ cart_count }}
                 </span>
               {% endif %}
             </a>
@@ -173,15 +183,18 @@
             </div>
             {% if cart.item_count > 0 %}
               {% comment %}
-                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                <span
+                  id="cart-count-scrolled"
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart.item_count == 0 %}hidden{% endif %}"
+                >
                   {{ cart.item_count }}
                 </span>
               {% endcomment %}
               <span
                 id="cart-count-scrolled"
-                class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart.item_count == 0 %}hidden{% endif %}"
+                class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart_count == 0 %}hidden{% endif %}"
               >
-                {{ cart.item_count }}
+                {{ cart_count }}
               </span>
             {% endif %}
           </a>
