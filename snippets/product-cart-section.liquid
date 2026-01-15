@@ -340,154 +340,105 @@
       const originalButtonText = button.textContent;
       const giftWrappingVariantId = form.getAttribute('data-gift-variant-id');
 
+      // --- 1. カートに追加ボタンの処理 ---
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        // 選択された商品を収集
         const itemsToAdd = [];
         const quantitySelects = document.querySelectorAll('.js-matrix-quantity');
 
         quantitySelects.forEach((select) => {
           const quantity = parseInt(select.value);
           const variantId = select.getAttribute('data-variant-id');
-
           if (quantity > 0 && variantId) {
-            itemsToAdd.push({
-              id: variantId,
-              quantity: quantity,
-            });
+            itemsToAdd.push({ id: variantId, quantity: quantity });
           }
         });
 
-        // 何も選択されていない場合
         if (itemsToAdd.length === 0) {
-          if (window.cartAPI) {
-            window.cartAPI.showToast('数量を選択してください', 'error');
-          } else {
-            alert('数量を選択してください');
-          }
+          window.cartAPI?.showToast('数量を選択してください', 'error');
           return;
         }
 
-        // ボタンを無効化
         button.disabled = true;
         button.textContent = '追加中...';
 
         try {
-          // ギフトオプションを取得（複数商品の場合）
-          const giftWrappingCheckbox = document.getElementById('gift-wrapping-checkbox-{{ section_id }}');
-          const giftMessageTextarea = document.getElementById('gift-message-textarea-{{ section_id }}');
-          const giftMessageToggle = document.getElementById('gift-message-toggle-{{ section_id }}');
+          const giftWrappingCheckbox =
+            document.getElementById('gift-wrapping-checkbox-{{ section_id }}') ||
+            document.getElementById('gift-wrapping-checkbox-single-{{ section_id }}');
+          const giftMessageToggle =
+            document.getElementById('gift-message-toggle-{{ section_id }}') ||
+            document.getElementById('gift-message-toggle-single-{{ section_id }}');
+          const giftMessageTextarea =
+            document.getElementById('gift-message-textarea-{{ section_id }}') ||
+            document.getElementById('gift-message-textarea-single-{{ section_id }}');
 
-          // ギフトオプションを取得（単品の場合）
-          const giftWrappingCheckboxSingle = document.getElementById('gift-wrapping-checkbox-single-{{ section_id }}');
-          const giftMessageTextareaSingle = document.getElementById('gift-message-textarea-single-{{ section_id }}');
-          const giftMessageToggleSingle = document.getElementById('gift-message-toggle-single-{{ section_id }}');
-
-          const isGiftWrappingChecked =
-            (giftWrappingCheckbox && giftWrappingCheckbox.checked) ||
-            (giftWrappingCheckboxSingle && giftWrappingCheckboxSingle.checked);
-
+          const isGiftWrappingChecked = giftWrappingCheckbox?.checked;
           const giftMessage =
-            (giftMessageToggle && giftMessageToggle.checked && giftMessageTextarea) ||
-            (giftMessageToggleSingle && giftMessageToggleSingle.checked && giftMessageTextareaSingle)
-              ? giftMessageTextarea
-                ? giftMessageTextarea.value.trim()
-                : giftMessageTextareaSingle.value.trim()
-              : null;
+            giftMessageToggle?.checked && giftMessageTextarea ? giftMessageTextarea.value.trim() : null;
 
-          // ギフトラッピングがチェックされている場合、ギフトラッピング商品を追加
+          // ギフトラッピングの追加
           if (isGiftWrappingChecked && giftWrappingVariantId) {
-            try {
-              // まず現在のカートを取得して、ギフトラッピングが既にあるか確認
-              let cart;
-              if (window.cartAPI) {
-                cart = await window.cartAPI.getCart();
-              } else {
-                const cartResponse = await fetch('/cart.js');
-                cart = await cartResponse.json();
-              }
-
-              // ギフトラッピング商品が既にカートにあるかチェック
-              const giftWrappingInCart = cart.items.find((item) => item.id == giftWrappingVariantId);
-
-              if (!giftWrappingInCart) {
-                // カートにない場合のみ追加
-                const giftWrappingData = {
-                  id: giftWrappingVariantId,
-                  quantity: 1,
-                  properties: {},
-                };
-
-                if (giftMessage) {
-                  giftWrappingData.properties['ギフトメッセージ'] = giftMessage;
-                }
-
-                if (window.cartAPI) {
-                  await window.cartAPI.addToCart(giftWrappingData);
-                } else {
-                  const response = await fetch('/cart/add.js', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ items: [giftWrappingData] }),
-                  });
-                  if (!response.ok) {
-                    throw new Error('ギフトラッピングの追加に失敗しました');
-                  }
-                }
-              }
-            } catch (giftError) {
-              console.warn('Gift wrapping add warning:', giftError);
-              // ギフトラッピングの追加に失敗しても、メイン商品の追加は続行
+            const cart = await window.cartAPI?.getCart();
+            const giftWrappingInCart = cart?.items.find((item) => item.id == giftWrappingVariantId);
+            if (!giftWrappingInCart) {
+              const giftData = { id: giftWrappingVariantId, quantity: 1, properties: {} };
+              if (giftMessage) giftData.properties['ギフトメッセージ'] = giftMessage;
+              await window.cartAPI?.addToCart(giftData);
             }
           }
 
-          // 各商品アイテムをカートに追加
+          // メイン商品の追加
           for (const item of itemsToAdd) {
-            const cartData = {
-              id: item.id,
-              quantity: item.quantity,
-              properties: {},
-            };
-
-            // メッセージがある場合は商品にも追加
-            if (giftMessage) {
-              cartData.properties['ギフトメッセージ'] = giftMessage;
-            }
-
-            if (window.cartAPI) {
-              await window.cartAPI.addToCart(cartData);
-            } else {
-              const response = await fetch('/cart/add.js', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items: [cartData] }),
-              });
-              if (!response.ok) {
-                throw new Error('カートへの追加に失敗しました');
-              }
-            }
+            const cartData = { id: item.id, quantity: item.quantity, properties: {} };
+            if (giftMessage) cartData.properties['ギフトメッセージ'] = giftMessage;
+            await window.cartAPI?.addToCart(cartData);
           }
 
-          // 成功メッセージ
+          // ★ ここに成功メッセージがあるよ！
           if (window.cartAPI) {
-            await window.cartAPI.getCart(); // カート情報を最新に更新
-            window.cartAPI.updateCartCount(); // カート数を更新
-            window.cartAPI.showToast('カートに追加しました', 'success');
+            await window.cartAPI.getCart();
+            window.cartAPI.updateCartCount();
+            window.cartAPI.showToast('カートに追加しました', 'success'); // これが表示されるよ
           }
         } catch (error) {
-          console.error('Add to cart error:', error);
-          if (window.cartAPI) {
-            window.cartAPI.showToast(error.message || 'カートへの追加に失敗しました', 'error');
-          } else {
-            alert(error.message || 'カートへの追加に失敗しました');
-          }
+          console.error('Add error:', error);
+          window.cartAPI?.showToast('カートへの追加に失敗しました', 'error');
         } finally {
-          // ボタンを元に戻す
           button.disabled = false;
           button.textContent = originalButtonText;
         }
       });
+
+      // --- 2. 「今すぐ購入」ボタンの制御ロジック ---
+      const initBuyNowControl = () => {
+        const wrapper = document.getElementById(`buy-now-wrapper-{{ section_id }}`);
+        const guard = document.getElementById(`buy-now-guard-{{ section_id }}`);
+
+        const getGiftInputs = () =>
+          [
+            document.getElementById('gift-wrapping-checkbox-{{ section_id }}'),
+            document.getElementById('gift-wrapping-checkbox-single-{{ section_id }}'),
+            document.getElementById('gift-message-toggle-{{ section_id }}'),
+            document.getElementById('gift-message-toggle-single-{{ section_id }}'),
+          ].filter((el) => el !== null);
+
+        const updateButtonState = () => {
+          const isGiftSelected = getGiftInputs().some((input) => input.checked);
+          if (wrapper) {
+            wrapper.style.filter = isGiftSelected ? 'grayscale(1)' : 'none';
+            wrapper.style.opacity = isGiftSelected ? '0.4' : '1';
+            wrapper.style.pointerEvents = isGiftSelected ? 'none' : 'auto';
+          }
+          guard?.classList.toggle('hidden', !isGiftSelected);
+        };
+
+        getGiftInputs().forEach((input) => input.addEventListener('change', updateButtonState));
+        updateButtonState();
+      };
+
+      setTimeout(initBuyNowControl, 500);
     });
   })();
 </script>
