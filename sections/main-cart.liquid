@@ -244,6 +244,10 @@
 
 {%- comment -%} JavaScript for Cart Updates {%- endcomment -%}
 <script>
+  // ギフトラッピングのバリエーションIDを定義
+  window.giftWrappingVariantId = {{ all_products['gift-wrapping'].selected_or_first_available_variant.id | json }};
+
+  function updateQuantity(key, quantity) {
   function updateQuantity(key, quantity) {
     const formData = new FormData();
     formData.append('updates[' + key + ']', quantity);
