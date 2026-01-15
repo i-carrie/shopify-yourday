@@ -616,6 +616,9 @@
   .grid-cols-12 {
     grid-template-columns: repeat(12, minmax(0, 1fr));
   }
+  .grid-cols-\[2fr_1fr\] {
+    grid-template-columns: 2fr 1fr;
+  }
   .flex-col {
     flex-direction: column;
   }
@@ -704,6 +707,9 @@
   }
   .gap-x-4 {
     column-gap: calc(var(--spacing) * 4);
+  }
+  .gap-x-12 {
+    column-gap: calc(var(--spacing) * 12);
   }
   .space-x-2 {
     :where(& > :not(:last-child)) {
