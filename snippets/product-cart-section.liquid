@@ -468,6 +468,8 @@
 
           // 成功メッセージ
           if (window.cartAPI) {
+            await window.cartAPI.getCart(); // 追加
+            window.cartAPI.updateCartCount(); // 追加
             window.cartAPI.showToast('カートに追加しました', 'success');
           } else {
             alert('カートに追加しました');
