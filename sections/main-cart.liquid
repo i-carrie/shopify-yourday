@@ -245,43 +245,54 @@
 {%- comment -%} JavaScript for Cart Updates {%- endcomment -%}
 <script>
   // ギフトラッピングのバリエーションIDを定義
-  window.giftWrappingVariantId = {{ all_products['gift-wrapping'].selected_or_first_available_variant.id | json }};
+    window.giftWrappingVariantId = {{ all_products['gift-wrapping'].selected_or_first_available_variant.id | json }};
 
-  function updateQuantity(key, quantity) {
-  function updateQuantity(key, quantity) {
-    const formData = new FormData();
-    formData.append('updates[' + key + ']', quantity);
+    function updateQuantity(key, quantity) {
+      const formData = new FormData();
+      formData.append('updates[' + key + ']', quantity);
 
-    fetch('/cart/update.js', {
-      method: 'POST',
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        window.location.reload();
+      fetch('/cart/update.js', {
+        method: 'POST',
+        body: formData,
       })
-      .catch((error) => {
-        console.error('Error:', error);
-        alert('カートの更新に失敗しました');
-      });
-  }
+        .then((response) => response.json())
+        .then((data) => {
+          // ギフトラッピング1点だけがカートに残っているかチェック
+          const items = data.items;
+          if (items.length === 1 && items[0].variant_id === window.giftWrappingVariantId) {
+            // 残ったのがギフトラッピングなら、それも数量0にして削除する
+            const clearData = new FormData();
+            clearData.append('updates[' + items[0].key + ']', 0);
+            return fetch('/cart/update.js', {
+              method: 'POST',
+              body: clearData,
+            });
+          }
+        })
+        .then(() => {
+          // すべての更新が終わったらリロードして画面を更新
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          alert('カートの更新に失敗しました');
+        });
+    }
 
-  function toggleGiftMessage() {
-    const checkbox = document.getElementById('gift-message-toggle');
-    const input = document.getElementById('gift-message-input');
-
-    if (checkbox.checked) {
-      input.classList.remove('hidden');
-    } else {
-      input.classList.add('hidden');
-      // メッセージをクリア
-      const textarea = input.querySelector('textarea');
-      if (textarea) {
-        textarea.value = '';
-        document.getElementById('cart-form').submit();
+    function toggleGiftMessage() {
+      const checkbox = document.getElementById('gift-message-toggle');
+      const input = document.getElementById('gift-message-input');
+      if (checkbox.checked) {
+        input.classList.remove('hidden');
+      } else {
+        input.classList.add('hidden');
+        const textarea = input.querySelector('textarea');
+        if (textarea) {
+          textarea.value = '';
+          document.getElementById('cart-form').submit();
+        }
       }
     }
-  }
 </script>
 
 {% schema %}
