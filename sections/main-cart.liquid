@@ -86,11 +86,10 @@
                         {% endif %}
                       </div>
                     </div>
-
                     {%- comment -%} 数量変更と削除 {%- endcomment -%}
                     <div class="flex items-center justify-between mt-4">
                       <div class="flex items-center gap-3">
-                        {%- comment -%} 数量変更 {%- endcomment -%}
+                        {%- comment -%} ギフトラッピング以外の場合のみ、数量変更を表示 {%- endcomment -%}
                         {% unless item.product.handle == 'gift-wrapping' %}
                           <div class="flex items-center border border-stone-300 rounded">
                             <button
@@ -123,11 +122,9 @@
                               <span class="text-stone-600">+</span>
                             </button>
                           </div>
-                        {% else %}
-                          <div class="px-3 py-2 text-sm text-stone-500 font-medium">数量: 1</div>
                         {% endunless %}
 
-                        {%- comment -%} 削除ボタン {%- endcomment -%}
+                        {%- comment -%} 削除ボタン：ギフトラッピングの場合は数量がないので、自動的に左に寄るよ {%- endcomment -%}
                         <button
                           type="button"
                           class="text-sm text-stone-500 hover:text-red-600 transition-colors"
