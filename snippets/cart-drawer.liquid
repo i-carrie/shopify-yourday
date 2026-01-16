@@ -133,7 +133,7 @@
   }
 
   // 4.5秒の待機付きフェッチ監視（フリッカー防止）
-  (function () {
+  {% comment %} (function () {
     const originalFetch = window.fetch;
     window.fetch = function (...args) {
       return originalFetch.apply(this, args).then(async (response) => {
@@ -147,5 +147,74 @@
         return response;
       });
     };
-  })();
+  })(); {% endcomment %}
+  
+// ★ window. をつけて公開し、一番下にあった「監視ロジック」は消すよ
+  window.updateCartDrawer = async function() {
+    const response = await fetch('/cart.js');
+    const cart = await response.json();
+    const itemsContainer = document.getElementById('cart-drawer-items');
+    const totalContainer = document.getElementById('cart-drawer-total');
+
+    if (cart.items.length === 0) {
+      itemsContainer.innerHTML = '<p class="text-center text-stone-500 py-8">カートに商品がありません。</p>';
+      totalContainer.innerText = '¥0';
+    } else {
+      const sortedItems = [...cart.items].sort((a, b) => {
+        const aIsGift = a.handle === 'gift-wrapping' || a.handle === 'message-card';
+        const bIsGift = b.handle === 'gift-wrapping' || b.handle === 'message-card';
+        if (aIsGift && !bIsGift) return 1;
+        if (!aIsGift && bIsGift) return -1;
+        return 0;
+      });
+
+      const html = sortedItems.map((item) => {
+        const isGiftItem = item.handle === 'gift-wrapping' || item.handle === 'message-card';
+        let propertiesHtml = '';
+        if (isGiftItem && item.properties) {
+          propertiesHtml = Object.entries(item.properties)
+            .filter(([key, value]) => value !== null && value !== '')
+            .map(([key, value]) => `<p class="text-xs text-stone-500 mt-1 italic">💌 メッセージ: ${value}</p>`)
+            .join('');
+        }
+        return `
+          <div class="flex gap-4">
+            <img src="${item.image}" alt="${item.product_title}" class="w-20 h-20 object-cover rounded">
+            <div class="flex-1">
+              <h3 class="text-sm font-medium text-stone-800">${item.product_title}</h3>
+              <p class="text-xs text-stone-500">${item.variant_title || ''}</p>
+              ${propertiesHtml}
+              <div class="flex justify-between items-end mt-2">
+                <span class="text-xs text-stone-600">数量: ${item.quantity}</span>
+                <span class="text-sm font-medium text-stone-800">¥${(item.line_price / 100).toLocaleString()}</span>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+      itemsContainer.innerHTML = html;
+      totalContainer.innerText = '¥' + (cart.total_price / 100).toLocaleString();
+    }
+  };
+
+  window.openCartDrawer = function() {
+    const drawer = document.getElementById('cart-drawer');
+    const overlay = document.getElementById('cart-drawer-overlay');
+    const content = document.getElementById('cart-drawer-content');
+    drawer.classList.remove('invisible');
+    setTimeout(() => {
+      overlay.classList.add('opacity-100');
+      content.classList.remove('translate-x-full');
+    }, 10);
+  };
+
+  window.closeCartDrawer = function() {
+    const drawer = document.getElementById('cart-drawer');
+    const overlay = document.getElementById('cart-drawer-overlay');
+    const content = document.getElementById('cart-drawer-content');
+    overlay.classList.remove('opacity-100');
+    content.classList.add('translate-x-full');
+    setTimeout(() => {
+      drawer.classList.add('invisible');
+    }, 300);
+  };
 </script>
