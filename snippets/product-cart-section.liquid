@@ -376,14 +376,19 @@
           mainItems.forEach((item) => itemsToSubmit.push(item));
 
           // 順番にカートへ追加
-          for (const item of itemsToSubmit) {
-            await window.cartAPI?.addToCart(item);
-          }
 
-          if (window.cartAPI) {
-            await window.cartAPI.getCart();
-            window.cartAPI.updateCartCount();
-            window.cartAPI.showToast('カートに追加しました', 'success');
+          // ★ 一括送信（Batch Add）
+          const response = await fetch(window.Shopify.routes.root + 'cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: itemsToSubmit }),
+          });
+
+          if (response.ok) {
+            // 要件1：アイコン更新とメッセージを「同時」に実行する
+            // どちらかの完了を待たずに両方キックするのがポイントだよ
+            window.cartAPI?.updateCartCount();
+            window.cartAPI?.showToast('カートに追加しました', 'success');
           }
         } catch (error) {
           window.cartAPI?.showToast('追加に失敗しました', 'error');
