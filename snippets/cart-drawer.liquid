@@ -56,8 +56,7 @@
 </div>
 
 <script>
-  // ★ window. をつけて公開。これで商品ページから確実に呼べるようになるよ
-  window.updateCartDrawer = async function () {
+  async function updateCartDrawer() {
     const response = await fetch('/cart.js');
     const cart = await response.json();
     const itemsContainer = document.getElementById('cart-drawer-items');
@@ -67,7 +66,7 @@
       itemsContainer.innerHTML = '<p class="text-center text-stone-500 py-8">カートに商品がありません。</p>';
       totalContainer.innerText = '¥0';
     } else {
-      // ★ 描画前に並び替えるロジック
+      // ★ 描画前に「メイン商品を上、ギフトを下」に強制的に並び替える
       const sortedItems = [...cart.items].sort((a, b) => {
         const aIsGift = a.handle === 'gift-wrapping' || a.handle === 'message-card';
         const bIsGift = b.handle === 'gift-wrapping' || b.handle === 'message-card';
@@ -78,55 +77,75 @@
 
       const html = sortedItems
         .map((item) => {
+          // 特定のハンドル以外はプロパティを表示しない（要件①の担保）
           const isGiftItem = item.handle === 'gift-wrapping' || item.handle === 'message-card';
           let propertiesHtml = '';
+
           if (isGiftItem && item.properties) {
             propertiesHtml = Object.entries(item.properties)
               .filter(([key, value]) => value !== null && value !== '')
               .map(([key, value]) => `<p class="text-xs text-stone-500 mt-1 italic">💌 メッセージ: ${value}</p>`)
               .join('');
           }
+
           return `
-          <div class="flex gap-4">
-            <img src="${item.image}" alt="${item.product_title}" class="w-20 h-20 object-cover rounded">
-            <div class="flex-1">
-              <h3 class="text-sm font-medium text-stone-800">${item.product_title}</h3>
-              <p class="text-xs text-stone-500">${item.variant_title || ''}</p>
-              ${propertiesHtml}
-              <div class="flex justify-between items-end mt-2">
-                <span class="text-xs text-stone-600">数量: ${item.quantity}</span>
-                <span class="text-sm font-medium text-stone-800">¥${(item.line_price / 100).toLocaleString()}</span>
-              </div>
+        <div class="flex gap-4">
+          <img src="${item.image}" alt="${item.product_title}" class="w-20 h-20 object-cover rounded">
+          <div class="flex-1">
+            <h3 class="text-sm font-medium text-stone-800">${item.product_title}</h3>
+            <p class="text-xs text-stone-500">${item.variant_title || ''}</p>
+            ${propertiesHtml}
+            <div class="flex justify-between items-end mt-2">
+              <span class="text-xs text-stone-600">数量: ${item.quantity}</span>
+              <span class="text-sm font-medium text-stone-800">¥${(item.line_price / 100).toLocaleString()}</span>
             </div>
-          </div>`;
+          </div>
+        </div>
+      `;
         })
         .join('');
+
       itemsContainer.innerHTML = html;
       totalContainer.innerText = '¥' + (cart.total_price / 100).toLocaleString();
     }
-  };
+  }
 
-  window.openCartDrawer = function () {
+  function openCartDrawer() {
     const drawer = document.getElementById('cart-drawer');
     const overlay = document.getElementById('cart-drawer-overlay');
     const content = document.getElementById('cart-drawer-content');
-    if (!drawer || !content) return;
     drawer.classList.remove('invisible');
     setTimeout(() => {
       overlay.classList.add('opacity-100');
       content.classList.remove('translate-x-full');
     }, 10);
-  };
+  }
 
-  window.closeCartDrawer = function () {
+  function closeCartDrawer() {
     const drawer = document.getElementById('cart-drawer');
     const overlay = document.getElementById('cart-drawer-overlay');
     const content = document.getElementById('cart-drawer-content');
-    if (!overlay || !content) return;
     overlay.classList.remove('opacity-100');
     content.classList.add('translate-x-full');
     setTimeout(() => {
       drawer.classList.add('invisible');
     }, 300);
-  };
+  }
+
+  // 4.5秒の待機付きフェッチ監視（フリッカー防止）
+  (function () {
+    const originalFetch = window.fetch;
+    window.fetch = function (...args) {
+      return originalFetch.apply(this, args).then(async (response) => {
+        const url = args[0] instanceof Request ? args[0].url : args[0];
+        if (response.ok && typeof url === 'string' && url.includes('/cart/add')) {
+          setTimeout(async () => {
+            await updateCartDrawer();
+            openCartDrawer();
+          }, 4500);
+        }
+        return response;
+      });
+    };
+  })();
 </script>
