@@ -47,7 +47,7 @@
   <body>
     {% section 'header' %}
     {% render 'breadcrumb' %}
-    {% render 'cart-drawer' %}
+    {% comment %} {% render 'cart-drawer' %} {% endcomment %}
 
     <main role="main">
       {{ content_for_layout }}
