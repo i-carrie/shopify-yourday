@@ -346,6 +346,18 @@
           return;
         }
 
+        // ★ ギフトメッセージのバリデーション（追加）
+        const giftMsgToggle = document.querySelector('[id*="gift-message-toggle"]:checked');
+        const giftMsgText = document.querySelector('[id*="gift-message-textarea"]');
+
+        if (giftMsgToggle && giftMsgText) {
+          const messageValue = giftMsgText.value.trim();
+          if (!messageValue) {
+            window.cartAPI?.showToast('メッセージを入力してください', 'error');
+            return;
+          }
+        }
+
         button.disabled = true;
         button.textContent = '追加中...';
 
