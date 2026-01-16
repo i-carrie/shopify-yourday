@@ -383,16 +383,15 @@
           const MSG_CARD_ID = '45726478368908';
 
           // メッセージがある場合の振り分け
+
           if (giftMessage) {
             if (giftWrap && giftWrappingVariantId) {
-              // 要件①：有料ラッピングにメッセージを紐付け
               itemsToAdd.push({
                 id: giftWrappingVariantId,
                 quantity: 1,
                 properties: { ギフトメッセージ: giftMessage },
               });
             } else {
-              // 要件②：ラッピングなし・メッセージありなら無料カードを追加
               itemsToAdd.push({
                 id: MSG_CARD_ID,
                 quantity: 1,
@@ -400,7 +399,6 @@
               });
             }
           } else if (giftWrap && giftWrappingVariantId) {
-            // メッセージなし・ラッピングのみの場合
             itemsToAdd.push({
               id: giftWrappingVariantId,
               quantity: 1,
