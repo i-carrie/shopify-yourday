@@ -322,6 +322,19 @@
         </button>
       </form>
 
+      {% comment %} カートアイコン {% endcomment %}
+      <a href="{{ routes.cart_url }}" class="relative text-gray-600 hover:opacity-80 transition mr-2">
+        <div class="w-6 h-6">
+          {% render 'icon-cart' %}
+        </div>
+        <span
+          id="cart-count-mobile"
+          class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart_count == 0 %}hidden{% endif %}"
+        >
+          {{ cart_count }}
+        </span>
+      </a>
+
       <button
         @click="mobileMenuOpen = !mobileMenuOpen"
         type="button"
