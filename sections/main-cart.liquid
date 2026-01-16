@@ -4,17 +4,10 @@
 {% endcomment %}
 
 {% assign cart_count = 0 %}
-{% comment %}
-  {% for item in cart.items %}
-    {% unless item.product.handle == 'gift-wrapping' %}
-      {% assign cart_count = cart_count | plus: item.quantity %}
-    {% endunless %}
-  {% endfor %}
-{% endcomment %}
 {% for item in cart.items %}
-  {% if item.product.handle != 'gift-wrapping' and item.product.handle != 'message-card' %}
+  {% unless item.product.handle == 'gift-wrapping' %}
     {% assign cart_count = cart_count | plus: item.quantity %}
-  {% endif %}
+  {% endunless %}
 {% endfor %}
 
 <div class="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
