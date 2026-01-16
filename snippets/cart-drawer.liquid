@@ -133,7 +133,7 @@
   }
 
   // 4.5秒の待機付きフェッチ監視（フリッカー防止）
-  (function () {
+  {% comment %} (function () {
     const originalFetch = window.fetch;
     window.fetch = function (...args) {
       return originalFetch.apply(this, args).then(async (response) => {
@@ -147,5 +147,5 @@
         return response;
       });
     };
-  })();
+  })(); {% endcomment %}
 </script>
