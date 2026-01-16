@@ -383,6 +383,31 @@
           });
 
           if (response.ok) {
+            // 要件①：アイコンとメッセージを同時に出す
+            await window.cartAPI?.getCart();
+            window.cartAPI?.updateCartCount();
+            window.cartAPI?.showToast('カートに追加しました', 'success');
+
+            // 要件②：1秒後にドロワーを一気に表示
+            setTimeout(async () => {
+              // cart-drawer.liquid の関数が読み込まれているかチェック
+              if (typeof updateCartDrawer === 'function') {
+                // 1. 先にデータを取得・HTML構築を完了させる（一気表示の鍵）
+                // これにより、スライド中に中身がパタパタ変わるのを防ぐよ
+                await updateCartDrawer(); 
+                
+                // 2. 準備が整った状態でスライドインを開始
+                openCartDrawer();
+              }
+            }, 1000); // メッセージ表示から1秒（1000ms）待機
+          }
+        } catch (error) {
+          window.cartAPI?.showToast('追加に失敗しました', 'error');
+        } finally {
+          button.disabled = false;
+          button.textContent = originalButtonText;
+        }
+          {% comment %} if (response.ok) {
             // 2秒かかる「最新データの取得」を待ってから、2つのUIを「同時」に叩くよ
             // これで数量とメッセージのタイミングが100%一致するんだ
             await window.cartAPI?.getCart();
@@ -395,7 +420,7 @@
         } finally {
           button.disabled = false;
           button.textContent = originalButtonText;
-        }
+        } {% endcomment %}
       });
 
       const wrapper = document.getElementById(`buy-now-wrapper-{{ section_id }}`);
