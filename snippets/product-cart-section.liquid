@@ -376,6 +376,8 @@
           mainItems.forEach((item) => itemsToSubmit.push(item));
 
           // 順番にカートへ追加
+
+          // ★ 一括送信（Batch Add）
           const response = await fetch(window.Shopify.routes.root + 'cart/add.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -383,12 +385,19 @@
           });
 
           if (response.ok) {
-            // 2秒かかる「最新データの取得」を待ってから、2つのUIを「同時」に叩くよ
-            // これで数量とメッセージのタイミングが100%一致するんだ
-            await window.cartAPI?.getCart();
-
-            window.cartAPI?.updateCartCount();
+            // 要件①：【ラグ解消】await を使わずに即座に UI を動かす
             window.cartAPI?.showToast('カートに追加しました', 'success');
+            window.cartAPI?.updateCartCount();
+            window.cartAPI?.getCart(); // 裏側でデータを更新しておく
+
+            // 要件②：1秒後にドロワーを「完成状態で」開く
+            setTimeout(async () => {
+              if (typeof window.updateCartDrawer === 'function') {
+                // スライド前に裏でHTMLを完全に組み立てる（await で待つ）
+                await window.updateCartDrawer();
+                window.openCartDrawer();
+              }
+            }, 1000);
           }
         } catch (error) {
           window.cartAPI?.showToast('追加に失敗しました', 'error');
