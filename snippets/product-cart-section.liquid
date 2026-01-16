@@ -361,7 +361,10 @@
         quantitySelects.forEach((select) => {
           const quantity = parseInt(select.value);
           const variantId = select.getAttribute('data-variant-id');
-          if (quantity > 0 && variantId) itemsToAdd.push({ id: variantId, quantity: quantity });
+          // メイン商品はプロパティを空にして追加
+          if (quantity > 0 && variantId) {
+            itemsToAdd.push({ id: variantId, quantity: quantity, properties: {} });
+          }
         });
 
         if (itemsToAdd.length === 0) {
@@ -373,28 +376,43 @@
         button.textContent = '追加中...';
 
         try {
-          // ギフト設定の取得
           const giftWrap = document.querySelector('[id*="gift-wrapping-checkbox"]:checked');
           const giftMsgToggle = document.querySelector('[id*="gift-message-toggle"]:checked');
           const giftMsgText = document.querySelector('[id*="gift-message-textarea"]');
           const giftMessage = giftMsgToggle && giftMsgText ? giftMsgText.value.trim() : null;
+          const MSG_CARD_ID = '45726478368908';
 
-          if (giftWrap && giftWrappingVariantId) {
-            const cart = await window.cartAPI?.getCart();
-            if (!cart?.items.find((item) => item.id == giftWrappingVariantId)) {
-              const giftData = { id: giftWrappingVariantId, quantity: 1, properties: {} };
-              if (giftMessage) giftData.properties['ギフトメッセージ'] = giftMessage;
-              await window.cartAPI?.addToCart(giftData);
+          // メッセージがある場合の振り分け
+          if (giftMessage) {
+            if (giftWrap && giftWrappingVariantId) {
+              // 要件①：有料ラッピングにメッセージを紐付け
+              itemsToAdd.push({
+                id: giftWrappingVariantId,
+                quantity: 1,
+                properties: { ギフトメッセージ: giftMessage },
+              });
+            } else {
+              // 要件②：ラッピングなし・メッセージありなら無料カードを追加
+              itemsToAdd.push({
+                id: MSG_CARD_ID,
+                quantity: 1,
+                properties: { ギフトメッセージ: giftMessage },
+              });
             }
+          } else if (giftWrap && giftWrappingVariantId) {
+            // メッセージなし・ラッピングのみの場合
+            itemsToAdd.push({
+              id: giftWrappingVariantId,
+              quantity: 1,
+              properties: {},
+            });
           }
 
+          // 順番にカートへ追加
           for (const item of itemsToAdd) {
-            const cartData = { id: item.id, quantity: item.quantity, properties: {} };
-            if (giftMessage) cartData.properties['ギフトメッセージ'] = giftMessage;
-            await window.cartAPI?.addToCart(cartData);
+            await window.cartAPI?.addToCart(item);
           }
 
-          // ★ 成功メッセージ ★
           if (window.cartAPI) {
             await window.cartAPI.getCart();
             window.cartAPI.updateCartCount();
