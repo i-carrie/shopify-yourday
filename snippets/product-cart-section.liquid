@@ -376,7 +376,8 @@
           mainItems.forEach((item) => itemsToSubmit.push(item));
 
           // 順番にカートへ追加
-          for (const item of itemsToSubmit) {
+
+          {% comment %} for (const item of itemsToSubmit) {
             await window.cartAPI?.addToCart(item);
           }
 
@@ -390,7 +391,23 @@
         } finally {
           button.disabled = false;
           button.textContent = originalButtonText;
-        }
+        } {% endcomment %}
+        const response = await fetch(window.Shopify.routes.root + 'cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: itemsToSubmit })
+          });
+
+          if (response.ok) {
+            // 要件①：メッセージを最速で出す
+            window.cartAPI?.showToast('カートに追加しました', 'success');
+
+            // 数量更新は裏側で並行して行い、完了次第アイコンを更新する
+            // await を付けないことで、トースト表示を止めずに処理を進めるよ
+            window.cartAPI?.getCart().then(() => {
+              window.cartAPI?.updateCartCount();
+            });
+          }
       });
 
       const wrapper = document.getElementById(`buy-now-wrapper-{{ section_id }}`);
