@@ -201,14 +201,14 @@
     } else {
       const html = cart.items
         .map((item) => {
-          // ラッピング商品かメッセージカードの時だけプロパティを表示
+          // 特定のハンドル以外はプロパティを表示しない
           const isGiftItem = item.handle === 'gift-wrapping' || item.handle === 'message-card';
           let propertiesHtml = '';
 
           if (isGiftItem && item.properties) {
             propertiesHtml = Object.entries(item.properties)
               .filter(([key, value]) => value !== null && value !== '')
-              .map(([key, value]) => `<p class="text-xs text-stone-500 mt-1 italic">💌 ${key}: ${value}</p>`)
+              .map(([key, value]) => `<p class="text-xs text-stone-500 mt-1 italic">💌 メッセージ: ${value}</p>`)
               .join('');
           }
 
@@ -256,24 +256,18 @@
     }, 300);
   }
 
-  // カスタムイベントを監視
-  window.addEventListener('cart:updated', async () => {
-    await updateCartDrawer();
-    openCartDrawer();
-  });
-
-  // 標準のfetchを監視して、カート追加時にドロワーを開く
+  // 4.5秒の待機付きフェッチ監視
   (function () {
     const originalFetch = window.fetch;
     window.fetch = function (...args) {
       return originalFetch.apply(this, args).then(async (response) => {
         const url = args[0] instanceof Request ? args[0].url : args[0];
         if (response.ok && typeof url === 'string' && url.includes('/cart/add')) {
-          // 既存の標準処理を邪魔しないように少し待ってから実行
+          // ここで4.5秒待つことでフリッカーを防止
           setTimeout(async () => {
             await updateCartDrawer();
             openCartDrawer();
-          }, 500);
+          }, 4500);
         }
         return response;
       });
