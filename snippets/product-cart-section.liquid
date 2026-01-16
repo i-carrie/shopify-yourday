@@ -376,8 +376,6 @@
           mainItems.forEach((item) => itemsToSubmit.push(item));
 
           // 順番にカートへ追加
-
-          // ★ 一括送信（Batch Add）
           const response = await fetch(window.Shopify.routes.root + 'cart/add.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -385,17 +383,12 @@
           });
 
           if (response.ok) {
-            // 要件①：アイコンとメッセージを即座に出す
-            window.cartAPI?.showToast('カートに追加しました', 'success');
-            window.cartAPI?.updateCartCount();
+            // 2秒かかる「最新データの取得」を待ってから、2つのUIを「同時」に叩くよ
+            // これで数量とメッセージのタイミングが100%一致するんだ
+            await window.cartAPI?.getCart();
 
-            // 要件②：1秒後にドロワーを一気に見せる
-            setTimeout(async () => {
-              if (typeof window.updateCartDrawer === 'function') {
-                await window.updateCartDrawer();
-                window.openCartDrawer();
-              }
-            }, 1000); // ここが1秒（1000ms）の指定だよ
+            window.cartAPI?.updateCartCount();
+            window.cartAPI?.showToast('カートに追加しました', 'success');
           }
         } catch (error) {
           window.cartAPI?.showToast('追加に失敗しました', 'error');
