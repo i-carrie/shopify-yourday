@@ -39,6 +39,11 @@
         "
       >
         {% for product in collection.products %}
+          {% comment %}ギフト商品を除外{% endcomment %}
+          {% if product.handle == 'gift-wrapping' or product.handle == 'message-card' %}
+            {% continue %}
+          {% endif %}
+
           <div class="flex flex-col items-center">
             {% render 'product-card', product: product, collection: collection %}
           </div>
