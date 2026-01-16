@@ -22,12 +22,11 @@
         {% comment %} 左側: カート商品リスト {% endcomment %}
         <div class="lg:col-span-2">
           <div class="space-y-4">
-            {% comment %} 1. メイン商品を先に出力（ラッピングとカード以外） {% endcomment %}
+            {% comment %} 1. メイン商品のみを先に出力 {% endcomment %}
             {% for item in cart.items %}
               {% if item.product.handle != 'gift-wrapping' and item.product.handle != 'message-card' %}
                 <div class="bg-white border border-stone-200 rounded-lg p-4 md:p-6" data-cart-item="{{ item.key }}">
                   <div class="flex gap-4">
-                    {% comment %} 商品画像 {% endcomment %}
                     <div class="flex-shrink-0 w-24 h-24 md:w-32 md:h-32">
                       {% if item.image %}
                         <img
@@ -43,41 +42,25 @@
                       {% endif %}
                     </div>
 
-                    {% comment %} 商品情報 {% endcomment %}
                     <div class="flex-1 min-w-0">
                       <div class="flex justify-between items-start mb-2">
                         <div class="flex-1 pr-4">
                           <h3 class="text-base md:text-lg font-medium text-stone-800 mb-1">
-                            <a href="{{ item.url }}" class="hover:text-stone-600">
-                              {{ item.product.title }}
-                            </a>
+                            <a href="{{ item.url }}" class="hover:text-stone-600">{{ item.product.title }}</a>
                           </h3>
-
-                          {% comment %} バリアント情報 {% endcomment %}
                           {% unless item.variant.title == 'Default Title' %}
-                            <p class="text-sm text-stone-600">
-                              {{ item.variant.title }}
-                            </p>
+                            <p class="text-sm text-stone-600">{{ item.variant.title }}</p>
                           {% endunless %}
                         </div>
 
-                        {% comment %} 価格（PC） {% endcomment %}
                         <div class="hidden md:block text-right">
                           {% if item.quantity > 1 %}
                             <p class="text-xs text-stone-500 mb-1">{{ item.final_price | money }} / 1点</p>
                           {% endif %}
-                          <p class="text-lg font-medium text-stone-800">
-                            {{ item.final_line_price | money }}
-                          </p>
-                          {% if item.original_line_price > item.final_line_price %}
-                            <p class="text-sm text-stone-500 line-through">
-                              {{ item.original_line_price | money }}
-                            </p>
-                          {% endif %}
+                          <p class="text-lg font-medium text-stone-800">{{ item.final_line_price | money }}</p>
                         </div>
                       </div>
 
-                      {% comment %} 数量変更と削除 {% endcomment %}
                       <div class="flex items-center justify-between mt-4">
                         <div class="flex items-center gap-3">
                           <div class="flex items-center border border-stone-300 rounded">
@@ -118,12 +101,7 @@
                           </button>
                         </div>
                         <div class="md:hidden text-right">
-                          {% if item.quantity > 1 %}
-                            <p class="text-[10px] text-stone-500 mb-0.5">{{ item.final_price | money }} / 1点</p>
-                          {% endif %}
-                          <p class="text-base font-medium text-stone-800">
-                            {{ item.final_line_price | money }}
-                          </p>
+                          <p class="text-base font-medium text-stone-800">{{ item.final_line_price | money }}</p>
                         </div>
                       </div>
                     </div>
@@ -132,48 +110,35 @@
               {% endif %}
             {% endfor %}
 
-            {% comment %} 2. ギフト関連（ラッピング・カード）を最後に出力 {% endcomment %}
+            {% comment %} 2. ギフトオプションを最後に出力 {% endcomment %}
             {% for item in cart.items %}
               {% if item.product.handle == 'gift-wrapping' or item.product.handle == 'message-card' %}
                 <div class="bg-white border border-stone-200 rounded-lg p-4 md:p-6" data-cart-item="{{ item.key }}">
                   <div class="flex gap-4">
-                    {% comment %} 商品画像 {% endcomment %}
                     <div class="flex-shrink-0 w-24 h-24 md:w-32 md:h-32">
-                      {% if item.image %}
+                      {% if item.image -%}
                         <img
                           src="{{ item.image | image_url: width: 200 }}"
                           alt="{{ item.product.title }}"
                           class="w-full h-full object-cover rounded"
                           loading="lazy"
                         >
-                      {% else %}
-                        <div class="w-full h-full bg-stone-100 rounded flex items-center justify-center">
-                          <span class="text-stone-400 text-sm">No image</span>
-                        </div>
-                      {% endif %}
+                      {%- endif %}
                     </div>
-
                     <div class="flex-1 min-w-0">
                       <div class="flex justify-between items-start mb-2">
                         <div class="flex-1 pr-4">
-                          <h3 class="text-base md:text-lg font-medium text-stone-800 mb-1">
-                            {{ item.product.title }}
-                          </h3>
-
+                          <h3 class="text-base md:text-lg font-medium text-stone-800 mb-1">{{ item.product.title }}</h3>
                           {% if item.properties['ギフトメッセージ'] %}
                             <p class="text-sm text-stone-600 mt-1">
                               💌 メッセージ: {{ item.properties['ギフトメッセージ'] }}
                             </p>
                           {% endif %}
                         </div>
-
                         <div class="text-right">
-                          <p class="text-lg font-medium text-stone-800">
-                            {{ item.final_line_price | money }}
-                          </p>
+                          <p class="text-lg font-medium text-stone-800">{{ item.final_line_price | money }}</p>
                         </div>
                       </div>
-
                       <div class="flex justify-end mt-4">
                         <button
                           type="button"
@@ -195,25 +160,16 @@
         <div class="lg:col-span-1">
           <div class="bg-stone-50 border border-stone-200 rounded-lg p-6 sticky top-24">
             <div class="grid grid-cols-2 text-xs font-bold uppercase tracking-widest mb-4 border-b border-stone-200 pb-2 gap-x-18">
-              <span class="text-center">商品名</span>
-              <span class="text-center">価格</span>
+              <span class="text-center">商品名</span><span class="text-center">価格</span>
             </div>
-
             <div class="space-y-3 mb-6">
-              {% comment %} サマリーもメイン → ギフトの順で出力 {% endcomment %}
               {% for item in cart.items %}
                 {% if item.product.handle != 'gift-wrapping' and item.product.handle != 'message-card' %}
-                  {% capture sidebar_item_title %}
-                    {{ item.product.title }}
-                    {% unless item.product.has_only_default_variant %}
-                      : {{ item.variant.title | slice: 0, 7 }}{% if item.variant.title.size > 7 %}...{% endif %}
-                    {% endunless %}
-                    {% if item.quantity > 1 %} x {{ item.quantity }}{% endif %}
-                  {% endcapture %}
                   <div class="flex justify-between items-end gap-4">
                     <div class="flex-1 min-w-0">
                       <p class="text-sm text-stone-700 leading-snug break-all max-w-[14em]">
-                        {{ sidebar_item_title }}
+                        {{ item.product.title -}}
+                        {%- if item.quantity > 1 %} x {{ item.quantity }}{% endif %}
                       </p>
                     </div>
                     <div class="flex-shrink-0 text-right">
@@ -222,14 +178,11 @@
                   </div>
                 {% endif %}
               {% endfor %}
-
               {% for item in cart.items %}
                 {% if item.product.handle == 'gift-wrapping' or item.product.handle == 'message-card' %}
                   <div class="flex justify-between items-end gap-4">
                     <div class="flex-1 min-w-0">
-                      <p class="text-sm text-stone-700 leading-snug break-all max-w-[14em]">
-                        {{ item.product.title }}
-                      </p>
+                      <p class="text-sm text-stone-700 leading-snug break-all max-w-[14em]">{{ item.product.title }}</p>
                     </div>
                     <div class="flex-shrink-0 text-right">
                       <p class="text-sm font-medium text-stone-800">{{ item.final_line_price | money }}</p>
@@ -239,25 +192,23 @@
               {% endfor %}
             </div>
 
-            {% comment %} 金額サマリー {% endcomment %}
             <div class="space-y-3 mb-6">
               <div class="flex justify-between text-sm">
-                <span class="text-stone-600">{{ section.settings.subtotal_label }}</span>
-                <span class="text-stone-800 font-medium">{{ cart.total_price | money }}</span>
+                <span class="text-stone-600">{{ section.settings.subtotal_label }}</span
+                ><span class="text-stone-800 font-medium">{{ cart.total_price | money }}</span>
               </div>
               <div class="flex justify-between text-sm">
-                <span class="text-stone-600">{{ section.settings.shipping_label }}</span>
-                <span class="text-stone-500 text-xs">{{ section.settings.shipping_note }}</span>
+                <span class="text-stone-600">{{ section.settings.shipping_label }}</span
+                ><span class="text-stone-500 text-xs">{{ section.settings.shipping_note }}</span>
               </div>
               <div class="pt-3 border-t border-stone-300">
                 <div class="flex justify-between text-lg font-medium">
-                  <span class="text-stone-800">{{ section.settings.total_label }}</span>
-                  <span class="text-stone-800">{{ cart.total_price | money }}</span>
+                  <span class="text-stone-800">{{ section.settings.total_label }}</span
+                  ><span class="text-stone-800">{{ cart.total_price | money }}</span>
                 </div>
               </div>
               <p class="text-xs text-stone-500 text-center mt-3">税込価格で表示されています</p>
             </div>
-
             <button
               type="submit"
               name="checkout"
@@ -269,24 +220,20 @@
               href="{{ routes.all_products_collection_url }}"
               class="w-full inline-block text-center bg-white border border-stone-300 text-stone-600 py-3 px-6 rounded hover:bg-stone-50 transition-colors font-medium mt-3"
             >
-              {{ section.settings.continue_shopping_text }}
+              {{- section.settings.continue_shopping_text -}}
             </a>
           </div>
         </div>
       </div>
     </form>
-
   {% else %}
     <div class="text-center py-16 md:py-24">
-      <svg class="w-20 h-20 mx-auto text-stone-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-      </svg>
       <h2 class="text-2xl font-light text-stone-800 mb-3">{{ section.settings.empty_cart_message }}</h2>
       <a
         href="{{ routes.all_products_collection_url }}"
         class="inline-block mt-6 px-8 py-3 bg-stone-800 text-white rounded hover:bg-stone-700 transition-colors"
       >
-        {{ section.settings.continue_shopping_text }}
+        {{- section.settings.continue_shopping_text -}}
       </a>
     </div>
   {% endif %}
@@ -294,37 +241,21 @@
 
 <script>
   window.giftWrappingVariantId = {{ all_products['gift-wrapping'].selected_or_first_available_variant.id | json }};
-
   function updateQuantity(key, quantity) {
     const formData = new FormData();
     formData.append('updates[' + key + ']', quantity);
-
-    fetch('/cart/update.js', {
-      method: 'POST',
-      body: formData,
-    })
+    fetch('/cart/update.js', { method: 'POST', body: formData })
     .then((response) => response.json())
     .then((data) => {
       const items = data.items;
-      // ギフト関連商品しか残っていないかチェック
       const hasOnlyAccessories = items.every(item => item.handle === 'gift-wrapping' || item.handle === 'message-card');
-
       if (items.length > 0 && hasOnlyAccessories) {
         const clearData = new FormData();
         items.forEach(item => clearData.append('updates[' + item.key + ']', 0));
-        return fetch('/cart/update.js', {
-          method: 'POST',
-          body: clearData,
-        });
+        return fetch('/cart/update.js', { method: 'POST', body: clearData });
       }
     })
-    .then(() => {
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-      alert('カートの更新に失敗しました');
-    });
+    .then(() => { window.location.reload(); });
   }
 </script>
 
