@@ -740,60 +740,53 @@
   })();
 </script>
 
-{% comment %}
-  要件①・②を確実に実行する司令塔スクリプト
-{% endcomment %}
+{%- comment -%}
+  要件①：ラッピングにだけメッセージを紐付けるロジック
+{%- endcomment -%}
 <script>
   (function () {
     const GIFT_WRAP_ID = '45686779871372';
 
-    // 1. 標準機能がメッセージを勝手に拾うのを防ぐ
-    const msgInput = document.querySelector('[name^="properties["]');
-    if (msgInput) {
-      msgInput.removeAttribute('name');
-      msgInput.setAttribute('data-msg-field', 'true');
-    }
-
-    // 2. カート追加を乗っ取る
     document.addEventListener(
-      'click',
-      async function (e) {
-        const btn = e.target.closest('button[type="submit"]');
-        const form = e.target.closest('form[action="/cart/add"]');
-        if (!btn || !form) return;
+      'submit',
+      function (e) {
+        const form = e.target;
+        if (!form.action || !form.action.includes('/cart/add')) return;
 
         const giftCheckbox = document.querySelector('#gift-wrapping');
         const isGiftSelected = giftCheckbox && giftCheckbox.checked;
 
-        // ギフトラッピングが選ばれていない場合は通常の動きに任せる
+        // ギフトラッピングが選ばれていない時は、標準の動きに任せる
         if (!isGiftSelected) return;
 
+        // ギフトがある時は、標準の送信を止めて振り分け送信をする
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        const msgField = document.querySelector('[data-msg-field="true"]');
-        const messageValue = msgField ? msgField.value.trim() : '';
+        const messageInput = form.querySelector('[name^="properties["]');
+        const messageValue = messageInput ? messageInput.value.trim() : '';
         const mainVariantId = form.querySelector('[name="id"]').value;
         const quantity = parseInt(form.querySelector('[name="quantity"]')?.value || 1);
 
         const items = [
-          { id: mainVariantId, quantity: quantity },
+          { id: mainVariantId, quantity: quantity }, // 本体（プロパティなし）
           {
             id: GIFT_WRAP_ID,
             quantity: 1,
-            properties: { メッセージ: messageValue },
+            properties: { メッセージ: messageValue }, // ラッピング（メッセージあり）
           },
         ];
 
-        await fetch('/cart/add.js', {
+        fetch('/cart/add.js', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items: items }),
+        }).then(() => {
+          // 完了したらドロワーを更新するイベントを飛ばす
+          window.dispatchEvent(new CustomEvent('cart:updated'));
         });
-
-        window.dispatchEvent(new CustomEvent('cart:updated'));
       },
-      true
+      { capture: true }
     );
   })();
 </script>
