@@ -376,6 +376,7 @@
           mainItems.forEach((item) => itemsToSubmit.push(item));
 
           // 順番にカートへ追加
+          // ★ 一括送信（Batch Add）に切り替えて、1秒後にドロワーを起動する完成版
           const response = await fetch(window.Shopify.routes.root + 'cart/add.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -383,16 +384,29 @@
           });
 
           if (response.ok) {
-            // 2秒かかる「最新データの取得」を待ってから、2つのUIを「同時」に叩くよ
-            // これで数量とメッセージのタイミングが100%一致するんだ
+            // 要件①：アイコンの数字とメッセージを「同時」に出す
             await window.cartAPI?.getCart();
-
             window.cartAPI?.updateCartCount();
             window.cartAPI?.showToast('カートに追加しました', 'success');
+
+            // 要件②：メッセージから1秒後にドロワーを「完成させた状態で」開く
+            setTimeout(async () => {
+              // cart-drawer.liquid で window. に紐づけた関数を呼ぶよ
+              if (typeof window.updateCartDrawer === 'function') {
+                // 1. スライドが始まる前に裏で最新のカート情報を取得して描画しきる（await で待つのがミソ）
+                // これにより、商品画像などがバラバラ出るのを防いで「一気に表示」を実現するよ
+                await window.updateCartDrawer();
+
+                // 2. 準備が整った状態でスライドイン開始
+                window.openCartDrawer();
+              }
+            }, 1000); // 1000ms = 1秒
           }
         } catch (error) {
+          // エラー時の命綱（削除厳禁！）
           window.cartAPI?.showToast('追加に失敗しました', 'error');
         } finally {
+          // ボタン表示を元に戻す大事な処理（削除厳禁！）
           button.disabled = false;
           button.textContent = originalButtonText;
         }
