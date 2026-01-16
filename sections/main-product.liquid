@@ -740,61 +740,53 @@
   })();
 </script>
 
-{%- comment -%}
-  ギフトメッセージの送り先を自動で振り分けるロジック
-{%- endcomment -%}
 <script>
   (function () {
-    const GIFT_WRAP_ID = '45686779871372'; // 有料ギフトラッピングのID
-    const MSG_CARD_ID = '45726478368908'; // 無料メッセージカードのID
+    const GIFT_WRAP_ID = '45686779871372';
+    const MSG_CARD_ID = '45726478368908';
 
+    // 他のスクリプトより先に実行させるために capture: true で監視
     document.addEventListener(
       'submit',
       function (e) {
         const form = e.target;
-        // カート追加フォーム以外は無視
         if (!form.action || !form.action.includes('/cart/add')) return;
 
-        // フォーム内の入力を取得
-        // ※ セレクターは環境に合わせて調整してね
-        const messageInput =
-          form.querySelector('textarea[name^="properties["]') ||
-          form.querySelector('input[name^="properties[メッセージ]"]');
-        const giftCheckbox =
-          document.querySelector('#gift-wrapping') || form.querySelector('input[type="checkbox"][name*="wrapping"]');
+        // 1. メッセージとラッピングの入力を特定
+        const messageInput = form.querySelector('[name^="properties["]');
+        const giftCheckbox = document.querySelector('#gift-wrapping') || form.querySelector('input[type="checkbox"]');
 
         const messageValue = messageInput ? messageInput.value.trim() : '';
         const isGiftSelected = giftCheckbox && giftCheckbox.checked;
 
-        // メッセージが空、かつギフトも未選択なら、通常の単体追加に任せる
+        // メッセージもギフト選択もない場合は、標準の動きに任せる
         if (messageValue === '' && !isGiftSelected) return;
 
-        // 標準の送信をキャンセルして、自前のロジックで送る
+        // 2. 標準の送信（テーマ側の処理）を完全に停止させる
         e.preventDefault();
         e.stopImmediatePropagation();
 
         const mainVariantId = form.querySelector('[name="id"]').value;
-        const quantity = form.querySelector('[name="quantity"]')?.value || 1;
+        const quantity = parseInt(form.querySelector('[name="quantity"]')?.value || 1);
 
-        // 送信するアイテムのリストを作成
+        // 3. 送信データの組み立て
         const items = [];
 
-        // 1. メイン商品を追加（プロパティは含めない）
+        // メイン商品（メッセージは一切含めない）
         items.push({
           id: mainVariantId,
-          quantity: parseInt(quantity),
+          quantity: quantity,
         });
 
-        // 2. メッセージの送り先を判定
         if (isGiftSelected) {
-          // 有料ラッピングがある場合：ラッピング商品にメッセージを付ける
+          // 要件①：有料ラッピングがある場合
           items.push({
             id: GIFT_WRAP_ID,
             quantity: 1,
             properties: { メッセージ: messageValue },
           });
         } else if (messageValue !== '') {
-          // ラッピングなしでメッセージのみの場合：無料メッセージカードを追加してそこに付ける
+          // 要件②：メッセージのみの場合（無料カードを追加）
           items.push({
             id: MSG_CARD_ID,
             quantity: 1,
@@ -802,20 +794,23 @@
           });
         }
 
-        // まとめてカートに送信
+        // 4. まとめて送信
         fetch('/cart/add.js', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items: items }),
-        })
-          .then((response) => {
-            if (response.ok) {
-              // 成功後、cart-drawer.liquid側のfetch監視が自動で反応して、4.5秒後にドロワーが開くよ
-            }
-          })
-          .catch((error) => console.error('Error adding to cart:', error));
+        }).then((response) => {
+          if (response.ok) {
+            // カート追加成功イベントを発生させてドロワー側に通知
+            window.dispatchEvent(new CustomEvent('cart:updated'));
+
+            // メッセージ入力をリセット（手戻り防止）
+            if (messageInput) messageInput.value = '';
+            if (giftCheckbox) giftCheckbox.checked = false;
+          }
+        });
       },
-      true
+      { capture: true }
     );
   })();
 </script>
