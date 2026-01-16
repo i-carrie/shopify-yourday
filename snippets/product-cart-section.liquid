@@ -376,14 +376,16 @@
           mainItems.forEach((item) => itemsToSubmit.push(item));
 
           // 順番にカートへ追加
-          for (const item of itemsToSubmit) {
-            await window.cartAPI?.addToCart(item);
-          }
+          const response = await fetch(window.Shopify.routes.root + 'cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: itemsToSubmit }),
+          });
 
-          if (window.cartAPI) {
-            await window.cartAPI.getCart();
-            window.cartAPI.updateCartCount();
-            window.cartAPI.showToast('カートに追加しました', 'success');
+          if (response.ok) {
+            // 要件①：アイコン更新とトースト表示を同時にキック（待ち時間を排除）
+            window.cartAPI?.updateCartCount();
+            window.cartAPI?.showToast('カートに追加しました', 'success');
           }
         } catch (error) {
           window.cartAPI?.showToast('追加に失敗しました', 'error');
