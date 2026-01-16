@@ -740,12 +740,17 @@
   })();
 </script>
 
-{%- comment -%}
-  要件①：ラッピングにだけメッセージを紐付けるロジック
-{%- endcomment -%}
 <script>
   (function () {
     const GIFT_WRAP_ID = '45686779871372';
+    const MSG_CARD_ID = '45726478368908';
+
+    // 標準機能が勝手にメッセージを拾わないように名前を隠す
+    const msgInput = document.querySelector('[name^="properties["]');
+    if (msgInput) {
+      msgInput.setAttribute('data-custom-msg', 'true');
+      msgInput.removeAttribute('name');
+    }
 
     document.addEventListener(
       'submit',
@@ -755,35 +760,36 @@
 
         const giftCheckbox = document.querySelector('#gift-wrapping');
         const isGiftSelected = giftCheckbox && giftCheckbox.checked;
+        const msgField = document.querySelector('[data-custom-msg="true"]');
+        const messageValue = msgField ? msgField.value.trim() : '';
 
-        // ギフトラッピングが選ばれていない時は、標準の動きに任せる
-        if (!isGiftSelected) return;
+        // ギフト選択もメッセージ入力もなければ通常の動きに任せる
+        if (!isGiftSelected && messageValue === '') return;
 
-        // ギフトがある時は、標準の送信を止めて振り分け送信をする
+        // 条件に合う場合は標準の送信を止めて「振り分け」を行う
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        const messageInput = form.querySelector('[name^="properties["]');
-        const messageValue = messageInput ? messageInput.value.trim() : '';
         const mainVariantId = form.querySelector('[name="id"]').value;
         const quantity = parseInt(form.querySelector('[name="quantity"]')?.value || 1);
+        const items = [{ id: mainVariantId, quantity: quantity }];
 
-        const items = [
-          { id: mainVariantId, quantity: quantity }, // 本体（プロパティなし）
-          {
-            id: GIFT_WRAP_ID,
-            quantity: 1,
-            properties: { メッセージ: messageValue }, // ラッピング（メッセージあり）
-          },
-        ];
+        if (isGiftSelected) {
+          // 要件①：有料ラッピングがある場合は、ラッピングにメッセージを付ける
+          items.push({ id: GIFT_WRAP_ID, quantity: 1, properties: { メッセージ: messageValue } });
+        } else if (messageValue !== '') {
+          // 要件②：ラッピングなしでメッセージがある場合は、無料カードを自動追加して付ける
+          items.push({ id: MSG_CARD_ID, quantity: 1, properties: { メッセージ: messageValue } });
+        }
 
         fetch('/cart/add.js', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items: items }),
         }).then(() => {
-          // 完了したらドロワーを更新するイベントを飛ばす
+          // 成功したらカスタムイベントを発火してドロワーを呼ぶ
           window.dispatchEvent(new CustomEvent('cart:updated'));
+          if (msgField) msgField.value = '';
         });
       },
       { capture: true }
