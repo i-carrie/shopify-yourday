@@ -11,7 +11,22 @@
   "sections": {
     "main": {
       "type": "main-cart",
-      "settings": {}
+      "settings": {
+        "cart_title": "カート",
+        "empty_cart_message": "カートに商品がありません。",
+        "continue_shopping_text": "ショッピングを続ける",
+        "checkout_button_text": "購入手続きへ",
+        "gift_title": "ギフトオプション",
+        "gift_wrapping_label": "ギフトラッピングを希望する",
+        "gift_wrapping_note": "+ ¥300",
+        "gift_message_label": "メッセージカードを追加",
+        "gift_message_note": "無料",
+        "gift_placeholder": "メッセージを入力してください (100文字以内)",
+        "subtotal_label": "小計",
+        "shipping_label": "配送料",
+        "shipping_note": "購入手続き時に計算されます",
+        "total_label": "合計"
+      }
     }
   },
   "order": [
