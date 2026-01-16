@@ -745,13 +745,17 @@
     const GIFT_WRAP_ID = '45686779871372';
     const MSG_CARD_ID = '45726478368908';
 
-    // 標準機能が勝手にメッセージを拾わないように名前を隠す
-    const msgInput = document.querySelector('[name^="properties["]');
-    if (msgInput) {
-      msgInput.setAttribute('data-custom-msg', 'true');
-      msgInput.removeAttribute('name');
-    }
+    // 1. 入力欄の初期化（nameを消して標準機能を無効化）
+    const setupInput = () => {
+      const input = document.querySelector('[name^="properties["]');
+      if (input) {
+        input.setAttribute('data-custom-property', 'true');
+        input.removeAttribute('name');
+      }
+    };
+    setupInput();
 
+    // 2. カート追加の乗っ取り
     document.addEventListener(
       'submit',
       function (e) {
@@ -760,13 +764,12 @@
 
         const giftCheckbox = document.querySelector('#gift-wrapping');
         const isGiftSelected = giftCheckbox && giftCheckbox.checked;
-        const msgField = document.querySelector('[data-custom-msg="true"]');
+        const msgField = document.querySelector('[data-custom-property="true"]');
         const messageValue = msgField ? msgField.value.trim() : '';
 
-        // ギフト選択もメッセージ入力もなければ通常の動きに任せる
+        // ギフトもメッセージもなければ通常送信（nameがないのでメッセージは飛ばない）
         if (!isGiftSelected && messageValue === '') return;
 
-        // 条件に合う場合は標準の送信を止めて「振り分け」を行う
         e.preventDefault();
         e.stopImmediatePropagation();
 
@@ -775,10 +778,10 @@
         const items = [{ id: mainVariantId, quantity: quantity }];
 
         if (isGiftSelected) {
-          // 要件①：有料ラッピングがある場合は、ラッピングにメッセージを付ける
+          // 要件①：有料ラッピングにメッセージを付ける
           items.push({ id: GIFT_WRAP_ID, quantity: 1, properties: { メッセージ: messageValue } });
         } else if (messageValue !== '') {
-          // 要件②：ラッピングなしでメッセージがある場合は、無料カードを自動追加して付ける
+          // 要件②：無料メッセージカードにメッセージを付ける
           items.push({ id: MSG_CARD_ID, quantity: 1, properties: { メッセージ: messageValue } });
         }
 
@@ -786,9 +789,8 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items: items }),
-        }).then(() => {
-          // 成功したらカスタムイベントを発火してドロワーを呼ぶ
-          window.dispatchEvent(new CustomEvent('cart:updated'));
+        }).then((response) => {
+          // cart-drawer.liquid 側の fetch 監視が 4.5秒後にドロワーを開いてくれる
           if (msgField) msgField.value = '';
         });
       },
