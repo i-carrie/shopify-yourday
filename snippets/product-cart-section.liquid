@@ -382,8 +382,7 @@
           const giftMessage = giftMsgToggle && giftMsgText ? giftMsgText.value.trim() : null;
           const MSG_CARD_ID = '45726478368908';
 
-          // メッセージがある場合の振り分け
-
+          // 先にギフトオプションを配列に入れる
           if (giftMessage) {
             if (giftWrap && giftWrappingVariantId) {
               itemsToAdd.push({
