@@ -377,25 +377,11 @@
 
           // 順番にカートへ追加
 
-          {% comment %} for (const item of itemsToSubmit) {
-            await window.cartAPI?.addToCart(item);
-          }
-
-          if (window.cartAPI) {
-            await window.cartAPI.getCart();
-            window.cartAPI.updateCartCount();
-            window.cartAPI.showToast('カートに追加しました', 'success');
-          }
-        } catch (error) {
-          window.cartAPI?.showToast('追加に失敗しました', 'error');
-        } finally {
-          button.disabled = false;
-          button.textContent = originalButtonText;
-        } {% endcomment %}
-        const response = await fetch(window.Shopify.routes.root + 'cart/add.js', {
+          // ★ 一括送信（Batch Add）で通信を1回に集約
+          const response = await fetch(window.Shopify.routes.root + 'cart/add.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items: itemsToSubmit })
+            body: JSON.stringify({ items: itemsToSubmit }),
           });
 
           if (response.ok) {
@@ -403,11 +389,17 @@
             window.cartAPI?.showToast('カートに追加しました', 'success');
 
             // 数量更新は裏側で並行して行い、完了次第アイコンを更新する
-            // await を付けないことで、トースト表示を止めずに処理を進めるよ
             window.cartAPI?.getCart().then(() => {
               window.cartAPI?.updateCartCount();
             });
           }
+        } catch (error) {
+          // ← この } が、116行目から始まった try を閉じる大切なタグだよ
+          window.cartAPI?.showToast('追加に失敗しました', 'error');
+        } finally {
+          button.disabled = false;
+          button.textContent = originalButtonText;
+        }
       });
 
       const wrapper = document.getElementById(`buy-now-wrapper-{{ section_id }}`);
