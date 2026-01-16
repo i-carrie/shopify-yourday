@@ -376,25 +376,16 @@
           mainItems.forEach((item) => itemsToSubmit.push(item));
 
           // 順番にカートへ追加
+          for (const item of itemsToSubmit) {
+            await window.cartAPI?.addToCart(item);
+          }
 
-          // ★ 一括送信（Batch Add）で通信を1回に集約
-          const response = await fetch(window.Shopify.routes.root + 'cart/add.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items: itemsToSubmit }),
-          });
-
-          if (response.ok) {
-            // 要件①：メッセージを最速で出す
-            window.cartAPI?.showToast('カートに追加しました', 'success');
-
-            // 数量更新は裏側で並行して行い、完了次第アイコンを更新する
-            window.cartAPI?.getCart().then(() => {
-              window.cartAPI?.updateCartCount();
-            });
+          if (window.cartAPI) {
+            await window.cartAPI.getCart();
+            window.cartAPI.updateCartCount();
+            window.cartAPI.showToast('カートに追加しました', 'success');
           }
         } catch (error) {
-          // ← この } が、116行目から始まった try を閉じる大切なタグだよ
           window.cartAPI?.showToast('追加に失敗しました', 'error');
         } finally {
           button.disabled = false;
