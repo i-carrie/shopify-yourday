@@ -740,77 +740,60 @@
   })();
 </script>
 
+{% comment %}
+  要件①・②を確実に実行する司令塔スクリプト
+{% endcomment %}
 <script>
   (function () {
     const GIFT_WRAP_ID = '45686779871372';
-    const MSG_CARD_ID = '45726478368908';
 
-    // 他のスクリプトより先に実行させるために capture: true で監視
+    // 1. 標準機能がメッセージを勝手に拾うのを防ぐ
+    const msgInput = document.querySelector('[name^="properties["]');
+    if (msgInput) {
+      msgInput.removeAttribute('name');
+      msgInput.setAttribute('data-msg-field', 'true');
+    }
+
+    // 2. カート追加を乗っ取る
     document.addEventListener(
-      'submit',
-      function (e) {
-        const form = e.target;
-        if (!form.action || !form.action.includes('/cart/add')) return;
+      'click',
+      async function (e) {
+        const btn = e.target.closest('button[type="submit"]');
+        const form = e.target.closest('form[action="/cart/add"]');
+        if (!btn || !form) return;
 
-        // 1. メッセージとラッピングの入力を特定
-        const messageInput = form.querySelector('[name^="properties["]');
-        const giftCheckbox = document.querySelector('#gift-wrapping') || form.querySelector('input[type="checkbox"]');
-
-        const messageValue = messageInput ? messageInput.value.trim() : '';
+        const giftCheckbox = document.querySelector('#gift-wrapping');
         const isGiftSelected = giftCheckbox && giftCheckbox.checked;
 
-        // メッセージもギフト選択もない場合は、標準の動きに任せる
-        if (messageValue === '' && !isGiftSelected) return;
+        // ギフトラッピングが選ばれていない場合は通常の動きに任せる
+        if (!isGiftSelected) return;
 
-        // 2. 標準の送信（テーマ側の処理）を完全に停止させる
         e.preventDefault();
         e.stopImmediatePropagation();
 
+        const msgField = document.querySelector('[data-msg-field="true"]');
+        const messageValue = msgField ? msgField.value.trim() : '';
         const mainVariantId = form.querySelector('[name="id"]').value;
         const quantity = parseInt(form.querySelector('[name="quantity"]')?.value || 1);
 
-        // 3. 送信データの組み立て
-        const items = [];
-
-        // メイン商品（メッセージは一切含めない）
-        items.push({
-          id: mainVariantId,
-          quantity: quantity,
-        });
-
-        if (isGiftSelected) {
-          // 要件①：有料ラッピングがある場合
-          items.push({
+        const items = [
+          { id: mainVariantId, quantity: quantity },
+          {
             id: GIFT_WRAP_ID,
             quantity: 1,
             properties: { メッセージ: messageValue },
-          });
-        } else if (messageValue !== '') {
-          // 要件②：メッセージのみの場合（無料カードを追加）
-          items.push({
-            id: MSG_CARD_ID,
-            quantity: 1,
-            properties: { メッセージ: messageValue },
-          });
-        }
+          },
+        ];
 
-        // 4. まとめて送信
-        fetch('/cart/add.js', {
+        await fetch('/cart/add.js', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items: items }),
-        }).then((response) => {
-          if (response.ok) {
-            // カート追加成功イベントを発生させてドロワー側に通知
-            window.dispatchEvent(new CustomEvent('cart:updated'));
-
-            // メッセージ入力をリセット（手戻り防止）
-            if (messageInput) messageInput.value = '';
-            if (giftCheckbox) giftCheckbox.checked = false;
-          }
         });
+
+        window.dispatchEvent(new CustomEvent('cart:updated'));
       },
-      { capture: true }
+      true
     );
   })();
 </script>
