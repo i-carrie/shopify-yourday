@@ -67,7 +67,19 @@
                         {% endif %}
 
                         {%- comment -%} ギフトメッセージ {%- endcomment -%}
-                        {% if item.properties['ギフトメッセージ'] %}
+                        {% comment %}
+                          {% if item.properties['ギフトメッセージ'] %}
+                            <p class="text-sm text-stone-600 mt-1">
+                              💌 メッセージ: {{ item.properties['ギフトメッセージ'] }}
+                            </p>
+                          {% endif %}
+                        {% endcomment %}
+                        {% assign is_accessory = false %}
+                        {% if item.product.handle == 'gift-wrapping' or item.product.handle == 'message-card' %}
+                          {% assign is_accessory = true %}
+                        {% endif %}
+
+                        {% if is_accessory and item.properties['ギフトメッセージ'] %}
                           <p class="text-sm text-stone-600 mt-1">
                             💌 メッセージ: {{ item.properties['ギフトメッセージ'] }}
                           </p>
