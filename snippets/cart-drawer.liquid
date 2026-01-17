@@ -140,7 +140,7 @@
         const url = args[0] instanceof Request ? args[0].url : args[0];
         if (response.ok && typeof url === 'string' && url.includes('/cart/add')) {
           setTimeout(async () => {
-            await updateCartDrawer();
+            {% comment %} await updateCartDrawer(); {% endcomment %}
 
             // 【修正】画面幅が1024px以上（PCサイズ）のときだけドロワーを開く
             if (window.innerWidth >= 1024) {
