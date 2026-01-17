@@ -5,6 +5,24 @@
   {% endunless %}
 {% endfor %}
 
+{% comment %}
+  <header
+    x-data="
+      {
+        mobileMenuOpen: false,
+        myMenuOpen: false,
+        scrolled: false
+      }
+    "
+    x-init="
+      window.addEventListener('scroll', () => {
+        scrolled = window.scrollY > 100
+      })
+    "
+    class="sticky top-0 z-50 w-full font-serif"
+  >
+{% endcomment %}
+
 <header
   x-data="
     {
@@ -18,10 +36,11 @@
       scrolled = window.scrollY > 100
     })
   "
-  class="sticky top-0 z-50 w-full font-serif"
+  class="z-50 w-full font-serif"
 >
   {% comment %} --- PC用：3段構成 (lgサイズ以上で表示) --- {% endcomment %}
-  <div class="hidden lg:block" style="padding-top: 42px;">
+  {% comment %} <div class="hidden lg:block" style="padding-top: 42px;"> {% endcomment %}
+  <div class="hidden lg:block sticky top-0" style="padding-top: 42px;">
     {% comment %} ① 上段：固定バー - 内容が切り替わる {% endcomment %}
     <div
       style="position: fixed; top: 0; left: 0; right: 0; z-index: 100;"
@@ -264,7 +283,8 @@
   </div>
 
   {% comment %} --- スマホ用：元のデザインを維持 --- {% endcomment %}
-  <div class="lg:hidden bg-[#FDFBF7]/90 backdrop-blur-md border-b border-[#C2A992]/20">
+  {% comment %} <div class="lg:hidden bg-[#FDFBF7]/90 backdrop-blur-md border-b border-[#C2A992]/20"> {% endcomment %}
+  <div class="lg:hidden sticky top-0 bg-[#FDFBF7]/90 backdrop-blur-md border-b border-[#C2A992]/20">
     <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-20">
       <div class="flex items-center">
         <a href="/" class="flex items-center">
