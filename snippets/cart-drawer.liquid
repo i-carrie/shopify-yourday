@@ -111,6 +111,8 @@
   }
 
   function openCartDrawer() {
+    // 【追加】1024px未満（スマホ）のときは、ここで処理を切り上げる
+    if (window.innerWidth < 1024) return;
     const drawer = document.getElementById('cart-drawer');
     const overlay = document.getElementById('cart-drawer-overlay');
     const content = document.getElementById('cart-drawer-content');
