@@ -141,6 +141,9 @@
         if (response.ok && typeof url === 'string' && url.includes('/cart/add')) {
           setTimeout(async () => {
             await updateCartDrawer();
+
+            // 【修正】画面幅が1024px以上（PCサイズ）のときだけドロワーを開く
+            if (window.innerWidth >= 1024) {
             openCartDrawer();
           }, 1000);
         }
