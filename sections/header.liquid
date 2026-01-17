@@ -264,7 +264,8 @@
   </div>
 
   {% comment %} --- スマホ用：元のデザインを維持 --- {% endcomment %}
-  <div class="lg:hidden bg-[#FDFBF7]/90 backdrop-blur-md border-b border-[#C2A992]/20">
+  {% comment %} <div class="lg:hidden bg-[#FDFBF7]/90 backdrop-blur-md border-b border-[#C2A992]/20"> {% endcomment %}
+  <div class="relative lg:hidden bg-[#FDFBF7]/90 backdrop-blur-md border-b border-[#C2A992]/20">
     <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-20">
       <div class="flex items-center">
         <a href="/" class="flex items-center">
@@ -325,7 +326,12 @@
   </div>
 
   {% comment %} モバイルメニュー {% endcomment %}
-  <div x-show="mobileMenuOpen" x-cloak class="lg:hidden bg-white border-t border-[#C2A992]/10">
+  {% comment %} <div x-show="mobileMenuOpen" x-cloak class="lg:hidden bg-white border-t border-[#C2A992]/10"> {% endcomment %}
+  <div
+    x-show="mobileMenuOpen"
+    x-cloak
+    class="absolute top-full left-0 w-full h-[calc(100vh-5rem)] z-50 bg-white border-t border-[#C2A992]/10 lg:hidden"
+  >
     <nav class="px-4 py-6 space-y-1">
       {% assign header_menu = linklists['header-menu'] %}
       {% for link in header_menu.links %}
