@@ -321,15 +321,18 @@
           </div>
         </button>
       </form>
-      {% render 'icon-cart' %}
 
-      <button
-        @click="mobileMenuOpen = !mobileMenuOpen"
-        type="button"
-        class="text-gray-600 p-2"
-      >
-        {% render 'icon-hambarger' %}
-      </button>
+      <div class="flex items-center">
+        {% render 'icon-cart' %}
+
+        <button
+          @click="mobileMenuOpen = !mobileMenuOpen"
+          type="button"
+          class="text-gray-600 p-2"
+        >
+          {% render 'icon-hambarger' %}
+        </button>
+      </div>
     </div>
   </div>
 
