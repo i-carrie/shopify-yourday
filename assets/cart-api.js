@@ -170,7 +170,8 @@ class CartAPI {
         } else {
           cartCountScrolled.classList.add('hidden');
         }
-      // 【追加】スマホ用のカート数
+      }
+// 【追加】スマホ用
       const cartCountMobile = document.getElementById('cart-count-mobile');
       if (cartCountMobile) {
         cartCountMobile.textContent = itemCount;
@@ -179,8 +180,8 @@ class CartAPI {
         } else {
           cartCountMobile.classList.add('hidden');
         }
-
       }
+
     }
   }
 
