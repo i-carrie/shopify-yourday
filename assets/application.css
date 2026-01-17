@@ -501,6 +501,9 @@
   .h-\[45px\] {
     height: 45px;
   }
+  .h-\[calc\(100vh-5rem\)\] {
+    height: calc(100vh - 5rem);
+  }
   .h-auto {
     height: auto;
   }
