@@ -147,16 +147,6 @@
               <div class="w-6 h-6">
                 {% render 'icon-cart' %}
               </div>
-              {% comment %}
-                {% if cart.item_count > 0 %}
-                  <span
-                    id="cart-count"
-                    class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart.item_count == 0 %}hidden{% endif %}"
-                  >
-                    {{ cart.item_count }}
-                  </span>
-                {% endif %}
-              {% endcomment %}
               <span
                 id="cart-count"
                 class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart_count == 0 %}hidden{% endif %}"
@@ -173,16 +163,6 @@
             <div class="w-8 h-8">
               {% render 'icon-cart' %}
             </div>
-            {% comment %}
-              {% if cart.item_count > 0 %}
-                <span
-                  id="cart-count-scrolled"
-                  class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart.item_count == 0 %}hidden{% endif %}"
-                >
-                  {{ cart.item_count }}
-                </span>
-              {% endif %}
-            {% endcomment %}
             <span
               id="cart-count-scrolled"
               class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center {% if cart_count == 0 %}hidden{% endif %}"
