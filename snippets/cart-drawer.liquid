@@ -141,7 +141,6 @@
         if (response.ok && typeof url === 'string' && url.includes('/cart/add')) {
           setTimeout(async () => {
             await updateCartDrawer();
-            if (window.innerWidth <= 1024) {
             openCartDrawer();
           }, 1000);
         }
